@@ -1,0 +1,23 @@
+{
+	"en":{
+		"main_menu":"Main Menu",
+		"play":"Play",
+		"hi_scores":"Hi Scores",
+		"settings":"Settings",
+		"credits":"Credits",
+		"acme_corp":"Acme Corp.",
+		"audio":"Audio",
+		"lives":"Lives",
+		"speed":"Speed",
+		"on":"on",
+		"off":"off",
+		"easy":"easy",
+		"hard":"hard",
+		"very_hard":"very hard",
+		"insane":"insane",
+		"game_mit":"Game &copy; <a href=\"https://github.com/cykod/AlienInvasion\" target=\"_blank\">Cykod LLC</a>.",
+		"audio_cc_by":"Audio &copy; <a href=\"http://www.freesound.org/people/zimbot/\" target=\"_blank\">Keith W. Blackwell</a> and <a href=\"http://www.freesound.org/people/CGEffex/\" target=\"_blank\">CGEffex</a>.",
+		"savvy_mit":"Savvy &copy; <a href=\"http://tvtextbook.com/\" target=\"_blank\">Avoca Learning</a>.",
+		"see_source":"See source code for other open-source licenses."
+	}
+}

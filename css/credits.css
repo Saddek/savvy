@@ -1,0 +1,45 @@
+h1, p, a, li {
+	font-family: 'Bangers', monospace;
+	text-decoration:none;
+}
+
+h1 {
+	font-size:48px;
+	font-style:italic;
+	font-weight:normal;
+	color:#DD0000;
+}
+
+a {
+	font-size:24px;
+	color:#DD0000;
+}
+
+p {
+	font-size:24px;
+	color:#DD0000;
+}
+
+ul {
+	padding: 0px;
+	margin: 80px 0px;
+}
+li {
+	font-size:24px;
+	color:#DD0000;
+	list-style-type: none;
+}
+
+a:link {    /* unvisited link */
+	color:#DD0000;
+}
+a:visited { /* visited link */
+	color:#DD0000;
+}
+a:hover {   /* mouse over link */
+	color:#FF0000;
+}
+a:active {  /* selected link */
+	color:#EE0000;
+}
+
