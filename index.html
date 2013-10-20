@@ -10,10 +10,28 @@
   <title>Loading...</title>
   
   <!-- Place favicon.ico and apple-touch-icon.png in the root directory: mathiasbynens.be/notes/touch-icons -->
-  
+
+  <!-- For non-Retina iPhone, iPod Touch, and Android 2.1+ devices: -->
+  <link rel="apple-touch-icon-precomposed" href="apple-touch-icon-precomposed.png">
+  <!-- For the iPad mini and the first- and second-generation iPad on iOS ≤ 6: -->
+  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="apple-touch-icon-72x72-precomposed.png">
+  <!-- For the iPad mini and the first- and second-generation iPad on iOS ≥ 7: -->
+  <link rel="apple-touch-icon-precomposed" sizes="76x76" href="apple-touch-icon-76x76-precomposed.png">
+  <!-- For iPhone with high-resolution Retina display running iOS ≤ 6: -->
+  <link rel="apple-touch-icon-precomposed" sizes="114x114" href="apple-touch-icon-114x114-precomposed.png">
+  <!-- For iPhone with high-resolution Retina display running iOS ≥ 7: -->
+  <link rel="apple-touch-icon-precomposed" sizes="120x120" href="apple-touch-icon-120x120-precomposed.png">
+  <!-- For iPad with high-resolution Retina display running iOS ≤ 6: -->
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="apple-touch-icon-144x144-precomposed.png">
+  <!-- For iPad with high-resolution Retina display running iOS ≥ 7: -->
+  <link rel="apple-touch-icon-precomposed" sizes="152x152" href="apple-touch-icon-152x152-precomposed.png">
+
+  <!-- favicon -->
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+
   <!-- Uncomment if human.txt is filled in - http://humanstxt.org/ -->
-  <!-- <link rel="author" href="humans.txt" /> -->
-  <meta name="description" content="">
+  <link rel="author" href="humans.txt" />
 
   <!-- Mobile viewport optimized and user sclaing and zooming disabled: h5bp.com/viewport -->
   <meta name="viewport" content="width=device-width, user-scalable=no">
@@ -39,10 +57,50 @@
   <link rel="stylesheet" href="css/libs/h5bp/h5bp.css">
   
   <style type="text/css">
+    * {
+      /* Disable the tap highlight on Andoid devices. */
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+       
+      /* Disable selection of all element (input fields enabled below). */
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    input, textarea {
+      /* Enable selection of input fields and text areas. */
+      -webkit-user-select: text;
+      -khtml-user-select: text;
+      -moz-user-select: text;
+      -ms-user-select: text;
+      user-select: text;
+    }
+
+    html {
+      /* Can approve appearance on iOS devices. */
+      -webkit-text-size-adjust: none;
+    }
+
+    /* Splash screen, while things load. */
   	body {
-  		background-color: black; /* set the background color for the app while it loads */
+      background:black url("assets/images/splash.svg") no-repeat fixed center center;
+      background-size: contain;
   	}
+
   </style>
+
+  <script type="text/javascript">
+  (function(){
+    /* Reset the splash screen. The only thing that will be retained is the black screen. */
+    Savvy.subscribe(Savvy.EXIT, function resetBackground() {
+      Savvy.unsubscribe(Savvy.EXIT, resetBackground);
+      document.body.style.background = "black";
+      document.body.style.backgroundSize = "auto";
+    })
+  })();
+  </script>
 </head>
 <body>
 
