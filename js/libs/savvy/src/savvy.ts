@@ -130,7 +130,8 @@ module Savvy {
 			singleQuotes: /url\('(?!https?:\/\/)(?!\/)/gi,
         	doubleQuotes: /url\("(?!https?:\/\/)(?!\/)/gi,
         	noQuotes: /url\((?!https?:\/\/)(?!['"]\/?)/gi
-		}
+		},
+        isJSIdentifier: /^[$A-Z_][0-9A-Z_$]*$/i
 	}
 
     // generate a GUID for use by DOM IDs etc.
@@ -450,14 +451,14 @@ module Savvy {
 
         guaranteeArray(app.json).forEach((element:any, index:number, array:Array):void => {
             var name = element["@name"];
-            if (name) {
-                parseData(element, name);
-            } else {
+            if (!name) {
                 name = element.toString();
-                name = name.substr(name.lastIndexOf("/")+1);
-                name = name.substr(0, name.indexOf("."));
-                parseData(element, name);
+                name = name.substr(name.lastIndexOf("/") + 1);
+                if (name.indexOf(".") > -1) {
+                    name = name.substr(0, name.indexOf("."));
+                }
             }
+            parseData(element, name);
         });
 
         guaranteeArray(app.js).forEach((element:string, index:number, array:Array):void => {
@@ -536,6 +537,11 @@ module Savvy {
      * @param context The object within which target should exist (defaults to window)
      */
     function parseData(url:string, target:string, context:any = window):void {
+        if (!regExpressions.isJSIdentifier.test(target)) {
+            console.error("Cannot parse data file, %s. \"%s\" is not a valid JavaScript identifier.", url, target)
+            return;
+        }
+
     	var src:any = readFile(url).data;
     	var data:any;
 
