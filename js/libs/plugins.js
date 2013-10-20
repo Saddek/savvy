@@ -1,6 +1,4 @@
-/*
- * Link to this file in app.xml. Place any jQuery or helper plugins here.
- */
+// Link to this file in app.xml. Place jQuery or helper functions here.
 
 // create the console object if it doesn't exist
 (function(a){function b(){}for(var c="assert,count,debug,dir,dirxml,error,exception,group,groupCollapsed,groupEnd,info,log,markTimeline,profile,profileEnd,time,timeEnd,trace,warn".split(","),d;!!(d=c.pop());){a[d]=a[d]||b;}})

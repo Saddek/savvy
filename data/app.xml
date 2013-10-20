@@ -1,41 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <app>
-	<screens>
-		<screen id="MainMenu" title="Main Menu" default="yes">
-			<html>html/menu.html</html>
-			<css>css/menu.css</css>
-			<js>js/menu.js</js>
-		</screen>
-		<screen id="Play" title="Space Invaders">
-			<html>html/play.html</html>
-			<js>js/play.js</js>
-			<css>css/play.css</css>
-		</screen>
-		<screen id="HiScores" title="Hi Scores">
-			<html>html/hi_scores.html</html>
-			<css>css/hi_scores.css</css>
-			<js>js/hi_scores.js</js>
-		</screen>
-		<screen id="Settings" title="Settings">
-			<html>html/settings.html</html>
-			<css>css/settings.css</css>
-			<js>js/settings.js</js>
-		</screen>
-		<screen id="Credits" title="Credits">
-			<html>html/credits.html</html>
-			<css>css/credits.css</css>
-			<js>js/credits.js</js>
+	<screens cache="auto">
+		<!-- Place <screen> elements here. Exactly one <screen> MUST be marked as default="yes". -->
+		<screen id="Home" title="Sample Screen" default="yes">
+			<!-- A <screen> MAY contain any number of <html>, <js> and <css> elements. -->
+			<html>html/home.html</html>
+			<js>js/home.js</js>
+			<css>css/home.css</css>
 		</screen>
 	</screens>
+	<!-- An <app> MAY contain any number of global <html>, <json>, <js> and <css> elements. -->
 	<html>html/global.html</html>
-	<json>data/l10n.json</json>
-    <js>js/libs/energize/energize-0.1.0.min.js</js>
-	<js>js/libs/jqmobi/jqmobi-2.0.0.min.js</js>
-	<js>js/libs/handlebars/handlebars-1.0.rc.1.js</js>
-	<js>js/libs/amplify/amplify-1.1.0-min.js</js>
-	<js>js/libs/buzz/buzz-1.0.0.min.js</js>
+	<json>data/1sample.json</json><!-- <json> elements MAY -->
 	<js>js/libs/plugins.js</js>
 	<js>js/script.js</js>
 	<css>css/styles.css</css>
-	<css>http://fonts.googleapis.com/css?family=Bangers</css>
 </app>

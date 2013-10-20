@@ -1,21 +1,13 @@
-/**
- * @author Oliver Moran
- */
+/* This script will be available on every screen as a child of the window object (see data/app.xml). */
 
-var settings = amplify.store("settings") || {audio: true, lives:3, speed:0.01};
+Savvy.subscribe(Savvy.READY, function(){
+	// fired every time a screen "ready" event is published
+});
 
-function getHiScores(){
-	return amplify.store("hiscores") || [20000, 10000, 5000, 2500, 1000];
-}
+Savvy.subscribe(Savvy.ENTER, function(){
+	// fired every time a screen "enter" event is published
+});
 
-function updateHiScores(score){
-	hiscores = getHiScores();
-	for (var i=0; i<hiscores.length; i++) {
-		if (score > hiscores[i]) {
-			hiscores.splice(i,0,score);
-			hiscores.pop();
-			break;
-		}
-	}
-	amplify.store("hiscores", hiscores);
-}
+Savvy.subscribe(Savvy.EXIT, function(){
+	// fired every time a screen "exit" event is published
+});
