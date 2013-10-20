@@ -1,6 +1,9 @@
 #Savvy#
 
-Savvy is a very light-weigth framework for developing single-page HTML5 applicaitons. It is designed for use on tablet, phone and smart TV apps, but it can also be used on websites.
+Savvy is an easy-to-use framework for developing single-page HTML5 applications. It is designed for use on tablet, phone and smart TV apps, but it can also be used on websites.
+
+Savvy is released under the MIT license. The pirate image is designed by [Anne Caroline Bittencourt Gonçalves](http://thenounproject.com/anne1003) from The Noun Project.
+
 
 ##Project structure##
 
