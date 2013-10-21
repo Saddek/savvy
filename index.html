@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Savvy by avoca-learning</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Savvy</h1>
+        <h2>An easy-to-use framework for HTML-based app development (tablet, smart phone, smart TV or web).</h2>
+        <a href="https://github.com/avoca-learning/savvy" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a name="savvy" class="anchor" href="#savvy"><span class="octicon octicon-link"></span></a>Savvy</h1>
+
+<p>Savvy is an easy-to-use framework for developing single-page HTML5 applications. It is intended for development of tablet, smart phone and smart TV apps, but it can also be used on websites.</p>
+
+<p>Savvy emphasises HTML, CSS and JavaScript as distinct technologies and employs a <a href="http://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93presenter">Model-View-Presenter</a>-style paradigm for app development.</p>
+
+<p>Alongside HTML, CSS and JavaScript, Savvy can parse <a href="http://www.json.org/">JSON</a> (and <a href="https://developer.mozilla.org/en-US/docs/JXON">JXON</a>) data models right out of the box.</p>
+
+<h2>
+<a name="project-structure" class="anchor" href="#project-structure"><span class="octicon octicon-link"></span></a>Project structure</h2>
+
+<p>Savvy apps follow a straight-forward project structure based on the <a href="http://html5boilerplate.com/">HTML5 Boilerplate</a>.</p>
+
+<p>The app is defined in <code>data/app.xml</code> (mandatory). Conventionally, other files are organised in directories as follows:</p>
+
+<ul>
+<li>
+<code>css/</code>: CSS snippets (including a <code>libs</code> directory for third-party CSS libraries)</li>
+<li>
+<code>html/</code>: HTML snippets used by the Savvy framework</li>
+<li>
+<code>js/</code>: JavaScript snippets (including a <code>libs</code> directory also)</li>
+<li>
+<code>assets/</code>: Image, audio, video and other media files</li>
+<li>
+<code>data/</code>: JSON or JXON models (including <code>app.xml</code>, which defines the app)</li>
+</ul><h2>
+<a name="composing-screens" class="anchor" href="#composing-screens"><span class="octicon octicon-link"></span></a>Composing screens</h2>
+
+<p>Savvy apps are composed of desecrate screens. Each screen is composed of any number of HTML, CSS and JavaScript snippets. These screens are defined in <code>data/app.xml</code>. One of these screen MUST be the default screen.</p>
+
+<p>Additionally, apps may be composed of any number of "global" HTML, CSS, JavaScript snippets (including external libraries) as well as data that persists across screens. The "global" elements of an app are also defined in <code>data/app.xml</code>.</p>
+
+<h3>
+<a name="appxml" class="anchor" href="#appxml"><span class="octicon octicon-link"></span></a><code>app.xml</code>
+</h3>
+
+<p>The essential layout of <code>app.xml</code> is as follows:</p>
+
+<pre><code>&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+&lt;app cache="auto"&gt;
+  &lt;screens&gt;
+    &lt;!-- screens are defined here --&gt;
+  &lt;/screen&gt;
+  &lt;!-- global HTML, CSS, JSON and JavaScript is defined here --&gt;
+&lt;/app&gt;
+</code></pre>
+
+<p>Within the <code>&lt;screens&gt;</code> tag, individual screens are defined using the following pattern:</p>
+
+<pre><code>&lt;screen id="MainMenu" title="Main Menu" default="yes"&gt;
+  &lt;html&gt;html/menu.html&lt;/html&gt;
+  &lt;css&gt;css/menu.css&lt;/css&gt;
+  &lt;js&gt;js/menu.js&lt;/js&gt;
+&lt;/screen&gt;
+</code></pre>
+
+<p>Each <code>&lt;screen&gt;</code> MUST have an <code>id</code> attribute. The value of the <code>id</code> attribute MUST be a valid JavaScript identifier, it MUST be unique and MUST NOT conflict with any other object in the scope of the JavaScript <code>window</code> object.</p>
+
+<p>Each <code>&lt;screen&gt;</code> SHOULD have a <code>title</code> attribute. The value of the <code>title</code> attribute will be set assigned to <code>window.title</code> when the screen is loaded.</p>
+
+<p>Exactly one <code>&lt;screen&gt;</code> MUST be have a <code>default</code> attribute with a value of <code>yes</code>. The default screen will be displayed when the application starts.</p>
+
+<h3>
+<a name="code-snippets" class="anchor" href="#code-snippets"><span class="octicon octicon-link"></span></a>Code snippets</h3>
+
+<p>Screens are composed of any number of HTML, CSS and JavaScript code snippets. The path to these snippet files MUST be indicated as EITHER an absolute path OR a relative path from the root directory of the Savvy project.</p>
+
+<p>A Savvy app MAY include any number of global HTML, CSS, JavaScript and JSON snippets. Example:</p>
+
+<pre><code>&lt;html&gt;html/global.html&lt;/html&gt;
+&lt;css&gt;css/styles.css&lt;/css&gt;
+&lt;data&gt;data/l10n.json&lt;/data&gt;
+&lt;js&gt;js/script.js&lt;/js&gt;
+</code></pre>
+
+<h3>
+<a name="data-files" class="anchor" href="#data-files"><span class="octicon octicon-link"></span></a>Data files</h3>
+
+<p><code>&lt;data&gt;</code> snippets MUST be <a href="http://www.json.org/">valid JSON</a> (or <a href="https://developer.mozilla.org/en-US/docs/JXON">Algorithm #3-style JXON</a>).</p>
+
+<p>Data will be initialised to a child of the JavaScript <code>window</code> object. The name of this child MAY be indicated using the <code>name</code> attribute of the <code>&lt;data&gt;</code> element (e.g. path/to/data.json`).</p>
+
+<p>If no <code>name</code> attribute is provided, Savvy will initialise the data to an identifier based on the file name. For example, <code>&lt;data&gt;data/l10n.json&lt;/data&gt;</code> will be initialised to <code>l10n</code>.</p>
+
+<p>In either case, the identifier MUST be a valid JavaScript identifier and SHOULD not conflict with any other child of the JavaScript <code>window</code> object.</p>
+
+<h2>
+<a name="moving-between-screens" class="anchor" href="#moving-between-screens"><span class="octicon octicon-link"></span></a>Moving between screens</h2>
+
+<p>The primary means to navigate through the screens of a Savvy app is the <code>Savvy.go()</code> method:</p>
+
+<ul>
+<li>
+<code>Savvy.go(String id)</code>: Loads a screen of ID <code>id</code>.</li>
+</ul><p>For example, the following JavaScript will load a screen with the ID of "MainMenu":</p>
+
+<pre><code>Savvy.go("MainMenu");
+</code></pre>
+
+<p>The JavaScript <code>history</code> object can also be used to navigate between screens. For example, <code>history.back()</code> will navigate back one screen in the navigation history. Whereas, <code>history.forward(2)</code> will navigation forward two screens in the navigation history.</p>
+
+<h3>
+<a name="screen-life-cycle" class="anchor" href="#screen-life-cycle"><span class="octicon octicon-link"></span></a>Screen life cycle</h3>
+
+<p>The life cycle of a screen in Savvy can be monitored using three event:</p>
+
+<ul>
+<li>Savvy.EXIT</li>
+<li>Savvy.READY</li>
+<li>Savvy.ENTER</li>
+</ul><h4>
+<a name="savvyexit" class="anchor" href="#savvyexit"><span class="octicon octicon-link"></span></a>Savvy.EXIT</h4>
+
+<p><code>Savvy.EXIT</code> is fired when a screen transition is about called. It provides an opportunity for an app to perform clean-up or other operations before a transition occurs.</p>
+
+<h4>
+<a name="savvyready" class="anchor" href="#savvyready"><span class="octicon octicon-link"></span></a>Savvy.READY</h4>
+
+<p><code>Savvy.READY</code> is fired when a mid-point through the screen transition process. The old screen's JavaScript has been unlinked and the new screen's HTML and JavaScript has been added to the DOM and executed. However, the new screen is not visible. The old screen's HTML is still in the DOM and it's CSS is still live.</p>
+
+<p>This event provides and opportunity for an app to preform preparatory operations with the new screen's HTML in the DOM and JavaScript fully linked but before the screen transition is finalised.</p>
+
+<h4>
+<a name="savvyenter" class="anchor" href="#savvyenter"><span class="octicon octicon-link"></span></a>Savvy.ENTER</h4>
+
+<p><code>Savvy.ENTER</code> is fired as the last step in a screen transition. It signals that the screen transition is complete and the new screen is visible to the user.</p>
+
+<p>After <code>Savvy.READY</code> is fired, the old screen's HTML and CSS is unloaded and the new screen's CSS is made live. The new screen is made visible, the window title is set to the new screen's title and the window location is set to Screen 2's ID (e.g. <code>http://www.example.com/!#/ScreenID</code>). Then <code>Savvy.ENTER</code> is fired.</p>
+
+<h4>
+<a name="pausing-transition" class="anchor" href="#pausing-transition"><span class="octicon octicon-link"></span></a>Pausing transition</h4>
+
+<p>If a <code>Savvy.EXIT</code> or <code>Savvy.READY</code> event message returns <code>false</code>, the screen transition will be paused at that step in the life cycle. This can be useful, for example, to wait until an AJAX call complete before continuing with the transition.</p>
+
+<p>To continue the transition, call <code>Savvy.go()</code> without passing any parameters. Calling <code>Savvy.go(...)</code> with any the ID of another screen will cancel the transition and start a new one.</p>
+
+<h3>
+<a name="event-subscriptions" class="anchor" href="#event-subscriptions"><span class="octicon octicon-link"></span></a>Event subscriptions</h3>
+
+<h4>
+<a name="subscribing-to-events" class="anchor" href="#subscribing-to-events"><span class="octicon octicon-link"></span></a>Subscribing to events</h4>
+
+<p>Messages can be subscribed to from individual screens (in which case they will be unsubscribed from when the screen unloads) or they can be subscribed to using the <code>Savvy</code> object (in which case the subscription will persist across screens). In general, snippets of JavaScript that are used by screen should subscribe to messages using the former technique. Snippets of JavaScript that are "global" will always subscribe using the latter.</p>
+
+<p>These can be subscribed to from an screen's JavaScript snippet as follows: </p>
+
+<pre><code>this.subscribe(Savvy.READY, function ready(){
+  // code goes here
+});
+
+this.subscribe(Savvy.ENTER, function(){
+  // code goes here
+});
+
+this.subscribe(Savvy.EXIT, function(){
+  // code goes here
+})
+</code></pre>
+
+<p>In "global" JavaScript contexts, the Savvy object can subscribe to these events as follows:</p>
+
+<pre><code>Savvy.subscribe(Savvy.READY, function ready(){
+  // code goes here
+});
+
+Savvy.subscribe(Savvy.ENTER, function(){
+  // code goes here
+});
+
+Savvy.subscribe(Savvy.EXIT, function(){
+  // code goes here
+})
+</code></pre>
+
+<h4>
+<a name="unsubscribing-from-events" class="anchor" href="#unsubscribing-from-events"><span class="octicon octicon-link"></span></a>Unsubscribing from events</h4>
+
+<p>To unsubscribe from an event, call <code>Savvy.unsubscribe(...)</code> and pass the type of message to unsubscribe and the function that was subscribed. For example:</p>
+
+<pre><code>function callback(){
+  // fires at all 
+}
+
+Savvy.subscribe(Savvy.ENTER, callback); // subscribe
+Savvy.unsubscribe(Savvy.ENTER, callback); // unsubscribe
+</code></pre>
+
+<h3>
+<a name="accessing-the-dom" class="anchor" href="#accessing-the-dom"><span class="octicon octicon-link"></span></a>Accessing the DOM</h3>
+
+<p>Savvy provides two methods to access the DOM:</p>
+
+<p><code>Savvy.getGlobal()</code> returns the HTML <code>div</code> element containing global HTML.</p>
+
+<p><code>Savvy.getScreen()</code> returns the HTML <code>div</code> element containing the current screen's HTML. During a transition, this methods returns the new screen after the <code>Savvy.EXIT</code> message. is fired.</p>
+
+<h2>
+<a name="screen-objects" class="anchor" href="#screen-objects"><span class="octicon octicon-link"></span></a>Screen objects</h2>
+
+<p>Savvy executes every screen's JavaScript snippet within an unique screen objects.</p>
+
+<p>These objects are created new everytime a screen is loaded (immediately prior to Savvy.READY) and destroyed with a screen is unloaded (immediately after Savvy.EXIT).</p>
+
+<h3>
+<a name="accessing-screen-objects" class="anchor" href="#accessing-screen-objects"><span class="octicon octicon-link"></span></a>Accessing screen objects</h3>
+
+<p>When a JavaScript snippet is executed within a screen object, the <code>this</code> keyword will ordinarily refer to the screen object. The screen object may also be accessed literally using the screen ID.</p>
+
+<p>For example, for a screen with an ID "MainMenu", the screen object may be accessed in the following way:</p>
+
+<pre><code>this
+MainMenu
+</code></pre>
+
+<p>Screen objects are children of the JavaScript <code>window</code> object, so they can be accessed from "global" JavaScript (including in-line JavaScript on DOM elements) using the screen's ID.</p>
+
+<h3>
+<a name="individual-closures" class="anchor" href="#individual-closures"><span class="octicon octicon-link"></span></a>Individual closures</h3>
+
+<p>Within a screen object, individual JavaScript snippets have seperate <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures">closures</a>.</p>
+
+<p>This means that different scripts used on the same screen may contain identical identifiers for different variables (e.g. <code>myVar</code> in one JavaScript snippet will ordinarily be a different object to <code>myVar</code> in another snippet).</p>
+
+<p>However, this also means that in order to call a function or access an variable in one script from another, the functino or variable needs to be explicitly exposed.</p>
+
+<p>Script 1:</p>
+
+<pre><code>function hello(world) {
+  console.log("Hello, " + world);
+}
+
+this.hello = hello;
+</code></pre>
+
+<p>Script 2:</p>
+
+<pre><code>var world = "Mars";
+this.hello(world); // Hello, Mars
+</code></pre>
+
+<h3>
+<a name="_screen-and-_global" class="anchor" href="#_screen-and-_global"><span class="octicon octicon-link"></span></a><code>_screen</code> and <code>_global</code>
+</h3>
+
+<p>Savvy extends the JavaScript <code>window</code> object with two helper objects: <code>_screen</code> and <code>_global</code>.</p>
+
+<p><code>_screen</code> is a reference to the current screen object. <code>_global</code> is a reference to the JavaScritpt <code>window</code> object (and is provided solely for syntatic consitency).</p>
+
+<p><code>_screen</code> is set to the current screen object immediately after the <code>Savvy.EXIT</code> event.</p>
+
+<h2>
+<a name="routing" class="anchor" href="#routing"><span class="octicon octicon-link"></span></a>Routing</h2>
+
+<p>The Savvy framework includes automatic routing of URLs to specific screen within an app. URLs used by the Savvy framework follow a simple pattern:</p>
+
+<pre><code>http://www.example.com/path/to/savvy/#!/id/optional/further/path
+</code></pre>
+
+<p>The above URL would load a screen with the ID <code>id</code>.</p>
+
+<p>The portion of the URL after <code>id</code> (i.e. <code>/optional/further/path</code>) is not used by the framework. However, it can be used applications to create REST-like URLs. For example, the following URL could be used to access a screen with the ID of <code>indox</code>. The application could then further interpret the URL to load the inbox of an individual user (<code>john</code>):</p>
+
+<pre><code>http://www.example.com/path/to/savvy/#!/inbox/john
+</code></pre>
+
+<p>The Savvy path of a screen, including the optional further path after the Savvy screen ID can be retrieved using <code>Savvy.getInfo()</code>. In the case of teh above example, this would return the following object:</p>
+
+<pre><code>{
+  id: "inbox",
+  title: "Inbox",
+  isDefault: false,
+  path: "/inbox/john"
+}
+</code></pre>
+
+<h2>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>The Savvy framework is open source and released under the <a href="http://opensource.org/licenses/MIT">MIT license</a>. The <a href="http://thenounproject.com/noun/pirate/#icon-No13422">pirate image</a> used by the project was designed by <a href="http://thenounproject.com/anne1003">Anne Caroline Bittencourt Gonçalves</a> from The Noun Project.</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/avoca-learning/savvy/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/avoca-learning/savvy/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/avoca-learning/savvy"></a> is maintained by <a href="https://github.com/avoca-learning">avoca-learning</a>.</p>
+
+          <p>This page was generated by <a href="pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
