@@ -5,7 +5,7 @@
  /        \/ __ \\   /  \   / \___  |
 /_______  (____  /\_/    \_/  / ____|
         \/     \/             \/     
-Version: 3.0.0
+Version: 3.0.1
 
 Copyright (c) 2013 Avoca Learning
 

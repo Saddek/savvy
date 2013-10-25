@@ -1,4 +1,4 @@
-version="3.0.0"
+version="3.0.1"
 output="../savvy-$version.js"
 
 function clean {
