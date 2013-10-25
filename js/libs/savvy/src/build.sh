@@ -1,5 +1,5 @@
 version="3.0.1"
-output="../savvy-$version.js"
+output="../savvy.js"
 
 function clean {
 	echo "Cleaning"
