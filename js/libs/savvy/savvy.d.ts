@@ -24,6 +24,11 @@ class SavvyStatic {
     subscribe(type:string, action:() => bool, screen:any = window):void;
     unsubscribe(type:string, action:() => bool):void;
     publish(type:string, arg:any = null):bool;
+
+    READY:string;
+    ENTER:string;
+    EXIT:string;
+    LOAD:string;
 }
 
 // Declare Savvy for use in TypeScript source

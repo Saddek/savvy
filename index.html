@@ -94,8 +94,7 @@
   <script type="text/javascript">
   (function(){
     /* Reset the splash screen. The only thing that will be retained is the black screen. */
-    Savvy.subscribe(Savvy.EXIT, function resetBackground() {
-      Savvy.unsubscribe(Savvy.EXIT, resetBackground);
+    Savvy.subscribe(Savvy.LOAD, function() {
       document.body.style.background = "black";
       document.body.style.backgroundSize = "auto";
     })

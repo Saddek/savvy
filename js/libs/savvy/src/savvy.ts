@@ -279,6 +279,7 @@ module Savvy {
     export var READY:string = "ready";
     export var ENTER:string = "enter";
     export var EXIT:string = "exit";
+    export var LOAD:string = "load";
 
     // wait for the window load event, then initiate savvy
 	window.addEventListener("load", function init():void {
@@ -304,6 +305,9 @@ module Savvy {
         }
     }, false);
 
+    // a flag to say this is the first load (signal to fire Savvy.LOAD)
+    var isFirstLoad:Boolean = true;
+
     /**
      * This function does the heavy lifting it loads the HTML, CSS and JS for a given route
      * @param route A route object, containing the path and data of the screen data
@@ -313,7 +317,15 @@ module Savvy {
 	function load(route:Route, preventHistory:Boolean = false):void {
         var limit:number = cssCounter - 1;
 
-        if (publish(Savvy.EXIT)) { // check if that transition wasn't stalled
+        var resp; // we might fire Savvy.LOAD or Savvy.EXIT here, this var will contain the result
+        if (isFirstLoad) {
+            resp = publish(Savvy.LOAD);
+            isFirstLoad = false;
+        } else {
+            resp = publish(Savvy.EXIT);
+        }
+
+        if (resp) { // check if that transition wasn't stalled
             prepareTransition();
         } else {
             continueTransition = prepareTransition;
