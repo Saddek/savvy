@@ -152,14 +152,19 @@ module Savvy {
 
     /**
      * Loads a screen in the app corresponding to id
-     * @param id A screen ID to load
+     * @param path A path to a new screen. This must be a screen ID or a string beginning with a screen ID followed by a slash. Further characters may follow the slash.
      */
-	export function go(id:string = null, path:string = "/"):void {
-        if (id == null) {
+	export function go(path:string = null):void {
+        if (path == null) {
             continueTransition();
             return;
         } else {
+            var id = path.toString();
+            if (id.indexOf("/") != -1) {
+                id = id.substring(0, id.indexOf("/"));
+            }
             var screen:Screen = null;
+
             // loop through screens matching hash
             for (var i=0, ii=model.length; i<ii; i++) {
                 if (model[i].id == id) {
@@ -170,7 +175,7 @@ module Savvy {
             if (screen == null) {
                 console.error("No screen with ID of \"%s\".", id);
             } else {
-                load({screen: screen, path: path});
+                load({screen: screen, path: "/" + path});
             }
         }
 	}
@@ -388,7 +393,7 @@ module Savvy {
             document.title = (route.screen.title || "");
             if(!preventHistory) {
                 ignoreHashChange = true;
-                window.location.hash = "!/" + route.screen.id;
+                window.location.hash = "!" + route.path;
             }
 
             publish(Savvy.ENTER);
@@ -408,7 +413,7 @@ module Savvy {
 	function getRoute(id?:string):Route {
 		var hash:string = window.location.hash;
 		var screen:Screen;
-        if(hash == "" || hash == "#!") {
+        if(hash == "" || hash == "#" || hash == "#!") {
             screen = defaultScreen;
         } else {
 			// loop through screens matching hash
