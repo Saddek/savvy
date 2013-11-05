@@ -462,7 +462,7 @@ module Savvy {
     	createModel(guaranteeArray(app.screens.screen));
 
 		guaranteeArray(app.css).forEach((element:string, index:number, array:Array):void => {
-			appendCssToHead(element);
+			appendCssToHead(element, savvy_id + "-GLOBAL-CSS-" + cssCounter++);
 		});
 
 		guaranteeArray(app.html).forEach((element:string, index:number, array:Array):void => {
