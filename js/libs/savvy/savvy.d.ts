@@ -17,6 +17,9 @@ class SavvyStatic {
 	getScreen():HTMLElement;
 	getGlobal():HTMLElement;
 
+    // Initialise Savvy (can only be called once)
+    start():void;
+
 	// Load a new screen
 	go(id?:string):void;
 

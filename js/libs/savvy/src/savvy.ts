@@ -131,7 +131,8 @@ module Savvy {
         	doubleQuotes: /url\("(?!https?:\/\/)(?!\/)/gi,
         	noQuotes: /url\((?!https?:\/\/)(?!['"]\/?)/gi
 		},
-        isJSIdentifier: /^[$A-Z_][0-9A-Z_$]*$/i
+        isJSIdentifier: /^[$A-Z_][0-9A-Z_$]*$/i,
+        xmlDeclaration: /^<\?xml.*\?>/i
 	}
 
     // generate a GUID for use by DOM IDs etc.
@@ -286,20 +287,22 @@ module Savvy {
     export var EXIT:string = "exit";
     export var LOAD:string = "load";
 
-    // wait for the window load event, then initiate savvy
-	window.addEventListener("load", function init():void {
-		window.removeEventListener("load", init)
-		createHTMLDivElement(savvy_id + "-GLOBAL", divStyles.global);
-		createHTMLDivElement(savvy_id, divStyles.screen);
-		var xmlData:any = getJXONTree(readFile("data/app.xml").data);
-		if (xmlData.app === undefined) {
-			throw "Could not parse app.xml. \"app\" node missing.";
-		}
-		cache.rule = (xmlData.app.cache === undefined) ? Cache.AUTO : xmlData.app.cache;
-		parseAppXML(xmlData.app);
+    export function start():void {
+        Savvy.start = function():void {
+            console.warn("Savvy.start can only be called once.");
+            return;
+        }
+        createHTMLDivElement(savvy_id + "-GLOBAL", divStyles.global);
+        createHTMLDivElement(savvy_id, divStyles.screen);
+        var xmlData:any = getJXONTree(readFile("data/app.xml").data);
+        if (xmlData.app === undefined) {
+            throw "Could not parse app.xml. \"app\" node missing.";
+        }
+        cache.rule = (xmlData.app.cache === undefined) ? Cache.AUTO : xmlData.app.cache;
+        parseAppXML(xmlData.app);
 
         load(getRoute(), true);
-	});
+    }
 
     var ignoreHashChange:bool = false;
     window.addEventListener("hashchange", function () {
@@ -379,8 +382,8 @@ module Savvy {
             removeDOMNode(savvy_id);
 
             // remove old CSS and add new CSS
-            for(var i = 0; i <= limit; i++) {
-                removeDOMNode(savvy_id + "-CSS-" + i);
+            while(removeDOMNode(savvy_id + "-CSS-" + limit)) {
+                limit--;
             }
             // NB: Old CSS is removed first because developers tend to write conflicting CSS selectors
             // when using Savvy
@@ -454,7 +457,7 @@ module Savvy {
      * @param app
      */
     function parseAppXML(app:any):void {
-    	preloadImages(guaranteeArray(app.image));
+    	preloadImages(guaranteeArray(app.img));
 
     	createModel(guaranteeArray(app.screens.screen));
 
@@ -502,8 +505,10 @@ module Savvy {
             node = document.createElement("style");
             node.setAttribute("type", "text/css");
         }
-        if (id !== undefined) {
+        if (id == undefined) {
     		node.id = savvy_id + "-CSS-" + cssCounter++;
+        } else {
+            node.id = id;
         }
         try {
             if(!doLink) {
@@ -660,12 +665,14 @@ module Savvy {
     /**
      * Removes a node from the DOM by specifying its ID
      * @param id The ID of the DOM node to be removed
+     * @returns {Boolean} true if the node was removed otherwise false
      */
-    function removeDOMNode(id) {
+    function removeDOMNode(id):Boolean {
         var node = document.getElementById(id);
         if(node && node.parentNode) {
-            node.parentNode.removeChild(node);
+            return node.parentNode.removeChild(node) !== null;
         }
+        return false;
     }
 
     /**
@@ -702,7 +709,8 @@ module Savvy {
 
 
 		var data:any;
-		if (xmlhttp.responseXML !== null) {
+		if (xmlhttp.responseXML !== null
+            && regExpressions.xmlDeclaration.test(xmlhttp.responseText)) {
 			data = xmlhttp.responseXML;
 		} else {
 			data = xmlhttp.responseText;
