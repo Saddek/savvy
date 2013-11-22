@@ -2,9 +2,6 @@
 interface Window {
     _global: any;
     _screen: any;
-    subscribe(type:string, action:() => bool, screen:any):void;
-    unsubscribe(type:string, action:() => bool):void;
-    getInfo();
 }
 
 // Declare _global and _screen for use in TypeScript source
@@ -26,7 +23,6 @@ class SavvyStatic {
 	// Sub-Pub mechanism
     subscribe(type:string, action:() => bool, screen:any = window):void;
     unsubscribe(type:string, action:() => bool):void;
-    publish(type:string, arg:any = null):bool;
 
     READY:string;
     ENTER:string;

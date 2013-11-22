@@ -4,23 +4,10 @@
 interface Window {
 	_global: any;
 	_screen: any;
-    subscribe(type:string, action:() => bool, screen:any):void;
-    unsubscribe(type:string, action:() => bool):void;
-    getInfo();
 }
 
 window._global = {};
 window._screen = {};
-
-window.subscribe = (type:string, action:() => bool, screen:any = this):void => {
-    Savvy.subscribe(type, action, screen);
-}
-window.unsubscribe = (type:string, action:() => bool):void => {
-    Savvy.unsubscribe(type, action);
-}
-window.getInfo = () => {
-    return Savvy.getInfo();
-}
 
 /**
  * The main Savvy object
@@ -76,9 +63,6 @@ module Savvy {
         }
         unsubscribe(type:string, action:() => bool) {
             Savvy.unsubscribe(type, action);
-        }
-        getInfo(){
-            return Savvy.getInfo();
         }
     }
 
