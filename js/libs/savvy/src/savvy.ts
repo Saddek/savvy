@@ -71,9 +71,6 @@ module Savvy {
 		constructor() {
 			window._screen = this;
 		}
-        _eval(data):any {
-            return eval(data);
-        }
         subscribe(type:string, action:() => bool, screen:any = this):void {
             Savvy.subscribe(type, action, screen);
         }
@@ -542,7 +539,6 @@ module Savvy {
 	                window["eval"].call(window, code);
 	            })(code);
         	} else {
-	            //context._eval(code);
 	            (function(code){
 	            	eval(code);
 	            }).call(context, code);
