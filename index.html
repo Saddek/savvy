@@ -88,6 +88,9 @@
       -moz-user-select: none;
       -ms-user-select: none;
       user-select: none;
+
+      /* Disable the iOS pop-up menu. */
+      -webkit-touch-callout: none;
     }
 
     input, textarea {
@@ -102,6 +105,23 @@
     html {
       /* Can approve appearance on iOS devices. */
       -webkit-text-size-adjust: none;
+    }
+
+    body {
+      /* Force hardware acceloration */
+
+      /* trick hardware acceleration */
+      -webkit-backface-visibility
+      -moz-backface-visibility: hidden;
+      -ms-backface-visibility: hidden;
+      -o-backface-visibility: hidden;
+      backface-visibility: hidden;
+
+      -webkit-rotateZ(360deg);
+      -moz-rotateZ(360deg);
+      -ms-rotateZ(360deg);
+      -o-rotateZ(360deg);
+      rotateZ(360deg);
     }
 
     /* Splash screen, while things load. */
