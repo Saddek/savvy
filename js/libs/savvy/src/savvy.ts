@@ -558,6 +558,7 @@ module Savvy {
 
     /*
      * Resolves a complicated path (e.g. one containing .. and .) to a simple path
+     * http://stackoverflow.com/questions/17967705/how-to-use-javascript-regexp-to-resolve-relative-paths
      * @params path a String path
      * @returns a String path, which is functionally identical but simplified
      */
