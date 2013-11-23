@@ -108,10 +108,11 @@
     }
 
     body {
-      /* Force hardware acceloration */
+      /* Set the background to black for appearances sake. */
+      background-color: black;
 
-      /* trick hardware acceleration */
-      -webkit-backface-visibility
+      /* Force hardware acceloration */
+      -webkit-backface-visibility: hidden;
       -moz-backface-visibility: hidden;
       -ms-backface-visibility: hidden;
       -o-backface-visibility: hidden;
@@ -124,24 +125,22 @@
       rotateZ(360deg);
     }
 
-    /* Splash screen, while things load. */
-  	body {
-      background:black url("assets/images/splash.svg") no-repeat fixed center center;
-      background-size: contain;
-  	}
-
   </style>
 
+  <!-- The splash screen CSS and JavaScript to remove it on load -->
+  <link rel="stylesheet" id="savvy-splash-css" href="css/splash.css">
   <script type="text/javascript">
   (function(){
-    /* Reset the splash screen. The only thing that will be retained is the black screen. */
+    /* Reset the splash screen. */
     Savvy.subscribe(Savvy.LOAD, function() {
-      document.body.style.background = "black";
-      document.body.style.backgroundSize = "auto";
+      // remove the CSS link altogether
+      var style = document.getElementById("savvy-splash-css");
+      style.parentNode.removeChild(style);
     })
   })();
   </script>
 </head>
+
 <body>
 
   <!-- Prompt IE 6 users to install Chrome Frame. Remove this if you support IE 6.
