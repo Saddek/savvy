@@ -1,4 +1,4 @@
-version="3-RC-DEV"
+version="3.1.0"
 output="../savvy.js"
 
 function clean {

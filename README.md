@@ -4,7 +4,8 @@ Savvy implements a modularised [Model-View-Presenter](http://en.wikipedia.org/wi
 
 ## Release notes ##
 
-* Version 3-RC-DEV: Initial open-source development release candidate.
+* Version 3.1.0: Bug fixes, improvements, additional features.
+* Version 3.0.1: Initial open-source release.
 
 ## Documentation ##
 

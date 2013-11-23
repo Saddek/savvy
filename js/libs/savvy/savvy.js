@@ -5,7 +5,7 @@
  /        \/ __ \\   /  \   / \___  |
 /_______  (____  /\_/    \_/  / ____|
         \/     \/             \/     
-Version: 3-RC-DEV
+Version: 3.1.0
 
 Copyright (c) 2013 Avoca Learning
 Copyright (c) 2013 Oliver Moran
