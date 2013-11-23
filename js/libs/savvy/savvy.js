@@ -8,6 +8,7 @@
 Version: 3-RC-DEV
 
 Copyright (c) 2013 Avoca Learning
+Copyright (c) 2013 Oliver Moran
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
