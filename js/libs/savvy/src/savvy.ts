@@ -61,7 +61,7 @@ module Savvy {
         subscribe(type:string, action:() => bool, screen:any = this):void {
             Savvy.subscribe(type, action, screen);
         }
-        unsubscribe(type:string, action:() => bool) {
+        unsubscribe(type:string, action:() => bool):void {
             Savvy.unsubscribe(type, action);
         }
     }
@@ -113,7 +113,8 @@ module Savvy {
         	noQuotes: /url\((?!https?:\/\/)(?!['"]\/?)/gi
 		},
         isJSIdentifier: /^[$A-Z_][0-9A-Z_$]*$/i,
-        xmlDeclaration: /^<\?xml.*\?>/i
+        xmlDeclaration: /^<\?xml.*\?>/i,
+        includeStatement: /^#include "(.*)"$/gm
 	}
 
     // generate a GUID for use by DOM IDs etc.
@@ -517,16 +518,17 @@ module Savvy {
      */
     function executeJavaScript(url:string, context?:ExecutionContext):void {
     	var code:string = readFile(url).data;
+        code = code.replace(regExpressions.includeStatement, function(match:string, p1:string):string {
+            var str:string = readFile(p1).data;
+            if (typeof str == "string") {
+                return str;
+            } else {
+                console.warn("Could not include \"%s\" in \"%s\". Please check file type.", p1, url);
+                return "";
+            }
+        });
         try  {
-        	if (context === undefined) {
-	            (window.execScript || function (code:string):void {
-	                window["eval"].call(window, code);
-	            })(code);
-        	} else {
-	            (function(code){
-	            	eval(code);
-	            }).call(context, code);
-        	}
+            Savvy._eval(code, context);
         } catch (err) {
 	    	console.error("%s (%s)", err.toString(), url);
     	}
@@ -687,7 +689,6 @@ module Savvy {
 			return {url:url, data:""};
 		}
 
-
 		var data:any;
 		if (xmlhttp.responseXML !== null
             && regExpressions.xmlDeclaration.test(xmlhttp.responseText)) {
@@ -765,4 +766,21 @@ module Savvy {
 		}
 	}
 
+}
+
+// Evaling scripts in the main Savvy block captures internal Savvy
+// methods and properties in the closure. Scripts are evaluated in
+// their own block in order to provide a "clean" closure
+module Savvy {
+    export function _eval(code:string, context?:any):void {
+        if (context === undefined) {
+            (window.execScript || function (code:string):void {
+                window["eval"].call(window, code);
+            })(code);
+        } else {
+            (function(code){
+                eval(code);
+            }).call(context, code);
+        }
+    }
 }
