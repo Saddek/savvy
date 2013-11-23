@@ -517,22 +517,74 @@ module Savvy {
      * @param context The context in which to execute the JavaScript
      */
     function executeJavaScript(url:string, context?:ExecutionContext):void {
-    	var code:string = readFile(url).data;
-        code = code.replace(regExpressions.includeStatement, function(match:string, p1:string):string {
-            var str:string = readFile(p1).data;
-            if (typeof str == "string") {
-                return str;
-            } else {
-                console.warn("Could not include \"%s\" in \"%s\". Please check file type.", p1, url);
-                return "";
-            }
-        });
+    	var code:string = parseScriptFile(readFile(url));
         try  {
             Savvy._eval(code, context);
         } catch (err) {
 	    	console.error("%s (%s)", err.toString(), url);
     	}
     }
+
+    /**
+     * A recursive method that parses a script file and honors #include directives.
+     * @param file a File to parse
+     * @returns a String of the parse source code
+     */
+    function parseScriptFile(file:File):string {
+        if (typeof file.data != "string") {
+            console.warn("Could not parse \"%s\". Script files must be plain text.", file.url);
+            return "";
+        }
+
+        var code = file.data.replace(regExpressions.includeStatement, function(match:string, p1:string):string {
+            var dir = getDirectoryFromFilePath(file.url);
+            var path = resolvePath(dir + p1);
+            var str:string = parseScriptFile(readFile(path));
+            return str;
+        });
+
+        return code;
+    }
+
+    /**
+     * Returns the directory path from a file path (i.e. path to the containing directory)
+     * @param path a String path to a file
+     * @returns a String path to the containing directory
+     */
+    function getDirectoryFromFilePath(path:string):string {
+        var i:number = path.toString().lastIndexOf("/");
+        return path.toString().substr(0, i + 1);
+    }
+
+    /*
+     * Resolves a complicated path (e.g. one containing .. and .) to a simple path
+     * @params path a String path
+     * @returns a String path, which is functionally identical but simplified
+     */
+    function resolvePath(path:string):string {
+        var parts:string[] = path.split('/');
+        var i:number = 1;
+        while (i < parts.length) {
+            // safeguard, may never happen
+            if (i < 0) continue;
+            
+            // if current part is '..' and previous part is different, remove both
+            if (parts[i] == ".." && parts[i-1] !== '..' && i > 0) {
+                parts.splice(i-1, 2);
+                i -= 2;
+            }
+
+            // if current part is '.' or '' simply remove it
+            if (parts[i] === '.' || parts[i] == '') {
+                parts.splice(i, 1);
+                i -= 1;
+            }
+
+            i++
+        }
+        return parts.join('/');
+    }
+
 
     /**
      * Parses a JSON or XML file to a variable.
