@@ -58,8 +58,8 @@ module Savvy {
 		constructor() {
 			window._screen = this;
 		}
-        subscribe(type:string, action:() => bool, screen:any = this):void {
-            Savvy.subscribe(type, action, screen);
+        subscribe(type:string, action:() => bool):void {
+            Savvy.subscribe(type, action, this);
         }
         unsubscribe(type:string, action:() => bool):void {
             Savvy.unsubscribe(type, action);
