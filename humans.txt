@@ -3,17 +3,16 @@
 
 
 /* TEAM */
-  Developer: Oliver Moran
-  Site: http://www.nth-iteration.ie
-  Twitter: oliver_moran
-  Location: Cork, Ireland
+  Developer: 
+  Site: 
+  Twitter: 
+  Location: 
 
 /* THANKS */
-  Names (& URL):
-
-  Pirate designed by Anne Caroline Bittencourt Gonçalves from The Noun Project <http://thenounproject.com/anne1003>
+  Names (& URL): 
 
 /* SITE */
+  Last update: 
   Standards: HTML5, CSS3, ECMAScript 5
-  Components: HTML5 Boilerplate, Savvy
-  Software:
+  Components: Savvy, HTML5 Boilerplate
+  Software: 
