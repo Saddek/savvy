@@ -1,10 +1,10 @@
-[Savvy](http://en.wiktionary.org/wiki/savvy) is an easy-to-use framework for developing [single-page](http://en.wikipedia.org/wiki/Single-page_application) [HTML5](http://www.w3.org/TR/html5/) applications. It is intended for development of tablet, smart phone and smart TV apps, but it can also be used on PC and the web.
+[Savvy](http://en.wiktionary.org/wiki/savvy) is an easy-to-use framework for developing [single-page](http://en.wikipedia.org/wiki/Single-page_application) [HTML5](http://www.w3.org/TR/html5/) applications. Its primary intention is for development of tablet, smart phone and smart TV apps.
 
-Savvy emphasises HTML, CSS and JavaScript as distinct technologies and employs a [Model-View-Presenter](http://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93presenter)-style paradigm for app development. Alongside HTML, CSS and JavaScript, Savvy understands [JSON](http://www.json.org/) (and [JXON](https://developer.mozilla.org/en-US/docs/JXON)) data models right out of the box.
+Savvy implements a modularised [Model-View-Presenter](http://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93presenter) design pattern. Alongside HTML, CSS and JavaScript, Savvy supports [JSON](http://www.json.org/) (and [JXON](https://developer.mozilla.org/en-US/docs/JXON)) data models right out of the box.
 
 ## Release notes ##
 
-* Version 3.0: Initial open-source release
+* Version 3-RC-DEV: Initial open-source development release candidate.
 
 ## Documentation ##
 
