@@ -11,7 +11,7 @@
 	</screens>
 	<!-- An <app> MAY contain any number of global <html>, <json>, <js> and <css> elements. -->
 	<html>html/global.html</html>
-	<json>data/sample.json</json>
+	<json target="data.sample">data/sample.json</json>
 	<js>js/libs/plugins.js</js>
 	<js>js/script.js</js>
 	<css>css/styles.css</css>

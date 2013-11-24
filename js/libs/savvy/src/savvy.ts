@@ -453,15 +453,12 @@ module Savvy {
 		});
 
         guaranteeArray(app.json).forEach((element:any, index:number, array:Array):void => {
-            var name = element["@name"];
-            if (!name) {
-                name = element.toString();
-                name = name.substr(name.lastIndexOf("/") + 1);
-                if (name.indexOf(".") > -1) {
-                    name = name.substr(0, name.indexOf("."));
-                }
+            var target = element["@target"];
+            if (typeof target == "string") {
+                parseData(element, target);
+            } else {
+                console.error("No target attribute provided for data node (\"" + element + "\")");
             }
-            parseData(element, name);
         });
 
         guaranteeArray(app.js).forEach((element:string, index:number, array:Array):void => {
@@ -589,36 +586,65 @@ module Savvy {
 
 
     /**
-     * Parses a JSON or XML file to a variable.
-     * @param url The URL of the JSON or XML file to load.
-     * @param target The name of the variable to set with the data from the JSON or XML file
+     * Parses a JSON file to a variable.
+     * @param url The URL of the JSON file to load.
+     * @param target The name of the variable to set with the data from the JSON file
      * @param context The object within which target should exist (defaults to window)
      */
     function parseData(url:string, target:string, context:any = window):void {
-        if (!regExpressions.isJSIdentifier.test(target)) {
-            console.error("Cannot parse data file, %s. \"%s\" is not a valid JavaScript identifier.", url, target)
+        var obj = createObjectFromString(target, context);
+        if (typeof obj == "undefined") {
+            // error is already given
             return;
         }
 
     	var src:any = readFile(url).data;
-    	var data:any;
+        
+        var data:any;
 
     	try {
-			if (src.constructor === Document) {
-		    	data = getJXONTree(src);
-			} else {
-	    		data = JSON.parse(src);
-			}
+			data = JSON.parse(src);
 		} catch (err) {
-			console.error("Cannot parse data file (%s). Only JSON or XML formats are supported.", url)
+			console.error("Cannot parse data file (\"" + url + "\"). Only JSON or XML formats are supported.");
 			return;
 		}
-
-        try  {
-        	context[target] = data;
-        } catch (err) {
-	    	console.error("Could not set data loaded from %s.", url);
-    	}
+        
+        obj = data;
+        if (obj != data) {
+            console.error("Could not assign data loaded from \"" + url + "\" to \"" + target + "\".");
+        }
+    }
+    
+    /**
+     * Finds or attempts to create an object given an ancestor object and a path to a descendant
+     * @param target a String path to the descendant object (e.g. child.obj)
+     * @param context an Object to act as the ancestor (defaults to window)
+     * @return the child object or null if it could not be created
+     */
+    function createObjectFromString(target:string, context:any = window):any {
+        var arr:string[] = target.split(".");
+        
+        function createChildObject(obj:any, id:string) {
+            if (typeof obj[id] == "undefined") {
+                obj[id] = {};
+                return obj[id];
+            }
+            
+            return obj[id];
+        }
+        
+        try {
+            for (var i:number=0; i<arr.length; i++) {
+                context = createChildObject(context, arr[i]);
+            }
+        
+            if (context.constructor === Object) {
+                return context;
+            }
+        } finally {
+            console.warn("Could not create object: " + target);
+            return undefined;
+        }
     }
 
     /**
