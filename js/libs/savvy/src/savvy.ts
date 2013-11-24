@@ -274,8 +274,8 @@ module Savvy {
             console.warn("Savvy.start can only be called once.");
             return;
         }
-        createHTMLDivElement(savvy_id + "-GLOBAL", divStyles.global);
-        createHTMLDivElement(savvy_id, divStyles.screen);
+        createHTMLDivElement(savvy_id + "-GLOBAL", divStyles.global, "global");
+        createHTMLDivElement(savvy_id, divStyles.screen, "screen");
         var xmlData:any = getJXONTree(readFile("data/app.xml").data);
         if (xmlData.app === undefined) {
             throw "Could not parse app.xml. \"app\" node missing.";
@@ -335,7 +335,7 @@ module Savvy {
             unsubscribe2(window._screen); // remove all subscriptions from this screen
             window._screen = {}; // and wipe out window._sreen
 
-            createHTMLDivElement(savvy_id + "-BUFFER", divStyles.buffer);
+            createHTMLDivElement(savvy_id + "-BUFFER", divStyles.buffer, "buffer");
 
             guaranteeArray(route.screen.html).forEach((element:File, index:number, array:Array):void => {
                 Savvy.getScreen().innerHTML += readFile(element.url).data;
@@ -375,6 +375,7 @@ module Savvy {
 
             Savvy.getScreen().id = savvy_id;
             Savvy.getScreen().setAttribute("style", divStyles.screen);
+            Savvy.getScreen().setAttribute("data-role", "screen");
             document.title = (route.screen.title || "");
             if(!preventHistory) {
                 ignoreHashChange = true;
@@ -689,11 +690,14 @@ module Savvy {
      * @param id The ID to give to the DIV
      * @param style The style to apply (inline) to the DIV
      */
-	function createHTMLDivElement(id:string, style:string):void {
+	function createHTMLDivElement(id:string, style:string, role?:string):void {
         removeDOMNode(id); // remove in case one exists already
 		var div:HTMLElement = document.createElement("div");
 		div.id = id;
 		div.setAttribute("style", style);
+        if (role) {
+            div.setAttribute("data-role", role);        
+        }
 		document.body.appendChild(div);
 	}
 
