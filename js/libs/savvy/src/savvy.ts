@@ -58,10 +58,10 @@ module Savvy {
 		constructor() {
 			window._screen = this;
 		}
-        subscribe(type:string, action:() => bool):void {
+        subscribe(type:string, action:() => boolean):void {
             Savvy.subscribe(type, action, this);
         }
-        unsubscribe(type:string, action:() => bool):void {
+        unsubscribe(type:string, action:() => boolean):void {
             Savvy.unsubscribe(type, action);
         }
     }
@@ -185,9 +185,9 @@ module Savvy {
      */
 	class Subscription {
 		type:string;
-		action:() => bool;
+		action:() => boolean;
         screen:any;
-		constructor (type:string, action:() => bool, screen:any = window){
+		constructor (type:string, action:() => boolean, screen:any = window){
 			this.type = type;
 			this.action = action;
             this.screen = screen;
@@ -203,7 +203,7 @@ module Savvy {
      * @param action A function to be called when the message occurs, return false to block the event
      * @param screen A screen object to associate the subscription with (usually left to default)
      */
-	export function subscribe(type:string, action:() => bool, screen:any = window):void {
+	export function subscribe(type:string, action:() => boolean, screen:any = window):void {
         unsubscribe(type, action); // attempt to unsubscribe, so as to ensure that functions don't get called twice
 		var sub = new Subscription(type, action, screen);
 		subscriptions.push(sub);
@@ -214,7 +214,7 @@ module Savvy {
      * @param type A String corresponding to the message to be unsubscibed from
      * @param action The function that is called when the subscription is called
      */
-	export function unsubscribe(type:string, action:() => bool):void {
+	export function unsubscribe(type:string, action:() => boolean):void {
         for (var i:number = 0; i < subscriptions.length; i++) {
             if (subscriptions[i].type === type && subscriptions[i].action === action) {
                 subscriptions.splice(i, 1);
@@ -242,8 +242,8 @@ module Savvy {
      * @param arg An object of any kind that will be passed to subscribing functions
      * @returns {boolean} Will be false if any of the subscription functions returned false
      */
-	function publish(type:string, arg:any = null):bool {
-		var ret:bool = true;
+	function publish(type:string, arg:any = null):boolean {
+		var ret:boolean = true;
 		subscriptions.forEach((element:Subscription, index:number, array:Subscription[]):void => {
 			if (element.type === type && typeof element.action === "function") {
 				ret = !(element.action.call(element.screen, arg) === false || ret === false);
@@ -270,7 +270,7 @@ module Savvy {
     export var LOAD:string = "load";
 
     export function start():void {
-        Savvy.start = function():void {
+        this.start = function():void {
             console.warn("Savvy.start can only be called once.");
             return;
         }
@@ -286,7 +286,7 @@ module Savvy {
         load(getRoute(), true);
     }
 
-    var ignoreHashChange:bool = false;
+    var ignoreHashChange:boolean = false;
     window.addEventListener("hashchange", function () {
         if (ignoreHashChange) {
             ignoreHashChange = false;
@@ -349,7 +349,7 @@ module Savvy {
                 executeJavaScript(element.url, executionContext);
             });
 
-            Savvy.getInfo = () => {
+            this.getInfo = () => {
                 return getInfo2(route); // update getInfo to get current screen info
             }
             if (publish(Savvy.READY)) { // check if that transition wasn't stalled
@@ -651,7 +651,7 @@ module Savvy {
      * Preloads an array of images to the browser cache.
      * @param images An array of URLs to load.
      */
-	function preloadImages(images:Array):void {
+	function preloadImages(images:string[]):void {
         for(var i = 0, ii = images.length; i < ii; i++) {
             var img = new Image();
             img.src = images[i];
@@ -663,7 +663,7 @@ module Savvy {
      * Creates a model of the screens described in the app.xml. Populates the model array with Screen objects.
      * @param screens An array subset of a JXON object describing the screens Array in app.xml.
      */
-    function createModel(screens:Array):void {
+    function createModel(screens:Screen[]):void {
         for(var i = 0, ii = screens.length; i < ii; i++) {
         	var screen:Screen = {
 	            id: screens[i]["@id"],
@@ -674,21 +674,21 @@ module Savvy {
 	            css:[]
         	};
 
-			guaranteeArray(screens[i].html).forEach((element:string, index:number, array:Array):void => {
+			guaranteeArray(screens[i].html).forEach((element:string, index:number, array:Screen[]):void => {
 				var url:string = element.toString();
                 var file = readFile(url);
                 cache.add(file);
                 screen.html.push(file);
 			});
 
-			guaranteeArray(screens[i].js).forEach((element:string, index:number, array:Array):void => {
+			guaranteeArray(screens[i].js).forEach((element:string, index:number, array:Screen[]):void => {
                 var url:string = element.toString();
                 var file = readFile(url);
                 cache.add(file);
                 screen.js.push(file);
 			});
 
-			guaranteeArray(screens[i].css).forEach((element:string, index:number, array:Array):void => {
+			guaranteeArray(screens[i].css).forEach((element:string, index:number, array:Screen[]):void => {
                 var url:string = element.toString();
                 var file = readFile(url);
                 cache.add(file);
