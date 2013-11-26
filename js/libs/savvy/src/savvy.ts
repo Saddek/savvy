@@ -156,7 +156,7 @@ module Savvy {
                 }
             }
             if (screen == null) {
-                console.error("No screen with ID of \"%s\".", id);
+                console.error("No screen with ID of \"" + id + "\".");
             } else {
                 load({screen: screen, path: "/" + path});
             }
@@ -342,8 +342,8 @@ module Savvy {
             });
 
             var executionContext:ExecutionContext = window[route.screen.id] = new ExecutionContext();
-            if(typeof window[route.screen.id] === "undefined") {
-                console.warn("\"window." + route.screen.id + "\" could not be created.");
+            if (typeof window[route.screen.id] === "undefined") {
+                console.error("\"window." + route.screen.id + "\" could not be created.");
             }
             guaranteeArray(route.screen.js).forEach((element:File, index:number, array:Array):void => {
                 executeJavaScript(element.url, executionContext);
@@ -505,7 +505,7 @@ module Savvy {
             }
             document.getElementsByTagName("head")[0].appendChild(node);
         } catch(err) {
-	    	console.error("Error appending CSS file (%s): %s ", url, err.toString());
+	    	console.error("Error appending CSS file (" + url + "): " + err.toString());
         }
     }
 
@@ -519,7 +519,7 @@ module Savvy {
         try  {
             Savvy._eval(code, context);
         } catch (err) {
-	    	console.error("%s (%s)", err.toString(), url);
+	    	console.error(err.toString() + "(" + url + ")");
     	}
     }
 
@@ -530,7 +530,7 @@ module Savvy {
      */
     function parseScriptFile(file:File):string {
         if (typeof file.data != "string") {
-            console.warn("Could not parse \"%s\". Script files must be plain text.", file.url);
+            console.error("Could not parse \"" + file.url + "\". Script files must be plain text.");
             return "";
         }
 
@@ -752,7 +752,7 @@ module Savvy {
 		//xmlhttp.responseType = responseType || "text";
 		xmlhttp.send();
 		if (xmlhttp.status !== 200 && xmlhttp.status !== 0) {
-			console.warn("HTTP status "+xmlhttp.status+" returned for file: " + url);
+			console.error("HTTP status "+xmlhttp.status+" returned for file: " + url);
 			return {url:url, data:""};
 		}
 
