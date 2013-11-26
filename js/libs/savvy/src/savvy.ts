@@ -119,7 +119,6 @@ module Savvy {
         	noQuotes: /url\((?!https?:\/\/)(?!['"]\/?)/gi
 		},
         isJSIdentifier: /^[$A-Z_][0-9A-Z_$]*$/i,
-        xmlDeclaration: /^<\?xml.*\?>/i,
         includeStatement: /^#include "(.*)"$/gm
 	}
 
