@@ -592,26 +592,20 @@ module Savvy {
      * @param context The object within which target should exist (defaults to window)
      */
     function parseData(url:string, target:string, context:any = window):void {
-        var obj = createObjectFromString(target, context);
-        if (typeof obj == "undefined") {
-            // error is already given
+        var data:any;
+        var src:any = readFile(url).data;
+        try {
+            data = JSON.parse(src);
+        } catch (err) {
+            console.error("Cannot parse data file (\"" + url + "\"). Only JSON or XML formats are supported.");
             return;
         }
-
-    	var src:any = readFile(url).data;
         
-        var data:any;
-
-    	try {
-			data = JSON.parse(src);
-		} catch (err) {
-			console.error("Cannot parse data file (\"" + url + "\"). Only JSON or XML formats are supported.");
-			return;
-		}
-        
-        obj = data;
-        if (obj != data) {
-            console.error("Could not assign data loaded from \"" + url + "\" to \"" + target + "\".");
+        try {
+            createObjectFromString(target, data, context);
+        } catch(err) {
+            console.error("Could not create object: " + ((context == window) ? "window." : "this.") + target);
+            return;
         }
     }
     
@@ -621,30 +615,20 @@ module Savvy {
      * @param context an Object to act as the ancestor (defaults to window)
      * @return the child object or null if it could not be created
      */
-    function createObjectFromString(target:string, context:any = window):any {
+    function createObjectFromString(target:string, data:any, context:any = window):any {
         var arr:string[] = target.split(".");
         
-        function createChildObject(obj:any, id:string) {
-            if (typeof obj[id] == "undefined") {
-                obj[id] = {};
-                return obj[id];
+        for (var i:number=0; i<arr.length - 1; i++) {
+            var id = arr[i];
+            if (typeof context[id] == "undefined") {
+                context[id] = {};
             }
-            
-            return obj[id];
+            context = context[id];
         }
-        
-        try {
-            for (var i:number=0; i<arr.length; i++) {
-                context = createChildObject(context, arr[i]);
-            }
-        
-            if (context.constructor === Object) {
-                return context;
-            }
-        } finally {
-            console.warn("Could not create object: " + target);
-            return undefined;
-        }
+
+        context = context[arr[i]] = data;
+
+        return context;
     }
 
     /**
