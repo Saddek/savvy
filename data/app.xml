@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<app>
+<app cordova="no">
 	<screens cache="auto">
 		<!-- Place <screen> elements here. Exactly one <screen> MUST be marked as default="yes". -->
 		<screen id="Home" title="Sample Screen" default="yes">

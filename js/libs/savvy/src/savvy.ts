@@ -31,6 +31,11 @@ module Savvy {
         url:string;
         data:any;
     }
+    
+    interface JSON {
+        file:File;
+        target:string;
+    }
 
     /**
      * The Screen interface: used to describe screens (id, title, html, etc.)
@@ -39,8 +44,9 @@ module Savvy {
 	    id:string;
 	    title:string;
 	    html:File[];
+        css:File[];
 	    js:File[];
-	    css:File[];
+        json:JSON[];
 	}
 
     /**
@@ -269,21 +275,55 @@ module Savvy {
     export var EXIT:string = "exit";
     export var LOAD:string = "load";
 
-    export function start():void {
-        this.start = function():void {
-            console.warn("Savvy.start can only be called once.");
-            return;
+    /**
+     * A JXONNode class, used as a container object when parsing XML to a JavaScript object.
+     */
+    class JXONNode {
+        private _value:any;
+        constructor(val?:any) {
+            this._value = (val === undefined) ? null : val;
         }
-        createHTMLDivElement(savvy_id + "-GLOBAL", divStyles.global, "global");
-        createHTMLDivElement(savvy_id, divStyles.screen, "screen");
-        var xmlData:any = getJXONTree(readFile("data/app.xml").data);
-        if (xmlData.app === undefined) {
-            throw "Could not parse app.xml. \"app\" node missing.";
+        setValue(val:any):void {
+            this._value = val;
         }
-        cache.rule = (xmlData.app.cache === undefined) ? Cache.AUTO : xmlData.app.cache;
-        parseAppXML(xmlData.app);
+        valueOf():any {
+            return this._value;
+        }
+        toString():any {
+            return (this._value === null) ? "null" : this._value.toString();
+        }
+    }
 
-        load(getRoute(), true);
+    var xmlData:any = getJXONTree(readFile("data/app.xml", true).data);
+    if (xmlData.app === undefined) {
+        console.error("Could not parse app.xml. \"app\" node missing.");
+    } else {
+        var event:string = (xmlData.app["@cordova"] == "yes") ? "deviceready" : "load";
+        if (xmlData.app["@cordova"] == "yes") {
+            var cordova_lib:HTMLElement = document.createElement("script");
+            cordova_lib.setAttribute("src", "cordova.js");
+            cordova_lib.setAttribute("type", "text/javascript");
+
+            var cordova_plugins:HTMLElement = document.createElement("script");
+            cordova_plugins.setAttribute("src", "cordova_plugins.js");
+            cordova_plugins.setAttribute("type", "text/javascript");
+
+            document.head.appendChild(cordova_lib);
+            document.head.appendChild(cordova_plugins);
+        }
+        
+        // ordinarily, Savvy will be initialised when the DOM is ready
+        window.addEventListener(event, function deviceReadyEvent():void {
+            window.removeEventListener(event, deviceReadyEvent);
+
+            createHTMLDivElement(savvy_id + "-GLOBAL", divStyles.global, "global");
+            createHTMLDivElement(savvy_id, divStyles.screen, "screen");
+            
+            cache.rule = (xmlData.app.cache === undefined) ? Cache.AUTO : xmlData.app.cache;
+            parseAppXML(xmlData.app);
+    
+            load(getRoute(), true);
+        }, false);
     }
 
     var ignoreHashChange:boolean = false;
@@ -337,6 +377,7 @@ module Savvy {
 
             createHTMLDivElement(savvy_id + "-BUFFER", divStyles.buffer, "buffer");
 
+            // NB: set up HTML before JS executes so HTML DOM is accessible
             guaranteeArray(route.screen.html).forEach((element:File, index:number, array:Array):void => {
                 Savvy.getScreen().innerHTML += readFile(element.url).data;
             });
@@ -345,6 +386,13 @@ module Savvy {
             if (typeof window[route.screen.id] === "undefined") {
                 console.error("\"window." + route.screen.id + "\" could not be created.");
             }
+            
+            // NB: set up JSON before JS executes so JSON objects are already populated
+            guaranteeArray(route.screen.json).forEach((element:JSON, index:number, array:Array):void => {
+                var target = element.target;
+                parseJSON(element.file.url, target, executionContext);
+            });
+            
             guaranteeArray(route.screen.js).forEach((element:File, index:number, array:Array):void => {
                 executeJavaScript(element.url, executionContext);
             });
@@ -444,6 +492,7 @@ module Savvy {
 
     	createModel(guaranteeArray(app.screens.screen));
 
+        // NB: Do before HTML so that HTML lands formatted
 		guaranteeArray(app.css).forEach((element:string, index:number, array:Array):void => {
 			appendCssToHead(element, savvy_id + "-GLOBAL-CSS-" + cssCounter++);
 		});
@@ -452,12 +501,13 @@ module Savvy {
 			Savvy.getGlobal().innerHTML += readFile(element).data;
 		});
 
+        // NB: Do before JS so that data models are available to JS
         guaranteeArray(app.json).forEach((element:any, index:number, array:Array):void => {
             var target = element["@target"];
             if (typeof target == "string") {
-                parseData(element, target);
+                parseJSON(element, target);
             } else {
-                console.error("No target attribute provided for data node (\"" + element + "\")");
+                console.error("No target attribute provided for JSON (\"" + element + "\")");
             }
         });
 
@@ -591,13 +641,13 @@ module Savvy {
      * @param target The name of the variable to set with the data from the JSON file
      * @param context The object within which target should exist (defaults to window)
      */
-    function parseData(url:string, target:string, context:any = window):void {
+    function parseJSON(url:string, target:string, context:any = window):void {
         var data:any;
-        var src:any = readFile(url).data;
         try {
+            var src:any = readFile(url).data;
             data = JSON.parse(src);
         } catch (err) {
-            console.error("Cannot parse data file (\"" + url + "\"). Only JSON or XML formats are supported.");
+            console.error("Cannot parse data file (\"" + url + "\"). Please check that the file is valid JSON <http://json.org/>.");
             return;
         }
         
@@ -653,9 +703,9 @@ module Savvy {
 	            id: screens[i]["@id"],
 	            title: screens[i]["@title"],
 	            html:[],
+                css:[],
 	            js:[],
-                data:[],
-	            css:[]
+                json:[]
         	};
 
 			guaranteeArray(screens[i].html).forEach((element:string, index:number, array:Screen[]):void => {
@@ -665,19 +715,31 @@ module Savvy {
                 screen.html.push(file);
 			});
 
-			guaranteeArray(screens[i].js).forEach((element:string, index:number, array:Screen[]):void => {
-                var url:string = element.toString();
-                var file = readFile(url);
-                cache.add(file);
-                screen.js.push(file);
-			});
-
-			guaranteeArray(screens[i].css).forEach((element:string, index:number, array:Screen[]):void => {
+            guaranteeArray(screens[i].css).forEach((element:string, index:number, array:Screen[]):void => {
                 var url:string = element.toString();
                 var file = readFile(url);
                 cache.add(file);
                 screen.css.push(file);
-			});
+            });
+
+            guaranteeArray(screens[i].js).forEach((element:string, index:number, array:Screen[]):void => {
+                var url:string = element.toString();
+                var file = readFile(url);
+                cache.add(file);
+                screen.js.push(file);
+            });
+
+            guaranteeArray(screens[i].json).forEach((element:string, index:number, array:Screen[]):void => {
+                var target = element["@target"];
+                if (typeof target == "string") {
+                    var url:string = element.toString();
+                    var file = readFile(url);
+                    cache.add(file);
+                    screen.json.push({file:file, target:target});
+                } else {
+                    console.error("No target attribute provided for JSON (\"" + url + "\")");
+                }
+            });
 
             if (screens[i]['@default'] !== undefined) {
                 if (defaultScreen === null) {
@@ -737,9 +799,10 @@ module Savvy {
     /**
      * Reads the file at URL and returns a File object for it.
      * @param url The URL to read.
+     * @param asXML A Boolean indicating that the file should be read as an XML document.
      * @returns {*} A File object containing the URL and data of the file.
      */
-	function readFile(url:string):File {
+	function readFile(url:string, asXML:boolean = false):File {
 		var file:File;
 
 		// first, try to get from cache first
@@ -749,7 +812,6 @@ module Savvy {
 		// not in cache?
 		var xmlhttp:XMLHttpRequest = new XMLHttpRequest(); // create the XMLHttpRequest object
 		xmlhttp.open("GET", url, false);
-		//xmlhttp.responseType = responseType || "text";
 		xmlhttp.send();
 		if (xmlhttp.status !== 200 && xmlhttp.status !== 0) {
 			console.error("HTTP status "+xmlhttp.status+" returned for file: " + url);
@@ -757,36 +819,15 @@ module Savvy {
 		}
 
 		var data:any;
-		if (xmlhttp.responseXML !== null
-            && regExpressions.xmlDeclaration.test(xmlhttp.responseText)) {
-			data = xmlhttp.responseXML;
-		} else {
-			data = xmlhttp.responseText;
-		}
-
+        if (asXML) {
+            data = xmlhttp.responseXML;
+        } else {
+            data = xmlhttp.responseText;
+        }
 		file = {url:url, data:data};
-
 		return file;
 	}
 
-    /**
-     * A JXONNode class, used as a container object when parsing XML to a JavaScript object.
-     */
-	class JXONNode {
-		private _value:any;
-		constructor(val?:any) {
-			this._value = (val === undefined) ? null : val;
-		}
-		setValue(val:any):void {
-			this._value = val;
-		}
-		valueOf():any {
-			return this._value;
-		}
-		toString():any {
-			return (this._value === null) ? "null" : this._value.toString();
-		}
-	}
 	/**
 	 * JXON Snippet #3 - Mozilla Developer Network
 	 * https://developer.mozilla.org/en-US/docs/JXON
