@@ -330,7 +330,11 @@ module Savvy {
         if (ignoreHashChange) {
             ignoreHashChange = false;
         } else {
-            load(getRoute(), true);
+            var route:Route = getRoute();
+            if (typeof route.screen == "object") {
+                // don't load a route that doesn't exist
+                load(route, true);
+            }
         }
     }, false);
 
@@ -344,6 +348,14 @@ module Savvy {
      * @private
      */
 	function load(route:Route, preventHistory:Boolean = false):void {
+        if (window._screen == window[route.screen.id]) {
+            if (preventHistory) {
+                console.info("Request to load current screen over itself. This is usually caused by navigating back from an fragment and can be ignored.");
+            } else {
+                console.warn("Attempt to load current screen as new screen. This is unsupported behavior. Ignoring.");
+            }
+            return;
+        }
         var limit:number = cssCounter - 1;
 
         var resp; // we might fire Savvy.LOAD or Savvy.EXIT here, this var will contain the result
@@ -443,7 +455,7 @@ module Savvy {
      * Creates a Route object for the current URL
      * @returns {{screen: Screen, path: string}}
      */
-	function getRoute(id?:string):Route {
+	function getRoute():Route {
 		var hash:string = window.location.hash;
 		var screen:Screen;
         if(hash == "" || hash == "#" || hash == "#!") {
