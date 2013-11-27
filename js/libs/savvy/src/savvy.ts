@@ -880,7 +880,7 @@ module Savvy {
 			if (/^\s*$/.test(sValue)) { return null; }
 			if (/^(?:true|false)$/i.test(sValue)) { return sValue.toLowerCase() === "true"; }
 			if (isFinite(sValue)) { return parseFloat(sValue); }
-			if (isFinite(Date.parse(sValue))) { return new Date(sValue); }
+			/* if (isFinite(Date.parse(sValue))) { return new Date(sValue); } */ // produces false positives
 			return sValue;
 		}
 	}
