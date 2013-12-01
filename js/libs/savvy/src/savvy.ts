@@ -1,12 +1,9 @@
-// Savvy extends the JavaScript window object with two new objects _global and _screen
-// _gobal can be used to set variables available across screens
-// _screen can be used to set variables available during the session of the current screen only
+// Savvy extends the JavaScript window with a "_screen" object that
+// refers to the current screen's execution context
 interface Window {
-	_global: any;
 	_screen: any;
 }
 
-window._global = {};
 window._screen = {};
 
 /**

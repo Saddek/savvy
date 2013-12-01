@@ -30,7 +30,7 @@ THE SOFTWARE.
 
 */
 
-window._global={};window._screen={};var Savvy;
+window._screen={};var Savvy;
 (function(e){function G(a,c){for(var b=0;b<n.length;b++)n[b].type===a&&n[b].action===c&&(n.splice(b,1),b--)}function t(a){for(var c=0;c<n.length;c++)n[c].screen===a&&(n.splice(c,1),c--)}function u(a,c){"undefined"===typeof c&&(c=null);var b=!0;n.forEach(function(d,f,l){d.type===a&&"function"===typeof d.action&&(b=!(!1===d.action.call(d.screen,c)||!1===b))});return b}function x(a,c){function b(){for(var c=0,b=m.length;c<b;c++)try{delete window[m[c].id]}catch(f){window[m[c].id]=null}t(window._screen);
 window._screen={};z(h+"-BUFFER",v.buffer,"buffer");g(a.screen.html).forEach(function(a,c,b){e.getScreen().innerHTML+=k(a.url).data});var l=window[a.screen.id]=new R;"undefined"===typeof window[a.screen.id]&&console.error('"window.'+a.screen.id+'" could not be created.');g(a.screen.json).forEach(function(a,c,b){H(a.file.url,a.target,l)});g(a.screen.js).forEach(function(a,c,b){I(a.url,l)});this.getInfo=function(){return J(a)};u(e.READY)?d():w=d}function d(){w=S;for(A(h);A(h+"-CSS-"+f);)f--;g(a.screen.css).forEach(function(a,
 c,b){K(a.url)});e.getScreen().id=h;e.getScreen().setAttribute("style",v.screen);e.getScreen().setAttribute("data-role","screen");document.title=a.screen.title||"";c||(B=!0,window.location.hash="!"+a.path);u(e.ENTER)}"undefined"===typeof c&&(c=!1);if(window._screen==window[a.screen.id])c?console.info("Request to load current screen over itself. This is usually caused by navigating back from an fragment and can be ignored."):console.warn("Attempt to load current screen as new screen. This is unsupported behavior. Ignoring.");

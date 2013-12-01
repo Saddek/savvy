@@ -1,11 +1,9 @@
-// Extend the window object to add the _global and _screen Objects
+// Extend the window object to add the _screen Object
 interface Window {
-    _global: any;
     _screen: any;
 }
 
-// Declare _global and _screen for use in TypeScript source
-declare var _global: any;
+// Declare _screen for use in TypeScript source
 declare var _screen: any;
 
 // A static definition of Savvy module
