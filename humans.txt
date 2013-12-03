@@ -13,6 +13,6 @@
 
 /* SITE */
   Last update: 
-  Standards: HTML5, CSS3, ECMAScript 5
-  Components: Savvy, HTML5 Boilerplate
+  Standards: HTML5, CSS3, JavaScript (ECMAScript 5)
+  Components: Savvy <http://avoca-learning.github.io/savvy/>, HTML5 Boilerplate <http://html5boilerplate.com/>, Normalize.css <http://necolas.github.io/normalize.css/>
   Software: 
