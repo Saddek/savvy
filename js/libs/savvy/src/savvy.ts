@@ -1,10 +1,8 @@
 // Savvy extends the JavaScript window with a "_screen" object that
 // refers to the current screen's execution context
-interface Window {
-	_screen: any;
+interface HTMLElement {
+	screen: any;
 }
-
-window._screen = {};
 
 /**
  * The main Savvy object
@@ -59,7 +57,7 @@ module Savvy {
      */
 	class ExecutionContext {
 		constructor() {
-			window._screen = this;
+			document.body.screen = this;
 		}
         subscribe(type:string, action:() => boolean):void {
             Savvy.subscribe(type, action, this);
@@ -120,7 +118,7 @@ module Savvy {
 	}
 
     // generate a GUID for use by DOM IDs etc.
-	var savvy_id:string = "SAVVY-" + guid();
+	var guid:string = "SAVVY-" + generateGuid();
     // a blank function (defined here once to save memory and time)
 	var noop:Function = ():void => {};
 
@@ -128,7 +126,7 @@ module Savvy {
      * Generates a pseudo GUID
      * @returns {string} A pseudo GUID
      */
-    function guid():string {
+    function generateGuid():string {
         function S4():string {
             return (((1 + Math.random()) * 65536) | 0).toString(16).substring(1);
         }
@@ -166,19 +164,11 @@ module Savvy {
 	}
 
     /**
-     * Gets the "global" DOM element (a DIV)
-     * @returns {HTMLElement} The "global" DOM element (a DIV)
-     */
-    export function getGlobal():HTMLElement {
-        return document.getElementById(savvy_id + "-GLOBAL");
-    }
-
-    /**
      * Gets the current "screen" DOM element (a DIV)
      * @returns {HTMLElement} The "screen" DOM element (a DIV)
      */
     export function getScreen():HTMLElement {
-        return (document.getElementById(savvy_id + "-BUFFER") || document.getElementById(savvy_id));
+        return (document.getElementById(guid + "-BUFFER") || document.getElementById(guid));
     }
 
     /**
@@ -254,15 +244,6 @@ module Savvy {
 		return ret;
 	}
 
-    // the style for DIVs that will be used by Savvy
-    var baseDivStyle:string = "width:100% !important; over-flow: visible !important; "
-                            + "padding:0px !important; margin:0px !important; visibility:visible !important;";
-    var divStyles:any = {
-        global: baseDivStyle + " display:block !important;",
-        buffer: baseDivStyle + " display:none !important;",
-        screen: baseDivStyle + " display:block !important;"
-    };
-
     // a counter to keep track of CSS links added to the HTML page
     var cssCounter:number = 0;
 
@@ -307,14 +288,14 @@ module Savvy {
             document.head.appendChild(cordova_lib);
             document.head.appendChild(cordova_plugins);
         }
-        
+
         // ordinarily, Savvy will be initialised when the DOM is ready
         window.addEventListener(event, function deviceReadyEvent():void {
             window.removeEventListener(event, deviceReadyEvent);
-
-            createHTMLDivElement(savvy_id + "-GLOBAL", divStyles.global, "global");
-            createHTMLDivElement(savvy_id, divStyles.screen, "screen");
             
+            // init screen object
+            document.body.screen = {};
+
             cache.rule = (xmlData.app.cache === undefined) ? Cache.AUTO : xmlData.app.cache;
             parseAppXML(xmlData.app);
     
@@ -345,7 +326,7 @@ module Savvy {
      * @private
      */
 	function load(route:Route, preventHistory:Boolean = false):void {
-        if (window._screen == window[route.screen.id]) {
+        if (document.body.screen == window[route.screen.id]) {
             if (preventHistory) {
                 console.info("Request to load current screen over itself. This is usually caused by navigating back from an fragment and can be ignored.");
             } else {
@@ -380,10 +361,11 @@ module Savvy {
                 }
             }
 
-            unsubscribe2(window._screen); // remove all subscriptions from this screen
-            window._screen = {}; // and wipe out window._sreen
+            unsubscribe2(document.body.screen); // remove all subscriptions from this screen
+            document.body.screen = {}; // and wipe out window._sreen
 
-            createHTMLDivElement(savvy_id + "-BUFFER", divStyles.buffer, "buffer");
+            createHTMLArticleElement(guid + "-BUFFER", "buffer");
+            Savvy.getScreen().style.display = "none";
 
             // NB: set up HTML before JS executes so HTML DOM is accessible
             guaranteeArray(route.screen.html).forEach((element:File, index:number, array:Array):void => {
@@ -417,21 +399,22 @@ module Savvy {
 
         function doTransition():void {
             continueTransition = noop;
-            removeDOMNode(savvy_id);
+            removeDOMNode(guid);
 
             // remove old CSS and add new CSS
-            while(removeDOMNode(savvy_id + "-CSS-" + limit)) {
+            while(removeDOMNode(guid + "-CSS-" + limit)) {
                 limit--;
             }
             // NB: Old CSS is removed first because developers tend to write conflicting CSS selectors
             // when using Savvy
             guaranteeArray(route.screen.css).forEach((element:File, index:number, array:Array):void => {
-                appendCssToHead(element.url);
+                appendCssToHead(element.url, guid + "-CSS-" + cssCounter++);
             });
 
-            Savvy.getScreen().id = savvy_id;
-            Savvy.getScreen().setAttribute("style", divStyles.screen);
+            Savvy.getScreen().id = guid;
             Savvy.getScreen().setAttribute("data-role", "screen");
+            Savvy.getScreen().style.display = "block";
+
             document.title = (route.screen.title || "");
             if(!preventHistory) {
                 ignoreHashChange = true;
@@ -502,11 +485,11 @@ module Savvy {
 
         // NB: Do before HTML so that HTML lands formatted
 		guaranteeArray(app.css).forEach((element:string, index:number, array:Array):void => {
-			appendCssToHead(element, savvy_id + "-GLOBAL-CSS-" + cssCounter++);
+			appendCssToHead(element);
 		});
 
 		guaranteeArray(app.html).forEach((element:string, index:number, array:Array):void => {
-			Savvy.getGlobal().innerHTML += readFile(element).data;
+            document.body.insertAdjacentHTML("beforeend", readFile(element).data);
 		});
 
         // NB: Do before JS so that data models are available to JS
@@ -543,9 +526,7 @@ module Savvy {
             node = document.createElement("style");
             node.setAttribute("type", "text/css");
         }
-        if (id == undefined) {
-    		node.id = savvy_id + "-CSS-" + cssCounter++;
-        } else {
+        if (typeof id == "string") {
             node.id = id;
         }
         try {
@@ -766,19 +747,25 @@ module Savvy {
 	}
 
     /**
-     * Creates a HTML DIV and appends it to the body of the HTML document.
+     * Creates a HTML <savvy-screen> element and appends it to the body of the HTML document.
      * @param id The ID to give to the DIV
      * @param style The style to apply (inline) to the DIV
      */
-	function createHTMLDivElement(id:string, style:string, role?:string):void {
+	function createHTMLArticleElement(id:string, role?:string):void {
         removeDOMNode(id); // remove in case one exists already
-		var div:HTMLElement = document.createElement("div");
-		div.id = id;
-		div.setAttribute("style", style);
-        if (role) {
-            div.setAttribute("data-role", role);        
+		var article:HTMLElement = document.createElement("article");
+		article.id = id;
+        if (typeof role == "string") {
+            article.setAttribute("data-role", role);        
         }
-		document.body.appendChild(div);
+        
+        article.style.width = "100%";
+        article.style.overflow = "visible";
+        article.style.padding = "0px";
+        article.style.margin = "0px";
+        article.style.visibility = "visible";
+
+		document.body.appendChild(article);
 	}
 
     /**
