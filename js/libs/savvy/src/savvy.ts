@@ -117,21 +117,8 @@ module Savvy {
         includeStatement: /^#include "(.*)"$/gm
 	}
 
-    // generate a GUID for use by DOM IDs etc.
-	var guid:string = "SAVVY-" + generateGuid();
     // a blank function (defined here once to save memory and time)
 	var noop:Function = ():void => {};
-
-    /**
-     * Generates a pseudo GUID
-     * @returns {string} A pseudo GUID
-     */
-    function generateGuid():string {
-        function S4():string {
-            return (((1 + Math.random()) * 65536) | 0).toString(16).substring(1);
-        }
-        return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
-    }
 
     /**
      * Loads a screen in the app corresponding to id
@@ -167,8 +154,8 @@ module Savvy {
      * Gets the current "screen" DOM element (a DIV)
      * @returns {HTMLElement} The "screen" DOM element (a DIV)
      */
-    export function getScreen():HTMLElement {
-        return (document.getElementById(guid + "-BUFFER") || document.getElementById(guid));
+    export function getScreen():any { // should be HTMLElement
+        return (document.querySelector("article[data-role='buffer']") || document.querySelector("article[data-role='screen']"));
     }
 
     /**
@@ -243,9 +230,6 @@ module Savvy {
 		});
 		return ret;
 	}
-
-    // a counter to keep track of CSS links added to the HTML page
-    var cssCounter:number = 0;
 
     export var READY:string = "ready";
     export var ENTER:string = "enter";
@@ -334,7 +318,6 @@ module Savvy {
             }
             return;
         }
-        var limit:number = cssCounter - 1;
 
         var resp; // we might fire Savvy.LOAD or Savvy.EXIT here, this var will contain the result
         if (isFirstLoad) {
@@ -364,7 +347,7 @@ module Savvy {
             unsubscribe2(document.body.screen); // remove all subscriptions from this screen
             document.body.screen = {}; // and wipe out window._sreen
 
-            createHTMLArticleElement(guid + "-BUFFER", "buffer");
+            createHTMLArticleElement("buffer");
             Savvy.getScreen().style.display = "none";
 
             // NB: set up HTML before JS executes so HTML DOM is accessible
@@ -399,19 +382,20 @@ module Savvy {
 
         function doTransition():void {
             continueTransition = noop;
-            removeDOMNode(guid);
+            removeDOMNode(document.querySelector("article[data-role='screen']"));
 
             // remove old CSS and add new CSS
-            while(removeDOMNode(guid + "-CSS-" + limit)) {
-                limit--;
-            }
             // NB: Old CSS is removed first because developers tend to write conflicting CSS selectors
+            var links:NodeList = document.querySelectorAll("style[data-for='screen']");
+            for (var i = 0; i < links.length; i++) {
+                removeDOMNode(links[i]);
+            }
+
             // when using Savvy
             guaranteeArray(route.screen.css).forEach((element:File, index:number, array:Array):void => {
-                appendCssToHead(element.url, guid + "-CSS-" + cssCounter++);
+                appendCssToHead(element.url, true);
             });
 
-            Savvy.getScreen().id = guid;
             Savvy.getScreen().setAttribute("data-role", "screen");
             Savvy.getScreen().style.display = "block";
 
@@ -514,7 +498,7 @@ module Savvy {
      * @param url The URL of the CSS file
      * @param id The ID to give to the CSS link (otherwise one will be auto generated)
      */
-    function appendCssToHead(url:string, id?:string):void {
+    function appendCssToHead(url:string, isScreenCSS:boolean = false):void {
         var doLink:Boolean = (regExpressions.isRemoteUrl.test(url) || (window.navigator.appVersion.indexOf("MSIE 8") != -1));
         var node:HTMLElement;
         if (doLink) {
@@ -526,8 +510,8 @@ module Savvy {
             node = document.createElement("style");
             node.setAttribute("type", "text/css");
         }
-        if (typeof id == "string") {
-            node.id = id;
+        if (isScreenCSS) {
+            node.setAttribute("data-for", "screen");
         }
         try {
             if(!doLink) {
@@ -751,13 +735,9 @@ module Savvy {
      * @param id The ID to give to the DIV
      * @param style The style to apply (inline) to the DIV
      */
-	function createHTMLArticleElement(id:string, role?:string):void {
-        removeDOMNode(id); // remove in case one exists already
+	function createHTMLArticleElement(role:string = "screen"):void {
 		var article:HTMLElement = document.createElement("article");
-		article.id = id;
-        if (typeof role == "string") {
-            article.setAttribute("data-role", role);        
-        }
+        article.setAttribute("data-role", role);        
         
         article.style.width = "100%";
         article.style.overflow = "visible";
@@ -773,8 +753,7 @@ module Savvy {
      * @param id The ID of the DOM node to be removed
      * @returns {Boolean} true if the node was removed otherwise false
      */
-    function removeDOMNode(id):Boolean {
-        var node = document.getElementById(id);
+    function removeDOMNode(node:any):Boolean {
         if(node && node.parentNode) {
             return node.parentNode.removeChild(node) !== null;
         }
