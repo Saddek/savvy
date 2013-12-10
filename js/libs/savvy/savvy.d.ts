@@ -3,8 +3,8 @@ interface Window {
     _screen: any;
 }
 
-// declare screen so it is available in all contexts
-declare screen;
+// declare _screen so it is available in all contexts
+declare _screen;
 
 // document.getScreen() will return the the Savvy screen article
 interface Document {
