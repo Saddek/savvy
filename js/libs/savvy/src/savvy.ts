@@ -161,7 +161,7 @@ module Savvy {
      * @returns {HTMLElement} The "screen" DOM element (a DIV)
      */
     function getScreen():any { // should be HTMLElement
-        return (document.querySelector("article[data-role='buffer']") || document.querySelector("article[data-role='screen']"));
+        return (document.querySelector("section[data-role='buffer']") || document.querySelector("section[data-role='screen']"));
     }
     
     document.getScreen = getScreen;
@@ -352,7 +352,7 @@ module Savvy {
             unsubscribe2(window._screen); // remove all subscriptions from this screen
             window._screen = {}; // and wipe out window._sreen
 
-            createHTMLArticleElement("buffer");
+            createHTMLSectionElement("buffer");
             document.getScreen().style.display = "none";
 
             // NB: set up HTML before JS executes so HTML DOM is accessible
@@ -387,7 +387,7 @@ module Savvy {
 
         function doTransition():void {
             continueTransition = noop;
-            removeDOMNode(document.querySelector("article[data-role='screen']"));
+            removeDOMNode(document.querySelector("section[data-role='screen']"));
 
             // remove old CSS and add new CSS
             // NB: Old CSS is removed first because developers tend to write conflicting CSS selectors
@@ -740,17 +740,17 @@ module Savvy {
      * @param id The ID to give to the DIV
      * @param style The style to apply (inline) to the DIV
      */
-	function createHTMLArticleElement(role:string = "screen"):void {
-		var article:HTMLElement = document.createElement("article");
-        article.setAttribute("data-role", role);        
+	function createHTMLSectionElement(role:string = "screen"):void {
+		var section:HTMLElement = document.createElement("section");
+        section.setAttribute("data-role", role);        
         
-        article.style.width = "100%";
-        article.style.overflow = "visible";
-        article.style.padding = "0px";
-        article.style.margin = "0px";
-        article.style.visibility = "visible";
+        section.style.width = "100%";
+        section.style.overflow = "visible";
+        section.style.padding = "0px";
+        section.style.margin = "0px";
+        section.style.visibility = "visible";
 
-		document.body.appendChild(article);
+		document.body.appendChild(section);
 	}
 
     /**
