@@ -1,1 +1,0 @@
-Put "cordova.js" and "cordova_plugins.js" here. These files are already linked form index.html.
