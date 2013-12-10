@@ -34,7 +34,7 @@ module Savvy {
     }
     
     interface JSON {
-        file:File;
+        url:string;
         target:string;
     }
 
@@ -44,9 +44,9 @@ module Savvy {
 	interface Screen {
 	    id:string;
 	    title:string;
-	    html:File[];
-        css:File[];
-	    js:File[];
+	    html:string[];
+        css:string[];
+	    js:string[];
         json:JSON[];
 	}
 
@@ -77,8 +77,9 @@ module Savvy {
      * The Cache: this object will be a cache of files (html, js, css, xml, etc.)
      */
     class Cache {
-    	public static AUTO:string = "auto";
-        public static NEVER:string = "never";
+        public static YES = "yes"; // screen files are pre-cached
+        public static AUTO:string = "auto"; // screen files are cached on first load
+        public static NEVER:string = "never"; // screen fiels are never cached
         rule:string;
     	private _files:File[];
     	constructor(rule:string = Cache.AUTO){
@@ -263,7 +264,7 @@ module Savvy {
         }
     }
 
-    var xmlData:any = getJXONTree(readFile("data/app.xml", true).data);
+    var xmlData:any = getJXONTree(getFileFromUrl("data/app.xml", true).data);
     if (xmlData.app === undefined) {
         console.error("Could not parse app.xml. \"app\" node missing.");
     } else {
@@ -356,8 +357,8 @@ module Savvy {
             document.getScreen().style.display = "none";
 
             // NB: set up HTML before JS executes so HTML DOM is accessible
-            guaranteeArray(route.screen.html).forEach((element:File, index:number, array:Array):void => {
-                document.getScreen().innerHTML += readFile(element.url).data;
+            guaranteeArray(route.screen.html).forEach((url:string, index:number, array:Array):void => {
+                document.getScreen().insertAdjacentHTML("beforeend", readFile(url).data);
             });
 
             var executionContext:ExecutionContext = window[route.screen.id] = new ExecutionContext();
@@ -368,11 +369,11 @@ module Savvy {
             // NB: set up JSON before JS executes so JSON objects are already populated
             guaranteeArray(route.screen.json).forEach((element:JSON, index:number, array:Array):void => {
                 var target = element.target;
-                parseJSON(element.file.url, target, executionContext);
+                parseJSON(element.url, target, executionContext);
             });
             
-            guaranteeArray(route.screen.js).forEach((element:File, index:number, array:Array):void => {
-                executeJavaScript(element.url, executionContext);
+            guaranteeArray(route.screen.js).forEach((url:string, index:number, array:Array):void => {
+                executeJavaScript(url, executionContext);
             });
 
             this.getInfo = () => {
@@ -397,8 +398,8 @@ module Savvy {
             }
 
             // when using Savvy
-            guaranteeArray(route.screen.css).forEach((element:File, index:number, array:Array):void => {
-                appendCssToHead(element.url, true);
+            guaranteeArray(route.screen.css).forEach((url:string, index:number, array:Array):void => {
+                appendCssToHead(url, true);
             });
 
             document.getScreen().setAttribute("data-role", "screen");
@@ -473,12 +474,12 @@ module Savvy {
     	createModel(guaranteeArray(app.screens.screen));
 
         // NB: Do before HTML so that HTML lands formatted
-		guaranteeArray(app.css).forEach((element:string, index:number, array:Array):void => {
-			appendCssToHead(element);
+		guaranteeArray(app.css).forEach((url:string, index:number, array:Array):void => {
+			appendCssToHead(url);
 		});
 
-		guaranteeArray(app.html).forEach((element:string, index:number, array:Array):void => {
-            document.body.insertAdjacentHTML("beforeend", readFile(element).data);
+		guaranteeArray(app.html).forEach((url:string, index:number, array:Array):void => {
+            document.body.insertAdjacentHTML("beforeend", readFile(url).data);
 		});
 
         // NB: Do before JS so that data models are available to JS
@@ -491,8 +492,8 @@ module Savvy {
             }
         });
 
-        guaranteeArray(app.js).forEach((element:string, index:number, array:Array):void => {
-			executeJavaScript(element);
+        guaranteeArray(app.js).forEach((url:string, index:number, array:Array):void => {
+			executeJavaScript(url);
 		});
     }
 
@@ -504,7 +505,7 @@ module Savvy {
      * @param id The ID to give to the CSS link (otherwise one will be auto generated)
      */
     function appendCssToHead(url:string, isScreenCSS:boolean = false):void {
-        var doLink:Boolean = (regExpressions.isRemoteUrl.test(url) || (window.navigator.appVersion.indexOf("MSIE 8") != -1));
+        var doLink:Boolean = (regExpressions.isRemoteUrl.test(url) || window.navigator.appVersion.indexOf("MSIE 8") != -1);
         var node:HTMLElement;
         if (doLink) {
             node = document.createElement("link");
@@ -622,7 +623,7 @@ module Savvy {
     function parseJSON(url:string, target:string, context:any = window):void {
         var data:any;
         try {
-            var src:any = readFile(url).data;
+            var src:any = readFile(url, true).data; // prevent caching always with JSON (presume it is an API)
             data = JSON.parse(src);
         } catch (err) {
             console.error("Cannot parse data file (\"" + url + "\"). Please check that the file is valid JSON <http://json.org/>.");
@@ -667,7 +668,7 @@ module Savvy {
         for(var i = 0, ii = images.length; i < ii; i++) {
             var img = new Image();
             img.src = images[i];
-            cache.add({url:img.src, data:img});
+            cache.add({url:img.src, data:img}); // will be rejected if rule is NEVER
         }
     }
 
@@ -686,36 +687,33 @@ module Savvy {
                 json:[]
         	};
 
-			guaranteeArray(screens[i].html).forEach((element:string, index:number, array:Screen[]):void => {
-				var url:string = element.toString();
-                var file = readFile(url);
-                cache.add(file);
-                screen.html.push(file);
+			guaranteeArray(screens[i].html).forEach((url:string, index:number, array:Screen[]):void => {
+                if (cache.rule == Cache.YES) { // pre-cache?
+                    var file = readFile(url);
+                }
+                screen.html.push(url);
 			});
 
-            guaranteeArray(screens[i].css).forEach((element:string, index:number, array:Screen[]):void => {
-                var url:string = element.toString();
-                var file = readFile(url);
-                cache.add(file);
-                screen.css.push(file);
+            guaranteeArray(screens[i].css).forEach((url:string, index:number, array:Screen[]):void => {
+                if (cache.rule == Cache.YES) { // pre-cache?
+                    var file = readFile(url);
+                }
+                screen.css.push(url);
             });
 
-            guaranteeArray(screens[i].js).forEach((element:string, index:number, array:Screen[]):void => {
-                var url:string = element.toString();
-                var file = readFile(url);
-                cache.add(file);
-                screen.js.push(file);
+            guaranteeArray(screens[i].js).forEach((url:string, index:number, array:Screen[]):void => {
+                if (cache.rule == Cache.YES) { // pre-cache?
+                    var file = readFile(url);
+                }
+                screen.js.push(url);
             });
 
-            guaranteeArray(screens[i].json).forEach((element:string, index:number, array:Screen[]):void => {
+            guaranteeArray(screens[i].json).forEach((element:any, index:number, array:Screen[]):void => {
                 var target = element["@target"];
                 if (typeof target == "string") {
-                    var url:string = element.toString();
-                    var file = readFile(url);
-                    cache.add(file);
-                    screen.json.push({file:file, target:target});
+                    screen.json.push({url:element, target:target});
                 } else {
-                    console.error("No target attribute provided for JSON (\"" + url + "\")");
+                    console.error("No target attribute provided for JSON (\"" + element + "\")");
                 }
             });
 
@@ -776,17 +774,32 @@ module Savvy {
 	}
 
     /**
+     * Attempts to retrieve a file from the cache otherwise reads it from a URL.
+     * @param url The URL to read.
+     * @param noCache A Boolean indicating that the file should be not cached if read from a URL.
+     * @returns {*} A File object containing the URL and data of the file.
+     */
+    function readFile(url:string, noCache:boolean = false):File {
+        var file:File;
+
+        // first, try to get from cache first
+        file = cache.get(url);
+        if (file.data !== null) return file;
+        
+        file = getFileFromUrl(url);
+        if (!noCache) cache.add(file);
+        
+        return file;
+    }
+    
+    /**
      * Reads the file at URL and returns a File object for it.
      * @param url The URL to read.
      * @param asXML A Boolean indicating that the file should be read as an XML document.
      * @returns {*} A File object containing the URL and data of the file.
      */
-	function readFile(url:string, asXML:boolean = false):File {
+	function getFileFromUrl(url:string, asXML:boolean = false):File {
 		var file:File;
-
-		// first, try to get from cache first
-		file = cache.get(url);
-		if (file.data !== null) return file;
 
 		// not in cache?
 		var xmlhttp:XMLHttpRequest = new XMLHttpRequest(); // create the XMLHttpRequest object
