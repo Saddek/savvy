@@ -1,8 +1,14 @@
 // Savvy extends the JavaScript window with a "_screen" object that
 // refers to the current screen's execution context
-interface HTMLElement {
-	screen: any;
+interface Window {
+	_screen: any;
 }
+
+interface Document {
+    getScreen():any
+}
+
+window._screen = {};
 
 /**
  * The main Savvy object
@@ -57,7 +63,7 @@ module Savvy {
      */
 	class ExecutionContext {
 		constructor() {
-			document.body.screen = this;
+			window._screen = this;
 		}
         subscribe(type:string, action:() => boolean):void {
             Savvy.subscribe(type, action, this);
@@ -154,9 +160,11 @@ module Savvy {
      * Gets the current "screen" DOM element (a DIV)
      * @returns {HTMLElement} The "screen" DOM element (a DIV)
      */
-    export function getScreen():any { // should be HTMLElement
+    function getScreen():any { // should be HTMLElement
         return (document.querySelector("article[data-role='buffer']") || document.querySelector("article[data-role='screen']"));
     }
+    
+    document.getScreen = getScreen;
 
     /**
      * Implements a basic subscription service:
@@ -277,9 +285,6 @@ module Savvy {
         window.addEventListener(event, function deviceReadyEvent():void {
             window.removeEventListener(event, deviceReadyEvent);
             
-            // init screen object
-            document.body.screen = {};
-
             cache.rule = (xmlData.app.cache === undefined) ? Cache.AUTO : xmlData.app.cache;
             parseAppXML(xmlData.app);
     
@@ -310,7 +315,7 @@ module Savvy {
      * @private
      */
 	function load(route:Route, preventHistory:Boolean = false):void {
-        if (document.body.screen == window[route.screen.id]) {
+        if (window._screen == window[route.screen.id]) {
             if (preventHistory) {
                 console.info("Request to load current screen over itself. This is usually caused by navigating back from an fragment and can be ignored.");
             } else {
@@ -344,15 +349,15 @@ module Savvy {
                 }
             }
 
-            unsubscribe2(document.body.screen); // remove all subscriptions from this screen
-            document.body.screen = {}; // and wipe out window._sreen
+            unsubscribe2(window._screen); // remove all subscriptions from this screen
+            window._screen = {}; // and wipe out window._sreen
 
             createHTMLArticleElement("buffer");
-            Savvy.getScreen().style.display = "none";
+            document.getScreen().style.display = "none";
 
             // NB: set up HTML before JS executes so HTML DOM is accessible
             guaranteeArray(route.screen.html).forEach((element:File, index:number, array:Array):void => {
-                Savvy.getScreen().innerHTML += readFile(element.url).data;
+                document.getScreen().innerHTML += readFile(element.url).data;
             });
 
             var executionContext:ExecutionContext = window[route.screen.id] = new ExecutionContext();
@@ -396,8 +401,8 @@ module Savvy {
                 appendCssToHead(element.url, true);
             });
 
-            Savvy.getScreen().setAttribute("data-role", "screen");
-            Savvy.getScreen().style.display = "block";
+            document.getScreen().setAttribute("data-role", "screen");
+            document.getScreen().style.display = "block";
 
             document.title = (route.screen.title || "");
             if(!preventHistory) {

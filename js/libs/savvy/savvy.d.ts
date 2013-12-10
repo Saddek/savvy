@@ -1,13 +1,18 @@
 // Extend the Document to add a screen Object
-interface HTMLBodyElement {
-    screen: any;
+interface Window {
+    _screen: any;
+}
+
+// declare screen so it is available in all contexts
+declare screen;
+
+// document.getScreen() will return the the Savvy screen article
+interface Document {
+    getScreen():any
 }
 
 // A static definition of Savvy module
 class SavvyStatic {
-	// Get the Savvy DIVs
-	getScreen():HTMLElement;
-
 	// Load a new screen
 	go(id?:string):void;
 
