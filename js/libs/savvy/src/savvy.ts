@@ -401,11 +401,18 @@ module Savvy {
 
             // when using Savvy
             guaranteeArray(route.screen.css).forEach((url:string, index:number, array:Array):void => {
-                appendCssToHead(url, true);
+                appendCssToHeadFromUrl(url, true);
             });
-
+            
             document.getScreen().setAttribute("data-role", "screen");
-            document.getScreen().style.display = "block";
+
+            // this trick avoids FOUC (flash of unstyled content), the section is only revealed the last CSS directive
+            if (window.navigator.appVersion.indexOf("MSIE 8") == -1) {
+                appendCssToHead("section[data-role='screen'] { display: block !important; }", true);
+            } else {
+                // on IE8 we cannot add CSS to the head, so fouc FOUC prevention on IE8
+                document.getScreen().style.display = "block";            
+            }
 
             document.title = (route.screen.title || "");
             if(!preventHistory) {
@@ -477,7 +484,7 @@ module Savvy {
 
         // NB: Do before HTML so that HTML lands formatted
 		guaranteeArray(app.css).forEach((url:string, index:number, array:Array):void => {
-			appendCssToHead(url);
+			appendCssToHeadFromUrl(url);
 		});
 
 		guaranteeArray(app.html).forEach((url:string, index:number, array:Array):void => {
@@ -506,7 +513,7 @@ module Savvy {
      * @param url The URL of the CSS file
      * @param isScreenCSS A Boolean indicating that this CSS relates to the current screeen (optional)
      */
-    function appendCssToHead(url:string, isScreenCSS:boolean = false):void {
+    function appendCssToHeadFromUrl(url:string, isScreenCSS:boolean = false):void {
         var doLink:Boolean = (regExpressions.isRemoteUrl.test(url) || window.navigator.appVersion.indexOf("MSIE 8") != -1);
         var node:HTMLElement;
         if (doLink) {
@@ -540,6 +547,27 @@ module Savvy {
         }
     }
 
+    /**
+     * Attempts to appends a given CSS to the head of the HTML document.
+     * On some browsers (e.g. MSIE8) the CSS has to be linked from the head. And in the cases of external CSS URLs,
+     * it needs to be linked from the head. Otherwise, we prefer adding the CSS to the head.
+     * @param css CSS code to be appended to the head
+     * @param isScreenCSS A Boolean indicating that this CSS relates to the current screeen (optional)
+     */
+    function appendCssToHead(css:string, isScreenCSS:boolean = false):void {
+        var node:HTMLElement = document.createElement("style");
+        node.setAttribute("type", "text/css");
+        if (isScreenCSS) {
+            node.setAttribute("data-for", "screen");
+        }
+        try {
+            node.appendChild(document.createTextNode(css));
+            document.getElementsByTagName("head")[0].appendChild(node);
+        } catch(err) {
+            console.error("Error appending CSS to head: " + err.toString());
+        }
+    }
+    
     /**
      * Loads a JavaScript file and executes it in a given ExecutionContext, otherwise with the window object
      * @param url The URL of the JavaScript to execute
