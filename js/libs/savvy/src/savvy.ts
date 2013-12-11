@@ -316,14 +316,16 @@ module Savvy {
      * @private
      */
 	function load(route:Route, preventHistory:Boolean = false):void {
-        if (window._screen == window[route.screen.id]) {
+        /* FIXME: this needs to be thought through more. There are cases when a screen will be loaded upon itself (e.g. if the REST path changes).
+        if (route.path == Savvy.getInfo().path) {
             if (preventHistory) {
-                console.info("Request to load current screen over itself. This is usually caused by navigating back from an fragment and can be ignored.");
+                console.info("Request to load current URI over itself. This is usually caused by navigating back from an fragment. Ignoring.");
             } else {
-                console.warn("Attempt to load current screen as new screen. This is unsupported behavior. Ignoring.");
+                console.warn("Attempt to load current URI as new screen. This is unsupported behavior. Ignoring.");
             }
             return;
         }
+        */
 
         var resp; // we might fire Savvy.LOAD or Savvy.EXIT here, this var will contain the result
         if (isFirstLoad) {
