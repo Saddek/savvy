@@ -394,7 +394,7 @@ module Savvy {
 
             // remove old CSS and add new CSS
             // NB: Old CSS is removed first because developers tend to write conflicting CSS selectors
-            var links:NodeList = document.querySelectorAll("style[data-for='screen']");
+            var links:NodeList = document.querySelectorAll("style[data-for='screen'], link[data-for='screen']");
             for (var i = 0; i < links.length; i++) {
                 removeDOMNode(links[i]);
             }
@@ -504,7 +504,7 @@ module Savvy {
      * On some browsers (e.g. MSIE8) the CSS has to be linked from the head. And in the cases of external CSS URLs,
      * it needs to be linked from the head. Otherwise, we prefer adding the CSS to the head.
      * @param url The URL of the CSS file
-     * @param id The ID to give to the CSS link (otherwise one will be auto generated)
+     * @param isScreenCSS A Boolean indicating that this CSS relates to the current screeen (optional)
      */
     function appendCssToHead(url:string, isScreenCSS:boolean = false):void {
         var doLink:Boolean = (regExpressions.isRemoteUrl.test(url) || window.navigator.appVersion.indexOf("MSIE 8") != -1);
