@@ -9,8 +9,9 @@ interface Window {
 }
 
 interface Document {
-    getScreen():any
-    goto():void
+    getScreen():any;
+    goto(path:string):void;
+    continue:Function;
 }
 
 window._screen = {};
@@ -136,29 +137,29 @@ module Savvy {
      * Loads a screen in the app corresponding to id
      * @param path A path to a new screen. This must be a screen ID or a string beginning with a screen ID followed by a slash. Further characters may follow the slash.
      */
-    document["goto"] = (path:string = null):void => {
-        if (path == null) {
-            continueTransition();
+    document["goto"] = (path:string):void => {
+        if (typeof path != "string") {
+            console.warn("A string indicating a screen ID must be passed to document.goto method.");
             return;
-        } else {
-            var id = path.toString();
-            if (id.indexOf("/") != -1) {
-                id = id.substring(0, id.indexOf("/"));
-            }
-            var screen:Screen = null;
+        }
 
-            // loop through screens matching hash
-            for (var i=0, ii=model.length; i<ii; i++) {
-                if (model[i].id == id) {
-                    screen = model[i];
-                    break;
-                }
+        var id = path;
+        if (id.indexOf("/") != -1) {
+            id = id.substring(0, id.indexOf("/"));
+        }
+        var screen:Screen = null;
+
+        // loop through screens matching hash
+        for (var i=0, ii=model.length; i<ii; i++) {
+            if (model[i].id == id) {
+                screen = model[i];
+                break;
             }
-            if (screen == null) {
-                console.error("No screen with ID of \"" + id + "\".");
-            } else {
-                load({screen: screen, path: "/" + path});
-            }
+        }
+        if (screen == null) {
+            console.error("No screen with ID of \"" + id + "\".");
+        } else {
+            load({screen: screen, path: "/" + path});
         }
 	}
 
@@ -241,10 +242,6 @@ module Savvy {
      * @returns {boolean} Will be false if any of the subscription functions returned false
      */
 	function publish(type:String, arg:any = null):boolean {
-        if (type === Savvy.READY || type === Savvy.ENTER || type === Savvy.EXIT || type === Savvy.LOAD) {
-            throw new Error("Illegal. Only Savvy may publish a Savvy event (i.e. Savvy.READY, Savvy.ENTER, Savvy.EXIT or Savvy.LOAD).");
-            return;
-        }
 		var ret:boolean = true;
 		subscriptions.forEach((element:Subscription, index:number, array:Subscription[]):void => {
 			if (element.type === type && typeof element.action === "function") {
@@ -253,8 +250,20 @@ module Savvy {
 		});
 		return ret;
 	}
-    // expose to Window object
-    window.publish = publish;
+
+    /**
+     * A public API to the publish method with safeguards against publishing private messages
+     * @param type A String corresponding to the subscription
+     * @param arg An object of any kind that will be passed to subscribing functions
+     * @returns {boolean} Will be false if any of the subscription functions returned false
+     */
+    window.publish = (type:String, arg:any = null):boolean => {
+        if (type === Savvy.READY || type === Savvy.ENTER || type === Savvy.EXIT || type === Savvy.LOAD) {
+            throw new Error("Illegal. Only Savvy may publish a Savvy event (i.e. Savvy.READY, Savvy.ENTER, Savvy.EXIT or Savvy.LOAD).");
+            return;
+        }
+        return publish(type, arg);
+    }
 
     // these are Strings so that they can be compared exactly agaisnt themselves (i.e. "ready" !== new String("ready"))
     export var READY:String = new String("ready");
@@ -446,6 +455,9 @@ module Savvy {
      * @type {Function}
      */
     var continueTransition:Function = ():void => {};
+    // expose to allow continuation
+    document["continue"] = continueTransition;
+
 
     /**
      * Creates a Route object for the current URL

@@ -13,7 +13,8 @@ declare _screen;
 // document.getScreen() will return the the Savvy screen article
 interface Document {
     getScreen():any;
-    goto():void;
+    goto(path:string):void;
+    continue:Function;
 }
 
 // A static definition of Savvy module
