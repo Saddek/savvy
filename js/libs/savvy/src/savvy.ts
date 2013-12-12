@@ -2,10 +2,15 @@
 // refers to the current screen's execution context
 interface Window {
 	_screen: any;
+    // Sub-Pub mechanism
+    subscribe(type:string, action:() => boolean, screen?:any):void;
+    unsubscribe(type:string, action:() => boolean):void;
+    publish(type:String, arg?:any):boolean;
 }
 
 interface Document {
     getScreen():any
+    goto():void
 }
 
 window._screen = {};
@@ -66,10 +71,10 @@ module Savvy {
 			window._screen = this;
 		}
         subscribe(type:string, action:() => boolean):void {
-            Savvy.subscribe(type, action, this);
+            window.subscribe(type, action, this);
         }
         unsubscribe(type:string, action:() => boolean):void {
-            Savvy.unsubscribe(type, action);
+            window.unsubscribe(type, action);
         }
     }
 
@@ -131,7 +136,7 @@ module Savvy {
      * Loads a screen in the app corresponding to id
      * @param path A path to a new screen. This must be a screen ID or a string beginning with a screen ID followed by a slash. Further characters may follow the slash.
      */
-	export function go(path:string = null):void {
+    document["goto"] = (path:string = null):void => {
         if (path == null) {
             continueTransition();
             return;
@@ -164,12 +169,12 @@ module Savvy {
     function getScreen():any { // should be HTMLElement
         return (document.querySelector("section[data-role='buffer']") || document.querySelector("section[data-role='screen']"));
     }
-    
+    // expose to Document
     document.getScreen = getScreen;
 
     /**
      * Implements a basic subscription service:
-     * Used in Savvy.subscribe() and Savvy.unsubscribe()
+     * Used in window.subscribe() and window.unsubscribe()
      */
 	class Subscription {
 		type:string;
@@ -191,18 +196,20 @@ module Savvy {
      * @param action A function to be called when the message occurs, return false to block the event
      * @param screen A screen object to associate the subscription with (usually left to default)
      */
-	export function subscribe(type:string, action:() => boolean, screen:any = window):void {
+	function subscribe(type:string, action:() => boolean, screen:any = window):void {
         unsubscribe(type, action); // attempt to unsubscribe, so as to ensure that functions don't get called twice
 		var sub = new Subscription(type, action, screen);
 		subscriptions.push(sub);
 	}
+    // expose to window object
+    window.subscribe = subscribe;
 
     /**
      * Enables an application to unsubscribe from Savvy events
      * @param type A String corresponding to the message to be unsubscibed from
      * @param action The function that is called when the subscription is called
      */
-	export function unsubscribe(type:string, action:() => boolean):void {
+	function unsubscribe(type:string, action:() => boolean):void {
         for (var i:number = 0; i < subscriptions.length; i++) {
             if (subscriptions[i].type === type && subscriptions[i].action === action) {
                 subscriptions.splice(i, 1);
@@ -210,6 +217,9 @@ module Savvy {
             }
         }
 	}
+    // expose to window object
+    window.unsubscribe = unsubscribe;
+
 
     /**
      * Removes all subscriptions associated with a given screen
@@ -230,7 +240,11 @@ module Savvy {
      * @param arg An object of any kind that will be passed to subscribing functions
      * @returns {boolean} Will be false if any of the subscription functions returned false
      */
-	function publish(type:string, arg:any = null):boolean {
+	function publish(type:String, arg:any = null):boolean {
+        if (type === Savvy.READY || type === Savvy.ENTER || type === Savvy.EXIT || type === Savvy.LOAD) {
+            throw new Error("Illegal. Only Savvy may publish a Savvy event (i.e. Savvy.READY, Savvy.ENTER, Savvy.EXIT or Savvy.LOAD).");
+            return;
+        }
 		var ret:boolean = true;
 		subscriptions.forEach((element:Subscription, index:number, array:Subscription[]):void => {
 			if (element.type === type && typeof element.action === "function") {
@@ -239,11 +253,14 @@ module Savvy {
 		});
 		return ret;
 	}
+    // expose to Window object
+    window.publish = publish;
 
-    export var READY:string = "ready";
-    export var ENTER:string = "enter";
-    export var EXIT:string = "exit";
-    export var LOAD:string = "load";
+    // these are Strings so that they can be compared exactly agaisnt themselves (i.e. "ready" !== new String("ready"))
+    export var READY:String = new String("ready");
+    export var ENTER:String = new String("enter");
+    export var EXIT:String = new String("exit");
+    export var LOAD:String = new String("load");
 
     /**
      * A JXONNode class, used as a container object when parsing XML to a JavaScript object.
@@ -356,11 +373,11 @@ module Savvy {
             window._screen = {}; // and wipe out window._sreen
 
             createHTMLSectionElement("buffer");
-            document.getScreen().style.display = "none";
+            getScreen().style.display = "none";
 
             // NB: set up HTML before JS executes so HTML DOM is accessible
             guaranteeArray(route.screen.html).forEach((url:string, index:number, array:Array):void => {
-                document.getScreen().insertAdjacentHTML("beforeend", readFile(url).data);
+                getScreen().insertAdjacentHTML("beforeend", readFile(url).data);
             });
 
             var executionContext:ExecutionContext = window[route.screen.id] = new ExecutionContext();
@@ -404,14 +421,14 @@ module Savvy {
                 appendCssToHeadFromUrl(url, true);
             });
             
-            document.getScreen().setAttribute("data-role", "screen");
+            getScreen().setAttribute("data-role", "screen");
 
             // this trick avoids FOUC (flash of unstyled content), the section is only revealed the last CSS directive
             if (window.navigator.appVersion.indexOf("MSIE 8") == -1) {
                 appendCssToHead("section[data-role='screen'] { display: block !important; }", true);
             } else {
                 // on IE8 we cannot add CSS to the head, so fouc FOUC prevention on IE8
-                document.getScreen().style.display = "block";            
+                getScreen().style.display = "block";            
             }
 
             document.title = (route.screen.title || "");

@@ -111,7 +111,7 @@
   <script type="text/javascript">
   (function(){
     /* Reset the splash screen. */
-    Savvy.subscribe(Savvy.LOAD, function() {
+    window.subscribe(Savvy.LOAD, function() {
       // remove the CSS link altogether
       var style = document.getElementById("savvy-splash-css");
       style.parentNode.removeChild(style);
