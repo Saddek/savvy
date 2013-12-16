@@ -4,7 +4,7 @@ interface Window {
     // Sub-Pub mechanism
     subscribe(type:string, action:() => boolean, screen?:any):void;
     unsubscribe(type:string, action:() => boolean):void;
-    publish(type:string, arg?:any):boolean;
+    publish(type:string, ...args:any[]):boolean;
 }
 
 // declare _screen so it is available in all contexts
