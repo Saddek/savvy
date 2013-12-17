@@ -310,8 +310,15 @@ module Savvy {
     if (xmlData.app === undefined) {
         console.error("Could not parse app.xml. \"app\" node missing.");
     } else {
-        var event:string = (xmlData.app["@cordova"] == "yes") ? "deviceready" : "load";
+        // first assume window.load
+        var event:string = "load";
+        var element:any = window;
         if (xmlData.app["@cordova"] == "yes") {
+            // then modify to document.deviceready
+            event = "deviceready";
+            element = document;
+
+            // add the Cordova scritps (assume these are in the root directory)
             var cordova_lib:HTMLElement = document.createElement("script");
             cordova_lib.setAttribute("src", "cordova.js");
             cordova_lib.setAttribute("type", "text/javascript");
@@ -325,8 +332,8 @@ module Savvy {
         }
 
         // ordinarily, Savvy will be initialised when the DOM is ready
-        window.addEventListener(event, function deviceReadyEvent():void {
-            window.removeEventListener(event, deviceReadyEvent);
+        element.addEventListener(event, function deviceReadyEvent():void {
+            element.removeEventListener(event, deviceReadyEvent);
             
             cache.rule = (xmlData.app.cache === undefined) ? Cache.AUTO : xmlData.app.cache;
             parseAppXML(xmlData.app);
