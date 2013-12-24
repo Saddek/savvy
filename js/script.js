@@ -2,6 +2,7 @@
 
 window.subscribe(Savvy.LOAD, function(){
 	// fired once when Savvy loads first
+	document.querySelector("audio").play();		
 });
 
 window.subscribe(Savvy.READY, function(){

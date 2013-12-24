@@ -1,15 +1,13 @@
 /* Use this file to set CSS styles for the Home screen (see data/app.xml). */
 
-h1 {
+h2, h3 {
 	font-family: 'Rock Salt', cursive;
 	color: #333;
 }
 
-img {
-	width: auto;
-	height: 320px;
-	min-height: 100px;
-	max-height: 320px;
+p {
+	font-family: Helvetica, Arial, Verdana, sans-serif;
+	text-align: justify;
 }
 
 button {
@@ -21,8 +19,8 @@ button {
 	-webkit-border-radius: 4px;
 	border-radius: 4px;
 	border: none;
-	background: #33B5E5;
-	color: white;
+	background: transparent;
+	color: #33B5E5;
 }
 
 button:focus {
@@ -31,11 +29,10 @@ button:focus {
 
 .align-center {
 	text-align: center;
-	width: 100%;
 }
 
-.fix-to-bottom {
-	position: absolute;
-	bottom: 1em;
-	left: 0px;
+.margins {
+	width:80%;
+	margin-left:auto;
+	margin-right:auto;
 }

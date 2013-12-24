@@ -1,1 +1,6 @@
 /* Use this file to set common CSS styles (see data/app.xml).. */
+
+body {
+	/* http://subtlepatterns.com/fabric-of-squares/ */
+	background-image: url("../assets/images/fabric_of_squares_gray/fabric_of_squares_gray.png");
+}

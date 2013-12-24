@@ -1,6 +1,6 @@
 /* Style for the splash screen to be shown while the framework loads. */
 
 body {
-	background:black url("../assets/images/splash.svg") no-repeat fixed center center;
+	background:black url("../assets/images/pirate.svg") no-repeat fixed center center;
 	background-size: contain;
 }

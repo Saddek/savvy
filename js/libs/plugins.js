@@ -1,13 +1,14 @@
-// Link to this file in app.xml. Place jQuery or helper functions here.
+// Monkey patches for various JavaScript objects (required for older browsers)
 
-// create the console object if it doesn't exist
+// Create the console object if it doesn't exist
 (function(a){function b(){}for(var c="assert,count,debug,dir,dirxml,error,exception,group,groupCollapsed,groupEnd,info,log,markTimeline,profile,profileEnd,time,timeEnd,trace,warn".split(","),d;!!(d=c.pop());){a[d]=a[d]||b;}})
 (function(){try{console.log();return window.console;}catch(a){return (window.console={});}}());
 
-// monkey patch window.addEventListener on IE8
-if(!window.addEventListener){window.addEventListener=function(c,a,b){window.attachEvent("on"+c,a,b)}};
+// Monkey patch window.addEventListener and window.removeEventListener on IE8
+window.addEventListener||(window.addEventListener=function(a,b,c){window.attachEvent("on"+a,b,c)});
+window.removeEventListener||(window.removeEventListener=function(a,b,c){window.detachEvent("on"+a,b,c)});
 
-// creates a standard JSON object if it does not exist already:
+// Creates a standard JSON serialiser/de-serialiser, if it does not exist already:
 // - https://github.com/douglascrockford/JSON-js
 // - http://json.org/
 "object"!==typeof JSON&&(JSON={});

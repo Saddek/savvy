@@ -182,7 +182,7 @@ module Savvy {
      * @returns {HTMLElement} The "screen" DOM element (a DIV)
      */
     function getScreen():any { // should be HTMLElement
-        return (document.querySelector("section[data-role='buffer']") || document.querySelector("section[data-role='screen']"));
+        return (document.querySelector("body > object[type='application/x-savvy-buffer']") || document.querySelector("body > object[type='application/x-savvy']"));
     }
     // expose to Document
     document.getScreen = getScreen;
@@ -335,7 +335,7 @@ module Savvy {
         element.addEventListener(event, function deviceReadyEvent():void {
             element.removeEventListener(event, deviceReadyEvent);
             
-            cache.rule = (xmlData.app.cache === undefined) ? Cache.AUTO : xmlData.app.cache;
+            cache.rule = (xmlData.app["@cache"] === undefined) ? Cache.AUTO : xmlData.app["@cache"];
             parseAppXML(xmlData.app);
     
             load.call(Savvy, getRoute(), true);
@@ -404,11 +404,14 @@ module Savvy {
             unsubscribe2(window._screen); // remove all subscriptions from this screen
             window._screen = {}; // and wipe out window._sreen
 
-            createHTMLSectionElement("buffer");
-            getScreen().style.display = "none";
+            // NB: once the following main section is created it will become document.getScreen()
+            var obj:HTMLElement = document.createElement("object");
+            obj.setAttribute("data", route.screen.id);
+            obj.setAttribute("type", "application/x-savvy-buffer");
+            document.body.insertBefore(obj, document.body.firstChild);
 
             // NB: set up HTML before JS executes so HTML DOM is accessible
-            guaranteeArray(route.screen.html).forEach((url:string, index:number, array:Array):void => {
+            guaranteeArray(route.screen.html).forEach((url:string, index:number, array:string[]):void => {
                 getScreen().insertAdjacentHTML("beforeend", readFile(url).data);
             });
 
@@ -418,12 +421,12 @@ module Savvy {
             }
             
             // NB: set up JSON before JS executes so JSON objects are already populated
-            guaranteeArray(route.screen.json).forEach((element:JSON, index:number, array:Array):void => {
+            guaranteeArray(route.screen.json).forEach((element:JSON, index:number, array:JSON[]):void => {
                 var target = element.target;
                 parseJSON(element.url, target, executionContext);
             });
             
-            guaranteeArray(route.screen.js).forEach((url:string, index:number, array:Array):void => {
+            guaranteeArray(route.screen.js).forEach((url:string, index:number, array:string[]):void => {
                 executeJavaScript(url, executionContext);
             });
 
@@ -439,7 +442,7 @@ module Savvy {
 
         function doTransition():void {
             continueTransition = noop;
-            removeDOMNode(document.querySelector("section[data-role='screen']"));
+            removeDOMNode(document.querySelector("body > object[type='application/x-savvy']"));
 
             // remove old CSS and add new CSS
             // NB: Old CSS is removed first because developers tend to write conflicting CSS selectors
@@ -449,15 +452,15 @@ module Savvy {
             }
 
             // when using Savvy
-            guaranteeArray(route.screen.css).forEach((url:string, index:number, array:Array):void => {
+            guaranteeArray(route.screen.css).forEach((url:string, index:number, array:string[]):void => {
                 appendCssToHeadFromUrl(url, true);
             });
             
-            getScreen().setAttribute("data-role", "screen");
+            getScreen().setAttribute("type", "application/x-savvy");
 
-            // this trick avoids FOUC (flash of unstyled content), the section is only revealed the last CSS directive
+            // this trick avoids FOUC (flash of unstyled content), the main section is only revealed the last CSS directive
             if (window.navigator.appVersion.indexOf("MSIE 8") == -1) {
-                appendCssToHead("section[data-role='screen'] { display: block !important; }", true);
+                appendCssToHead("body > object[type='application/x-savvy'] { display: block !important; }", true);
             } else {
                 // on IE8 we cannot add CSS to the head, so fouc FOUC prevention on IE8
                 getScreen().style.display = "block";            
@@ -537,16 +540,16 @@ module Savvy {
     	createModel(guaranteeArray(app.screens.screen));
 
         // NB: Do before HTML so that HTML lands formatted
-		guaranteeArray(app.css).forEach((url:string, index:number, array:Array):void => {
+		guaranteeArray(app.css).forEach((url:string, index:number, array:string[]):void => {
 			appendCssToHeadFromUrl(url);
 		});
 
-		guaranteeArray(app.html).forEach((url:string, index:number, array:Array):void => {
+		guaranteeArray(app.html).forEach((url:string, index:number, array:string[]):void => {
             document.body.insertAdjacentHTML("beforeend", readFile(url).data);
 		});
 
         // NB: Do before JS so that data models are available to JS
-        guaranteeArray(app.json).forEach((element:any, index:number, array:Array):void => {
+        guaranteeArray(app.json).forEach((element:any, index:number, array:any[]):void => {
             var target = element["@target"];
             if (typeof target == "string") {
                 parseJSON(element, target);
@@ -555,7 +558,7 @@ module Savvy {
             }
         });
 
-        guaranteeArray(app.js).forEach((url:string, index:number, array:Array):void => {
+        guaranteeArray(app.js).forEach((url:string, index:number, array:string[]):void => {
 			executeJavaScript(url);
 		});
     }
@@ -815,24 +818,6 @@ module Savvy {
         if (defaultScreen === null) {
             throw "No default screen set.";
         }
-	}
-
-    /**
-     * Creates a HTML <savvy-screen> element and appends it to the body of the HTML document.
-     * @param id The ID to give to the DIV
-     * @param style The style to apply (inline) to the DIV
-     */
-	function createHTMLSectionElement(role:string = "screen"):void {
-		var section:HTMLElement = document.createElement("section");
-        section.setAttribute("data-role", role);        
-        
-        section.style.width = "100%";
-        section.style.overflow = "visible";
-        section.style.padding = "0px";
-        section.style.margin = "0px";
-        section.style.visibility = "visible";
-
-		document.body.appendChild(section);
 	}
 
     /**
