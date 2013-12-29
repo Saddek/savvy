@@ -23,8 +23,12 @@
   <!-- iPhone-specific settings suitable for HTML-based apps: https://developer.apple.com/library/safari/#codinghowtos/Mobile/UserExperience/_index.html -->
   <!-- Hide the URL bar when running the app from the iPhone Home screen -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <!-- Do not attempt to automatically detect phone numbers -->
   <meta name="format-detection" content="telephone=no" />
+
+  <!-- enable ClearType on IE -->
+  <meta http-equiv="cleartype" content="on">
 
   <!-- es5-shim.js patches a JavaScript context to contain all EcmaScript 5 methods 
   	   that can be faithfully emulated with a legacy JavaScript engine.s -->
@@ -44,7 +48,7 @@
   <!--<![endif]-->
 
   <!-- normalize.css: http://necolas.github.io/normalize.css/ -->
-  <link rel="stylesheet" href="css/libs/normalize/normalize.css">
+  <link rel="stylesheet" href="css/libs/normalize/normalize.css" />
   
   <style type="text/css">
     * {
@@ -119,23 +123,58 @@
 
 	html, body {
 		height:100%;
+		width: 100%;
 	}
 	
-	body > object[type="application/x-savvy"],
-	body > object[type="application/x-savvy-buffer"] {
+	body > object[type="application/x-savvy"] {
 	  position: absolute;
-	  top: 0px;
-	  left: 0px;
+	  top: 0%;
+	  left: 0%;
 	  
       height: 100%;
       width: 100%;
       overflow: visible;
-
-      /* These elements will be displayed automatically */
-      display:none !important;
     }
     
   </style>
+  
+	<style type="text/css">
+
+	html.lock-scroll {
+		overflow: hidden;
+		overflow-x: hidden;
+		overflow-y: hidden;
+	}
+	
+	body > object[type="application/x-savvy"].transition {
+		-webkit-transition: -webkit-transform 500ms ease-in-out;
+		transition: transform 500ms ease-in-out;
+	}
+
+	body > object[type="application/x-savvy"].cut-scr1 {
+		display: none;
+	}
+	
+	body > object[type="application/x-savvy"].cut-scr2 {
+	}
+	
+	body > object[type="application/x-savvy"].pan-scr1 {
+		-webkit-transform: translate3d(-100%, 0%, 0);
+		transform: translate3d(-100%, 0%, 0);
+	}
+	
+	body > object[type="application/x-savvy"].pan-scr2 {
+		-webkit-transform: translate3d(+100%, 0%, 0);
+		transform: translate3d(+100%, 0%, 0);
+	}
+
+	body > object[type="application/x-savvy"].on-stage {
+		-webkit-transform: translate3d(0%, 0%, 0);
+		transform: translate3d(0%, 0%, 0);
+	}
+	
+	</style>
+
 
   <!-- The splash screen CSS and JavaScript to remove it on load -->
   <link rel="stylesheet" id="savvy-splash-css" href="css/splash.css">
@@ -143,9 +182,9 @@
   (function(){
 	/* Reset the splash screen. */
     window.subscribe(Savvy.LOAD, function() {
-      // remove the CSS link altogether
-      var style = document.getElementById("savvy-splash-css");
-      style.parentNode.removeChild(style);
+	  // remove the CSS link altogether
+	  var style = document.getElementById("savvy-splash-css");
+	  style.parentNode.removeChild(style);
     })
   })();
   </script>

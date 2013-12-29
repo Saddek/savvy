@@ -1,7 +1,4 @@
-// Savvy extends the JavaScript window with a "_screen" object that
-// refers to the current screen's execution context
 interface Window {
-	_screen: any;
     // Sub-Pub mechanism
     subscribe(type:string, action:() => boolean, screen?:any):void;
     unsubscribe(type:string, action:() => boolean):void;
@@ -9,12 +6,18 @@ interface Window {
 }
 
 interface Document {
-    getScreen():any;
+    screen:HTMLElement;
     goto(path:string):void;
     continue:Function;
 }
 
-window._screen = {};
+interface HTMLElement {
+    subscribe(type:string, action:() => boolean):void;
+    unsubscribe(type:string, action:() => boolean):void;
+    publish(type:String, ...args : any[]):boolean;
+}
+
+document.screen = null;
 
 /**
  * The main Savvy object
@@ -22,38 +25,16 @@ window._screen = {};
 module Savvy {
 
     /**
-     * Implement JavaScript's EventListener in TypeScript (appears to be missing from implementation)
-     */
-    interface EventListener {
-        type:string;
-        listener:Function;
-        useCapture:Boolean;
-    }
-
-
-    /**
-     * The File interface: used to describe files (url, data)
-     */
-    interface File {
-        url:string;
-        data:any;
-    }
-    
-    interface JSON {
-        url:string;
-        target:string;
-    }
-
-    /**
      * The Screen interface: used to describe screens (id, title, html, etc.)
      */
 	interface Screen {
 	    id:string;
 	    title:string;
-	    html:string[];
-        css:string[];
-	    js:string[];
-        json:JSON[];
+        html:HTMLElement;
+        scroll: {
+            top:number;
+            left:number;
+        }
 	}
 
     /**
@@ -67,70 +48,35 @@ module Savvy {
     /**
      * The ExecutionContext: this is the object that will be populated and executed each screen's JavaScript
      */
-	class ExecutionContext {
-		constructor() {
-			window._screen = this;
-		}
-        subscribe(type:string, action:() => boolean):void {
-            window.subscribe.call(Savvy, type, action, this);
+	function makeScreenContext(element:HTMLElement) {
+        element.subscribe = (type:string, action:() => boolean):void => {
+            window.subscribe.call(Savvy, type, action, element);
         }
-        unsubscribe(type:string, action:() => boolean):void {
+        element.unsubscribe = (type:string, action:() => boolean):void => {
             window.unsubscribe.call(Savvy, type, action);
         }
-        publish(type:String, ...args : any[]):boolean {
-            return publish2.apply(this, arguments);
+        element.publish = (type:String, ...args : any[]):boolean => {
+            return publish2.apply(element, arguments);
         }
-    }
-
-    /**
-     * The Cache: this object will be a cache of files (html, js, css, xml, etc.)
-     */
-    class Cache {
-        public static YES:string = "yes"; // screen files are pre-cached
-        public static AUTO:string = "auto"; // screen files are cached on first load
-        public static NEVER:string = "never"; // screen fiels are never cached
-        rule:string;
-    	private _files:File[];
-    	constructor(rule:string = Cache.AUTO){
-    		this.rule = rule;
-	    	this._files = [];
-    	}
-
-	    add(file:File):File {
-            if (this.rule != Cache.NEVER && this.get(file.url).data == null) {
-                this._files.push(file);
-                return file;
-            }
-	    }
-
-		get(url:string):File {
-			for (var i=0, ii=this._files.length; i<ii; i++) {
-				if (this._files[i].url === url) {
-					return this._files[i];
-				}
-			}
-
-			return {url:url, data:null};
-		}	    
     }
 
     // an array of screens in the app
 	var model:Screen[] = [];
     // the default screen for the app (this will reference one in the array)
     var defaultScreen:Screen = null;
-    // a cache of files used by the app (html, css, js, etc.)
-	var cache:Cache = new Cache();
 
 	// define all regexes one in a static variable to save computation time
-	var regExpressions:any = {
+	var regex = {
 		isRemoteUrl: new RegExp("(http|ftp|https)://[a-z0-9\-_]+(\.[a-z0-9\-_]+)+([a-z0-9\-\.,@\?^=%&;:/~\+#]*[a-z0-9\-@\?^=%&;/~\+#])?", "i"),
-		css: { // used to find instances of url references in css files that need to be modified
+		css: {
+            // used to find instances of url references in css files that need to be modified
+            // FIXME: gives a false positive for data URIs
 			singleQuotes: /url\('(?!https?:\/\/)(?!\/)/gi,
         	doubleQuotes: /url\("(?!https?:\/\/)(?!\/)/gi,
-        	noQuotes: /url\((?!https?:\/\/)(?!['"]\/?)/gi
+        	noQuotes: /url\((?!https?:\/\/)(?!['"]\/?)/gi,
+            selector: /([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/gi
 		},
-        isJSIdentifier: /^[$A-Z_][0-9A-Z_$]*$/i,
-        includeStatement: /^#include "(.*)"$/gm
+        include: /^#include "(.*)"$/gm
 	}
 
     // a blank function (defined here once to save memory and time)
@@ -140,15 +86,20 @@ module Savvy {
      * Loads a screen in the app corresponding to id
      * @param path A path to a new screen. This must be a screen ID or a string beginning with a screen ID followed by a slash. Further characters may follow the slash.
      */
-    document["goto"] = (path:string):void => {
-        goto2.call(Savvy, path);
+    document["goto"] = (path:string, transition:String = Savvy.CUT, reverse:boolean = false):void => {
+        if (transition == Savvy.CUT && reverse === true) {
+            console.warn("The cut transition has no reverse variant.");
+            reverse = false;
+        }
+        
+        goto2.call(Savvy, path, transition, reverse);
     }
 
     /**
      * The function called by document.goto
      * @param path A path to a new screen. This must be a screen ID or a string beginning with a screen ID followed by a slash. Further characters may follow the slash.
      */
-    function goto2(path:string):void {
+    function goto2(path:string, transition:String, reverse:boolean):void {
         try {
             // normalise
             path = path.toString();
@@ -161,31 +112,29 @@ module Savvy {
         if (id.indexOf("/") != -1) {
             id = id.substring(0, id.indexOf("/"));
         }
-        var screen:Screen = null;
+        var screen:Screen = getScreenWithID(id);
 
-        // loop through screens matching hash
-        for (var i=0, ii=model.length; i<ii; i++) {
-            if (model[i].id == id) {
-                screen = model[i];
-                break;
-            }
-        }
         if (screen == null) {
             console.error("No screen with ID of \"" + id + "\".");
         } else {
-            load.call(Savvy, {screen: screen, path: "/" + path});
+            load.call(Savvy, {screen: screen, path: "/" + path}, transition, reverse, false);
         }
 	}
-
-    /**
-     * Gets the current "screen" DOM element (a DIV)
-     * @returns {HTMLElement} The "screen" DOM element (a DIV)
+    
+    /*
+     * Searches the model for a screen of a particular ID
+     * @param id A String ID for a screen
+     * @returns {Screen} the Screen for the given ID or null
      */
-    function getScreen():any { // should be HTMLElement
-        return (document.querySelector("body > object[type='application/x-savvy-buffer']") || document.querySelector("body > object[type='application/x-savvy']"));
+    function getScreenWithID(id:string):Screen {
+        // loop through screens matching hash
+        for (var i=0, ii=model.length; i<ii; i++) {
+            if (model[i].id == id) {
+                return model[i];
+            }
+        }
+        return null;
     }
-    // expose to Document
-    document.getScreen = getScreen;
 
     /**
      * Implements a basic subscription service:
@@ -258,9 +207,17 @@ module Savvy {
 	function publish(type:String, ...args:any[]):boolean {
 		var ret:boolean = true;
 		subscriptions.forEach((element:Subscription, index:number, array:Subscription[]):void => {
-			if (element.type === type && typeof element.action === "function") {
-				ret = !(element.action.apply(element.screen, args) === false || ret === false);
-			}
+            switch (element.screen) {
+                case window:
+                case document.screen:
+                    if (element.type === type && typeof element.action === "function") {
+                        ret = !(element.action.apply(element.screen, args) === false || ret === false);
+                    }
+                    break;
+                default:
+                    // ignore all calls not to the current screen or window
+                    break;
+            }
 		});
 		return ret;
 	}
@@ -287,6 +244,9 @@ module Savvy {
     export var EXIT:String = new String("exit");
     export var LOAD:String = new String("load");
 
+    export var CUT:String = new String("cut");
+    export var PAN:String = new String("pan");
+    
     /**
      * A JXONNode class, used as a container object when parsing XML to a JavaScript object.
      */
@@ -306,7 +266,7 @@ module Savvy {
         }
     }
 
-    var xmlData:any = getJXONTree(getFileFromUrl("data/app.xml", true).data);
+    var xmlData:any = getJXONTree(readFile("data/app.xml", true));
     if (xmlData.app === undefined) {
         console.error("Could not parse app.xml. \"app\" node missing.");
     } else {
@@ -335,10 +295,9 @@ module Savvy {
         element.addEventListener(event, function deviceReadyEvent():void {
             element.removeEventListener(event, deviceReadyEvent);
             
-            cache.rule = (xmlData.app["@cache"] === undefined) ? Cache.AUTO : xmlData.app["@cache"];
             parseAppXML(xmlData.app);
     
-            load.call(Savvy, getRoute(), true);
+            load.call(Savvy, getRoute(), Savvy.CUT, false, true);
         }, false);
     }
 
@@ -350,7 +309,7 @@ module Savvy {
             var route:Route = getRoute();
             if (typeof route.screen == "object") {
                 // don't load a route that doesn't exist
-                load.call(Savvy, route, true);
+                load.call(Savvy, route, Savvy.CUT, false, true);
             }
         }
     }, false);
@@ -364,7 +323,7 @@ module Savvy {
      * @param preventHistory A Boolean (optional), if false the hash element of the URL will not be updated
      * @private
      */
-	function load(route:Route, preventHistory:Boolean = false):void {
+	function load(route:Route, transition:String, reverse:boolean, preventHistory:boolean):void {
         /* FIXME: this needs to be thought through more. There are cases when a screen will be loaded upon itself (e.g. if the REST path changes).
         if (route.path == Savvy.getInfo().path) {
             if (preventHistory) {
@@ -391,45 +350,8 @@ module Savvy {
         }
 
         function prepareTransition() {
-
-            // kill all previous screen's JavaScript
-            for(var i = 0, ii = model.length; i < ii; i++) {
-                try  {
-                    delete window[model[i].id];
-                } catch (err) {
-                    window[model[i].id] = null;
-                }
-            }
-
-            unsubscribe2(window._screen); // remove all subscriptions from this screen
-            window._screen = {}; // and wipe out window._sreen
-
-            // NB: once the following main section is created it will become document.getScreen()
-            var obj:HTMLElement = document.createElement("object");
-            obj.setAttribute("data", route.screen.id);
-            obj.setAttribute("type", "application/x-savvy-buffer");
-            document.body.insertBefore(obj, document.body.firstChild);
-
-            // NB: set up HTML before JS executes so HTML DOM is accessible
-            guaranteeArray(route.screen.html).forEach((url:string, index:number, array:string[]):void => {
-                getScreen().insertAdjacentHTML("beforeend", readFile(url).data);
-            });
-
-            var executionContext:ExecutionContext = window[route.screen.id] = new ExecutionContext();
-            if (typeof window[route.screen.id] === "undefined") {
-                console.error("\"window." + route.screen.id + "\" could not be created.");
-            }
+            document.screen = route.screen.html;
             
-            // NB: set up JSON before JS executes so JSON objects are already populated
-            guaranteeArray(route.screen.json).forEach((element:JSON, index:number, array:JSON[]):void => {
-                var target = element.target;
-                parseJSON(element.url, target, executionContext);
-            });
-            
-            guaranteeArray(route.screen.js).forEach((url:string, index:number, array:string[]):void => {
-                executeJavaScript(url, executionContext);
-            });
-
             this.getInfo = () => {
                 return getInfo2(route); // update getInfo to get current screen info
             }
@@ -442,37 +364,55 @@ module Savvy {
 
         function doTransition():void {
             continueTransition = noop;
-            removeDOMNode(document.querySelector("body > object[type='application/x-savvy']"));
 
-            // remove old CSS and add new CSS
-            // NB: Old CSS is removed first because developers tend to write conflicting CSS selectors
-            var links:NodeList = document.querySelectorAll("style[data-for='screen'], link[data-for='screen']");
-            for (var i = 0; i < links.length; i++) {
-                removeDOMNode(links[i]);
-            }
-
-            // when using Savvy
-            guaranteeArray(route.screen.css).forEach((url:string, index:number, array:string[]):void => {
-                appendCssToHeadFromUrl(url, true);
-            });
+            document.documentElement.className = "lock-scroll";
             
-            getScreen().setAttribute("type", "application/x-savvy");
+            var screen1:HTMLElement = <HTMLElement> document.querySelector("body > object[type='application/x-savvy']");
+            var screen2 = route.screen.html;
+           
+            var ms = (transition == Savvy.CUT) ? 0 : 500;
+            
+            if (screen1) {
+                var scr1 = getScreenWithID(screen1.getAttribute("data"));
+                // copy the document.body scroll values to restore when the screen is returned to
+                scr1.scroll.top = document.body.scrollTop;
+                scr1.scroll.left = document.body.scrollLeft;
+                
+                screen1.className = "transition " + transition + ((reverse) ? "-scr2" : "-scr1");
+                screen2.className = transition + ((reverse) ? "-scr1" : "-scr2");
+                document.body.appendChild(screen2);
+                screen2.className = "transition on-stage";
 
-            // this trick avoids FOUC (flash of unstyled content), the main section is only revealed the last CSS directive
-            if (window.navigator.appVersion.indexOf("MSIE 8") == -1) {
-                appendCssToHead("body > object[type='application/x-savvy'] { display: block !important; }", true);
+                screen1.style.top = (scr1.scroll.top * -1) + "px";
+                screen1.style.left = (scr1.scroll.left * -1) + "px";
+
+                setTimeout(endTransition, ms);
             } else {
-                // on IE8 we cannot add CSS to the head, so fouc FOUC prevention on IE8
-                getScreen().style.display = "block";            
+                document.body.appendChild(screen2);
+                endTransition();
             }
 
-            document.title = (route.screen.title || "");
-            if(!preventHistory) {
-                ignoreHashChange = true;
-                window.location.hash = "!" + route.path;
+            
+            function endTransition() {
+                if (screen1) {
+                    screen1.style.top = null;
+                    screen1.style.left = null;
+                    screen1.removeAttribute("style");
+                    screen1.removeAttribute("class");
+                    screen1.parentNode.removeChild(screen1);
+                }
+                screen2.removeAttribute("class");
+                document.documentElement.removeAttribute("class");
+
+                document.title = (route.screen.title || "");
+                if(!preventHistory) {
+                    ignoreHashChange = true;
+                    window.location.hash = "!" + route.path;
+                }
+    
+                publish(Savvy.ENTER);
             }
 
-            publish(Savvy.ENTER);
         }
 	}
 
@@ -537,22 +477,20 @@ module Savvy {
     function parseAppXML(app:any):void {
     	preloadImages(guaranteeArray(app.img));
 
-    	createModel(guaranteeArray(app.screens.screen));
-
         // NB: Do before HTML so that HTML lands formatted
 		guaranteeArray(app.css).forEach((url:string, index:number, array:string[]):void => {
 			appendCssToHeadFromUrl(url);
 		});
 
 		guaranteeArray(app.html).forEach((url:string, index:number, array:string[]):void => {
-            document.body.insertAdjacentHTML("beforeend", readFile(url).data);
+            document.body.insertAdjacentHTML("beforeend", readFile(url));
 		});
 
         // NB: Do before JS so that data models are available to JS
         guaranteeArray(app.json).forEach((element:any, index:number, array:any[]):void => {
             var target = element["@target"];
             if (typeof target == "string") {
-                parseJSON(element, target);
+                parseJSONToTarget(element, target);
             } else {
                 console.error("No target attribute provided for JSON (\"" + element + "\")");
             }
@@ -561,6 +499,10 @@ module Savvy {
         guaranteeArray(app.js).forEach((url:string, index:number, array:string[]):void => {
 			executeJavaScript(url);
 		});
+        
+        createModel(guaranteeArray(app.screens.screen));
+        
+        delete Savvy._eval; // no longer needed
     }
 
     /**
@@ -570,8 +512,11 @@ module Savvy {
      * @param url The URL of the CSS file
      * @param isScreenCSS A Boolean indicating that this CSS relates to the current screeen (optional)
      */
-    function appendCssToHeadFromUrl(url:string, isScreenCSS:boolean = false):void {
-        var doLink:Boolean = (regExpressions.isRemoteUrl.test(url) || window.navigator.appVersion.indexOf("MSIE 8") != -1);
+    function appendCssToHeadFromUrl(url:string, forId?:string):void {
+        var doLink:Boolean = (regex.isRemoteUrl.test(url) || window.navigator.appVersion.indexOf("MSIE 8") != -1);
+        if (doLink && forId) {
+            throw new Error("Screen styles sheets cannot be remote (e.g. http://www.examples.com/style.css). Please include remote style sheets globally.");
+        }
         var node:HTMLElement;
         if (doLink) {
             node = document.createElement("link");
@@ -582,18 +527,21 @@ module Savvy {
             node = document.createElement("style");
             node.setAttribute("type", "text/css");
         }
-        if (isScreenCSS) {
-            node.setAttribute("data-for", "screen");
+        if (forId) {
+            node.setAttribute("data-for", forId);
         }
         try {
             if(!doLink) {
-                var content:string = readFile(url).data;
+                var content:string = readFile(url);
+                if (forId) {
+                    content = content.replace(regex.css.selector, "body > object[data=\""+forId+"\"] $1$2");
+                }
                 var i:number = url.toString().lastIndexOf("/");
                 if(i != -1) {
                     var dir:string = url.toString().substr(0, i + 1);
-                    content = content.replace(regExpressions.css.noQuotes,
-                              "url(" + dir).replace(regExpressions.css.doubleQuotes,
-                              "url(\"" + dir).replace(regExpressions.css.singleQuotes,
+                    content = content.replace(regex.css.noQuotes,
+                              "url(" + dir).replace(regex.css.doubleQuotes,
+                              "url(\"" + dir).replace(regex.css.singleQuotes,
                               "url('" + dir);
                 }
                 node.appendChild(document.createTextNode(content));
@@ -603,35 +551,14 @@ module Savvy {
 	    	console.error("Error appending CSS file (" + url + "): " + err.toString());
         }
     }
-
-    /**
-     * Attempts to appends a given CSS to the head of the HTML document.
-     * On some browsers (e.g. MSIE8) the CSS has to be linked from the head. And in the cases of external CSS URLs,
-     * it needs to be linked from the head. Otherwise, we prefer adding the CSS to the head.
-     * @param css CSS code to be appended to the head
-     * @param isScreenCSS A Boolean indicating that this CSS relates to the current screeen (optional)
-     */
-    function appendCssToHead(css:string, isScreenCSS:boolean = false):void {
-        var node:HTMLElement = document.createElement("style");
-        node.setAttribute("type", "text/css");
-        if (isScreenCSS) {
-            node.setAttribute("data-for", "screen");
-        }
-        try {
-            node.appendChild(document.createTextNode(css));
-            document.getElementsByTagName("head")[0].appendChild(node);
-        } catch(err) {
-            console.error("Error appending CSS to head: " + err.toString());
-        }
-    }
     
     /**
-     * Loads a JavaScript file and executes it in a given ExecutionContext, otherwise with the window object
+     * Loads a JavaScript file and executes it in a given context, otherwise with the window object
      * @param url The URL of the JavaScript to execute
      * @param context The context in which to execute the JavaScript
      */
-    function executeJavaScript(url:string, context?:ExecutionContext):void {
-    	var code:string = parseScriptFile(readFile(url));
+    function executeJavaScript(url:string, context?:any):void {
+    	var code:string = parseScriptFile(url);
         try  {
             Savvy._eval(code, context);
         } catch (err) {
@@ -644,16 +571,13 @@ module Savvy {
      * @param file a File to parse
      * @returns a String of the parse source code
      */
-    function parseScriptFile(file:File):string {
-        if (typeof file.data != "string") {
-            console.error("Could not parse \"" + file.url + "\". Script files must be plain text.");
-            return "";
-        }
+    function parseScriptFile(url):string {
+        var src = readFile(url);
 
-        var code = file.data.replace(regExpressions.includeStatement, function(match:string, p1:string):string {
-            var dir = getDirectoryFromFilePath(file.url);
-            var path = resolvePath(dir + p1);
-            var str:string = parseScriptFile(readFile(path));
+        var code = src.replace(regex.include, function(match:string, p1:string):string {
+            var dir = getDirectoryFromFilePath(url);
+            var url2 = resolvePath(dir + p1);
+            var str:string = parseScriptFile(url2);
             return str;
         });
 
@@ -707,10 +631,10 @@ module Savvy {
      * @param target The name of the variable to set with the data from the JSON file
      * @param context The object within which target should exist (defaults to window)
      */
-    function parseJSON(url:string, target:string, context:any = window):void {
+    function parseJSONToTarget(url:string, target:string, context:any = window):void {
         var data:any;
         try {
-            var src:any = readFile(url, true).data; // prevent caching always with JSON (presume it is an API)
+            var src:any = readFile(url); // prevent caching always with JSON (presume it is an API)
             data = JSON.parse(src);
         } catch (err) {
             console.error("Cannot parse data file (\"" + url + "\"). Please check that the file is valid JSON <http://json.org/>.");
@@ -751,11 +675,12 @@ module Savvy {
      * Preloads an array of images to the browser cache.
      * @param images An array of URLs to load.
      */
+    var imgCache:HTMLImageElement[] = [];
 	function preloadImages(images:string[]):void {
         for(var i = 0, ii = images.length; i < ii; i++) {
             var img = new Image();
             img.src = images[i];
-            cache.add({url:img.src, data:img}); // will be rejected if rule is NEVER
+            imgCache.push(img); // to keep in memory
         }
     }
 
@@ -763,45 +688,47 @@ module Savvy {
      * Creates a model of the screens described in the app.xml. Populates the model array with Screen objects.
      * @param screens An array subset of a JXON object describing the screens Array in app.xml.
      */
-    function createModel(screens:Screen[]):void {
+    function createModel(screens:any):void {
         for(var i = 0, ii = screens.length; i < ii; i++) {
-        	var screen:Screen = {
+            // NB: this isn't added to the body until ready to be shown
+            var htmlObject = document.createElement("object");
+            htmlObject.setAttribute("data", screens[i]["@id"]);
+            htmlObject.setAttribute("type", "application/x-savvy");
+
+            makeScreenContext(htmlObject);
+            
+            var screen:Screen = {
 	            id: screens[i]["@id"],
 	            title: screens[i]["@title"],
-	            html:[],
-                css:[],
-	            js:[],
-                json:[]
+	            html:htmlObject,
+                scroll: {
+                    top: 0,
+                    left: 0
+                }
         	};
 
-			guaranteeArray(screens[i].html).forEach((url:string, index:number, array:Screen[]):void => {
-                if (cache.rule == Cache.YES) { // pre-cache?
-                    var file = readFile(url);
-                }
-                screen.html.push(url);
-			});
+            window[screen.id] = screen.html;
 
             guaranteeArray(screens[i].css).forEach((url:string, index:number, array:Screen[]):void => {
-                if (cache.rule == Cache.YES) { // pre-cache?
-                    var file = readFile(url);
-                }
-                screen.css.push(url);
+                appendCssToHeadFromUrl(url, screen.id);
             });
 
-            guaranteeArray(screens[i].js).forEach((url:string, index:number, array:Screen[]):void => {
-                if (cache.rule == Cache.YES) { // pre-cache?
-                    var file = readFile(url);
-                }
-                screen.js.push(url);
-            });
+			guaranteeArray(screens[i].html).forEach((url:string, index:number, array:Screen[]):void => {
+                screen.html.insertAdjacentHTML("beforeend", readFile(url));
+			});
 
             guaranteeArray(screens[i].json).forEach((element:any, index:number, array:Screen[]):void => {
                 var target = element["@target"];
                 if (typeof target == "string") {
-                    screen.json.push({url:element, target:target});
+                    var target = element.target;
+                    parseJSONToTarget(element, target, screen.html);
                 } else {
                     console.error("No target attribute provided for JSON (\"" + element + "\")");
                 }
+            });
+
+            guaranteeArray(screens[i].js).forEach((url:string, index:number, array:Screen[]):void => {
+                executeJavaScript(url, screen.html);
             });
 
             if (screens[i]['@default'] !== undefined) {
@@ -821,18 +748,6 @@ module Savvy {
 	}
 
     /**
-     * Removes a node from the DOM by specifying its ID
-     * @param id The ID of the DOM node to be removed
-     * @returns {Boolean} true if the node was removed otherwise false
-     */
-    function removeDOMNode(node:any):Boolean {
-        if(node && node.parentNode) {
-            return node.parentNode.removeChild(node) !== null;
-        }
-        return false;
-    }
-
-    /**
      * Accepts an object of any kind. If the object is an array it returns an identical object. If the object is not
      * an array, it makes a new Array containing that object. If the object is falsey, it returns an empty array.
      * @param arr The object to guarantee an array from.
@@ -843,50 +758,25 @@ module Savvy {
 	}
 
     /**
-     * Attempts to retrieve a file from the cache otherwise reads it from a URL.
-     * @param url The URL to read.
-     * @param noCache A Boolean indicating that the file should be not cached if read from a URL.
-     * @returns {*} A File object containing the URL and data of the file.
-     */
-    function readFile(url:string, noCache:boolean = false):File {
-        var file:File;
-
-        // first, try to get from cache first
-        file = cache.get(url);
-        if (file.data !== null) return file;
-        
-        file = getFileFromUrl(url);
-        if (!noCache) cache.add(file);
-        
-        return file;
-    }
-    
-    /**
      * Reads the file at URL and returns a File object for it.
      * @param url The URL to read.
      * @param asXML A Boolean indicating that the file should be read as an XML document.
-     * @returns {*} A File object containing the URL and data of the file.
+     * @returns {*} A String or XML object containing the URL and data of the file.
      */
-	function getFileFromUrl(url:string, asXML:boolean = false):File {
-		var file:File;
-
-		// not in cache?
+	function readFile(url:string, asXML:boolean = false):any {
 		var xmlhttp:XMLHttpRequest = new XMLHttpRequest(); // create the XMLHttpRequest object
 		xmlhttp.open("GET", url, false);
 		xmlhttp.send();
 		if (xmlhttp.status !== 200 && xmlhttp.status !== 0) {
 			console.error("HTTP status "+xmlhttp.status+" returned for file: " + url);
-			return {url:url, data:""};
+			return null;
 		}
 
-		var data:any;
         if (asXML) {
-            data = xmlhttp.responseXML;
+            return xmlhttp.responseXML;
         } else {
-            data = xmlhttp.responseText;
+            return xmlhttp.responseText;
         }
-		file = {url:url, data:data};
-		return file;
 	}
 
 	/**

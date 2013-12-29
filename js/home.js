@@ -1,18 +1,18 @@
 /* This script will be executed only on the Home screen (see data/app.xml). */
 
 var audio = document.querySelector("audio");
-var img = document.querySelector("img");
+var img = this.querySelector("img");
 
 this.subscribe(Savvy.READY, function(){
 	// fired when the "ready" event is published to the Home screen
 	window.addEventListener("resize", scalePirateImage);
-	document.getElementById("version").innerHTML = config.version;
+	this.querySelector("#version").innerHTML = config.version;
+	scalePirateImage();
+	setPirateImageOpacity();
 });
 
 this.subscribe(Savvy.ENTER, function(){
 	// fired when the "enter" event is published to the Home screen
-	scalePirateImage();
-	setPirateImageOpacity();
 	img.onclick = playPause;
 	if (typeof audio.paused == "boolean") {
 		img.style.cursor = "pointer";
