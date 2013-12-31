@@ -29,6 +29,10 @@ button:focus {
     outline: none;
 }
 
+button:active {
+	background: #0082B2;
+}
+
 .align-center {
 	text-align: center;
 	width: 100%;

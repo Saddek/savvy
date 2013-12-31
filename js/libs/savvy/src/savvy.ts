@@ -31,10 +31,6 @@ module Savvy {
 	    id:string;
 	    title:string;
         html:HTMLElement;
-        scroll: {
-            top:number;
-            left:number;
-        }
 	}
 
     /**
@@ -86,20 +82,15 @@ module Savvy {
      * Loads a screen in the app corresponding to id
      * @param path A path to a new screen. This must be a screen ID or a string beginning with a screen ID followed by a slash. Further characters may follow the slash.
      */
-    document["goto"] = (path:string, transition:String = Savvy.CUT, reverse:boolean = false):void => {
-        if (transition == Savvy.CUT && reverse === true) {
-            console.warn("The cut transition has no reverse variant.");
-            reverse = false;
-        }
-        
-        goto2.call(Savvy, path, transition, reverse);
+    document["goto"] = (path:string):void => {
+        goto2.call(Savvy, path);
     }
 
     /**
      * The function called by document.goto
      * @param path A path to a new screen. This must be a screen ID or a string beginning with a screen ID followed by a slash. Further characters may follow the slash.
      */
-    function goto2(path:string, transition:String, reverse:boolean):void {
+    function goto2(path:string):void {
         try {
             // normalise
             path = path.toString();
@@ -117,7 +108,7 @@ module Savvy {
         if (screen == null) {
             console.error("No screen with ID of \"" + id + "\".");
         } else {
-            load.call(Savvy, {screen: screen, path: "/" + path}, transition, reverse, false);
+            load.call(Savvy, {screen: screen, path: "/" + path}, false);
         }
 	}
     
@@ -242,11 +233,7 @@ module Savvy {
     export var READY:String = new String("ready");
     export var ENTER:String = new String("enter");
     export var EXIT:String = new String("exit");
-    export var LOAD:String = new String("load");
-
-    export var CUT:String = new String("cut");
-    export var PAN:String = new String("pan");
-    
+    export var LOAD:String = new String("load");    
     /**
      * A JXONNode class, used as a container object when parsing XML to a JavaScript object.
      */
@@ -297,7 +284,7 @@ module Savvy {
             
             parseAppXML(xmlData.app);
     
-            load.call(Savvy, getRoute(), Savvy.CUT, false, true);
+            load.call(Savvy, getRoute(), true);
         }, false);
     }
 
@@ -309,7 +296,7 @@ module Savvy {
             var route:Route = getRoute();
             if (typeof route.screen == "object") {
                 // don't load a route that doesn't exist
-                load.call(Savvy, route, Savvy.CUT, false, true);
+                load.call(Savvy, route, true);
             }
         }
     }, false);
@@ -323,7 +310,7 @@ module Savvy {
      * @param preventHistory A Boolean (optional), if false the hash element of the URL will not be updated
      * @private
      */
-	function load(route:Route, transition:String, reverse:boolean, preventHistory:boolean):void {
+	function load(route:Route, preventHistory:boolean):void {
         /* FIXME: this needs to be thought through more. There are cases when a screen will be loaded upon itself (e.g. if the REST path changes).
         if (route.path == Savvy.getInfo().path) {
             if (preventHistory) {
@@ -365,54 +352,23 @@ module Savvy {
         function doTransition():void {
             continueTransition = noop;
 
-            document.documentElement.className = "lock-scroll";
+            // hide all screens, except the one to be nagivated to (just in case it's already visible)
+            var screens:NodeList = document.querySelectorAll("body > object[type='application/x-savvy']");
+            for (var i=0; i<screens.length; i++) {
+                var el:HTMLElement = <HTMLElement> screens[i];
+                if (el == route.screen.html) continue;
+                el.style.display = null;
+            }
             
-            var screen1:HTMLElement = <HTMLElement> document.querySelector("body > object[type='application/x-savvy']");
-            var screen2 = route.screen.html;
+            route.screen.html.style.display = "block";
            
-            var ms = (transition == Savvy.CUT) ? 0 : 500;
-            
-            if (screen1) {
-                var scr1 = getScreenWithID(screen1.getAttribute("data"));
-                // copy the document.body scroll values to restore when the screen is returned to
-                scr1.scroll.top = document.body.scrollTop;
-                scr1.scroll.left = document.body.scrollLeft;
-                
-                screen1.className = "transition " + transition + ((reverse) ? "-scr2" : "-scr1");
-                screen2.className = transition + ((reverse) ? "-scr1" : "-scr2");
-                document.body.appendChild(screen2);
-                screen2.className = "transition on-stage";
-
-                screen1.style.top = (scr1.scroll.top * -1) + "px";
-                screen1.style.left = (scr1.scroll.left * -1) + "px";
-
-                setTimeout(endTransition, ms);
-            } else {
-                document.body.appendChild(screen2);
-                endTransition();
+            document.title = (route.screen.title || "");
+            if(!preventHistory) {
+                ignoreHashChange = true;
+                window.location.hash = "!" + route.path;
             }
 
-            
-            function endTransition() {
-                if (screen1) {
-                    screen1.style.top = null;
-                    screen1.style.left = null;
-                    screen1.removeAttribute("style");
-                    screen1.removeAttribute("class");
-                    screen1.parentNode.removeChild(screen1);
-                }
-                screen2.removeAttribute("class");
-                document.documentElement.removeAttribute("class");
-
-                document.title = (route.screen.title || "");
-                if(!preventHistory) {
-                    ignoreHashChange = true;
-                    window.location.hash = "!" + route.path;
-                }
-    
-                publish(Savvy.ENTER);
-            }
-
+            publish(Savvy.ENTER);
         }
 	}
 
@@ -740,6 +696,7 @@ module Savvy {
             }
 
             model.push(screen);
+            document.body.appendChild(screen.html);
     	}
 
         if (defaultScreen === null) {
@@ -766,6 +723,7 @@ module Savvy {
 	function readFile(url:string, asXML:boolean = false):any {
 		var xmlhttp:XMLHttpRequest = new XMLHttpRequest(); // create the XMLHttpRequest object
 		xmlhttp.open("GET", url, false);
+        xmlhttp.setRequestHeader("Cache-Control", "no-store"); // try not to cache the response
 		xmlhttp.send();
 		if (xmlhttp.status !== 200 && xmlhttp.status !== 0) {
 			console.error("HTTP status "+xmlhttp.status+" returned for file: " + url);

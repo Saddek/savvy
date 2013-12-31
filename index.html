@@ -18,12 +18,13 @@
   <link rel="author" href="humans.txt" />
 
   <!-- Mobile viewport optimized and user sclaing and zooming disabled: h5bp.com/viewport -->
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, minimum-scale=1, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
   
   <!-- iPhone-specific settings suitable for HTML-based apps: https://developer.apple.com/library/safari/#codinghowtos/Mobile/UserExperience/_index.html -->
   <!-- Hide the URL bar when running the app from the iPhone Home screen -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  
   <!-- Do not attempt to automatically detect phone numbers -->
   <meta name="format-detection" content="telephone=no" />
 
@@ -124,6 +125,7 @@
 	html, body {
 		height:100%;
 		width: 100%;
+		overflow: hidden;
 	}
 	
 	body > object[type="application/x-savvy"] {
@@ -133,56 +135,79 @@
 	  
       height: 100%;
       width: 100%;
-      overflow: visible;
+      
+      -webkit-transform: translateX(0%);
+      transform: translateX(0%);
+
+	  overflow: hidden;
+	  overflow-x: hidden;
+	  overflow-y: auto;
+	  
+	  display: none;
     }
     
   </style>
-  
-	<style type="text/css">
-
-	html.lock-scroll {
-		overflow: hidden;
-		overflow-x: hidden;
-		overflow-y: hidden;
-	}
-	
-	body > object[type="application/x-savvy"].transition {
-		-webkit-transition: -webkit-transform 500ms ease-in-out;
-		transition: transform 500ms ease-in-out;
-	}
-
-	body > object[type="application/x-savvy"].cut-scr1 {
-		display: none;
-	}
-	
-	body > object[type="application/x-savvy"].cut-scr2 {
-	}
-	
-	body > object[type="application/x-savvy"].pan-scr1 {
-		-webkit-transform: translate3d(-100%, 0%, 0);
-		transform: translate3d(-100%, 0%, 0);
-	}
-	
-	body > object[type="application/x-savvy"].pan-scr2 {
-		-webkit-transform: translate3d(+100%, 0%, 0);
-		transform: translate3d(+100%, 0%, 0);
-	}
-
-	body > object[type="application/x-savvy"].on-stage {
-		-webkit-transform: translate3d(0%, 0%, 0);
-		transform: translate3d(0%, 0%, 0);
-	}
-	
-	</style>
-
 
   <!-- The splash screen CSS and JavaScript to remove it on load -->
   <link rel="stylesheet" id="savvy-splash-css" href="css/splash.css">
   <script type="text/javascript">
   (function(){
-	/* Reset the splash screen. */
+	  
+	  if (!window.navigator.standalone) {
+		  // prevent scrolling of body on iOS standalone apps
+		  	var start = {x:0, y:0};
+			document.addEventListener('touchstart', function(e) {
+				start.x = e.touches[0].screenX;
+				start.y = e.touches[0].screenY;
+			});
+			document.addEventListener('touchmove', function(e) {
+		      if (e.target.type === 'range') { return; }
+		      var delta = {
+		 	 	 x: e.touches[0].screenX - start.x,
+		 	 	 y: e.touches[0].screenY - start.y
+		      }
+
+		      // test on the vertical
+		      var obj = e.target;
+		      while(obj != document.body && obj.scrollHeight == obj.getBoundingClientRect().height) {
+		    	  obj = obj.parentNode;
+		      }
+		      
+		      if (obj != document.body) {
+		          if ( delta.y > 0 && obj.scrollTop == 0 ) {
+		        	  e.preventDefault();
+		          }
+		          if ( delta.y < 0 && obj.scrollTop == obj.scrollHeight - obj.getBoundingClientRect().height ) {
+		        	  e.preventDefault();
+		          }
+		    	  // can scroll on vertical
+		          return;
+		      }
+
+		   	  // then on the horizontal
+		      obj = e.target;
+		      while(obj != document.body && obj.scrollWidth == obj.getBoundingClientRect().width) {
+		    	  obj = obj.parentNode;
+		      }
+		      
+		      if (obj != document.body) {
+		          if ( delta.x > 0 && obj.scrollLeft == 0 ) {
+		        	  e.preventDefault();
+		          }
+		          if ( delta.x < 0 && obj.scrollLeft == obj.scrollWidth - obj.getBoundingClientRect().width ) {
+		        	  e.preventDefault();
+		          }
+		    	  // can scroll on horizontal
+		          return;
+		      }
+
+		      // this is the body
+		      e.preventDefault();
+		    });
+	  	}
+	  
     window.subscribe(Savvy.LOAD, function() {
-	  // remove the CSS link altogether
+      // Remove the splash screen
 	  var style = document.getElementById("savvy-splash-css");
 	  style.parentNode.removeChild(style);
     })
