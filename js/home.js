@@ -14,6 +14,7 @@ this.subscribe(Savvy.READY, function(){
 this.subscribe(Savvy.ENTER, function(){
 	// fired when the "enter" event is published to the Home screen
 	img.onclick = playPause;
+	img.animate("tada");
 	if (typeof audio.paused == "boolean") {
 		img.style.cursor = "pointer";
 	}

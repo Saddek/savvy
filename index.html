@@ -50,7 +50,9 @@
 
   <!-- normalize.css: http://necolas.github.io/normalize.css/ -->
   <link rel="stylesheet" href="css/libs/normalize/normalize.css" />
-  
+  <!-- animate.css: https://github.com/daneden/animate.css -->
+  <link rel="stylesheet" href="css/libs/animate/animate.min.css" />
+
   <style type="text/css">
     * {
       /* Disable the tap highlight on Andoid devices. */
@@ -131,21 +133,21 @@
 	body > object[type="application/x-savvy"] {
 	  position: absolute;
 	  top: 0%;
-	  left: 0%;
+	  left: -100%;
 	  
       height: 100%;
       width: 100%;
       
-      -webkit-transform: translateX(0%);
-      transform: translateX(0%);
-
-	  overflow: hidden;
-	  overflow-x: hidden;
-	  overflow-y: auto;
-	  
-	  display: none;
+	  overflow: auto;
+	  visibility: hidden;
     }
     
+	body > object[type="application/x-savvy"][data-display='visible'],
+	body > object[type="application/x-savvy"].animated {
+	  left: 0%;
+	  visibility: visible;
+	}
+	
   </style>
 
   <!-- The splash screen CSS and JavaScript to remove it on load -->
@@ -153,7 +155,7 @@
   <script type="text/javascript">
   (function(){
 	  
-	  if (!window.navigator.standalone) {
+	  if (window.navigator.standalone) {
 		  // prevent scrolling of body on iOS standalone apps
 		  	var start = {x:0, y:0};
 			document.addEventListener('touchstart', function(e) {
@@ -169,42 +171,51 @@
 
 		      // test on the vertical
 		      var obj = e.target;
-		      while(obj != document.body && obj.scrollHeight == obj.getBoundingClientRect().height) {
+		      while(obj != document.body && !canScrollVertical(obj) && !canScrollHorizontal(obj)) {
 		    	  obj = obj.parentNode;
 		      }
-		      
-		      if (obj != document.body) {
-		          if ( delta.y > 0 && obj.scrollTop == 0 ) {
-		        	  e.preventDefault();
-		          }
-		          if ( delta.y < 0 && obj.scrollTop == obj.scrollHeight - obj.getBoundingClientRect().height ) {
-		        	  e.preventDefault();
-		          }
-		    	  // can scroll on vertical
-		          return;
-		      }
 
-		   	  // then on the horizontal
-		      obj = e.target;
-		      while(obj != document.body && obj.scrollWidth == obj.getBoundingClientRect().width) {
-		    	  obj = obj.parentNode;
+		      if (obj == document.body) {
+		    	  // didn't find any scroll-able element
+		    	  e.preventDefault();
+		    	  return;
 		      }
 		      
-		      if (obj != document.body) {
-		          if ( delta.x > 0 && obj.scrollLeft == 0 ) {
-		        	  e.preventDefault();
-		          }
-		          if ( delta.x < 0 && obj.scrollLeft == obj.scrollWidth - obj.getBoundingClientRect().width ) {
-		        	  e.preventDefault();
-		          }
-		    	  // can scroll on horizontal
-		          return;
+		      if (Math.abs(delta.y) > Math.abs(delta.x)) {
+		          if ( delta.y > 0 && canScrollUp(obj) ) { return; }
+		          if ( delta.y < 0 && canScrollDown(obj) ) { return; }
+	        	  e.preventDefault();
+		      } else {
+		          if ( delta.x > 0 && canScrollLeft(obj) ) { return; }
+		          if ( delta.x < 0 && canScrollRight(obj) ) { return; }
+	        	  e.preventDefault();
 		      }
-
-		      // this is the body
-		      e.preventDefault();
 		    });
-	  	}
+			
+			function canScrollVertical(el) {
+				return el.scrollHeight > el.getBoundingClientRect().height;
+			}
+
+			function canScrollHorizontal(el) {
+				return el.scrollWidth > el.getBoundingClientRect().width;
+			}
+			
+			function canScrollUp(el) {
+				return el.scrollTop != 0;
+			}
+			
+			function canScrollDown(el) {
+				return el.scrollTop != el.scrollHeight - el.getBoundingClientRect().height;
+			}
+			
+			function canScrollLeft(el) {
+				return el.scrollLeft != 0;
+			}
+			
+			function canScrollRight(el) {
+				return el.scrollLeft != el.scrollWidth - el.getBoundingClientRect().width;
+			}
+		}
 	  
     window.subscribe(Savvy.LOAD, function() {
       // Remove the splash screen

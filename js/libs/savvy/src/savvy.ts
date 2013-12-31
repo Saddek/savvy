@@ -44,7 +44,7 @@ module Savvy {
     /**
      * The ExecutionContext: this is the object that will be populated and executed each screen's JavaScript
      */
-	function makeScreenContext(element:HTMLElement) {
+	function extendHTMLElementAsExecutionContext(element:HTMLElement) {
         element.subscribe = (type:string, action:() => boolean):void => {
             window.subscribe.call(Savvy, type, action, element);
         }
@@ -357,10 +357,10 @@ module Savvy {
             for (var i=0; i<screens.length; i++) {
                 var el:HTMLElement = <HTMLElement> screens[i];
                 if (el == route.screen.html) continue;
-                el.style.display = null;
+                el.removeAttribute("data-display");
             }
             
-            route.screen.html.style.display = "block";
+            route.screen.html.setAttribute("data-display", "visible");
            
             document.title = (route.screen.title || "");
             if(!preventHistory) {
@@ -651,7 +651,7 @@ module Savvy {
             htmlObject.setAttribute("data", screens[i]["@id"]);
             htmlObject.setAttribute("type", "application/x-savvy");
 
-            makeScreenContext(htmlObject);
+            extendHTMLElementAsExecutionContext(htmlObject);
             
             var screen:Screen = {
 	            id: screens[i]["@id"],
