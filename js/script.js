@@ -1,18 +1,18 @@
 /* This script will be available on every screen as a child of the window object (see data/app.xml). */
 
-window.subscribe(Savvy.LOAD, function(){
+window.addEventListener(Savvy.LOAD, function(){
 	// fired once when Savvy loads first
 	document.querySelector("audio").play();		
 });
 
-window.subscribe(Savvy.READY, function(){
+window.addEventListener(Savvy.READY, function(){
 	// fired every time a screen "ready" event is published
 });
 
-window.subscribe(Savvy.ENTER, function(){
+document.addEventListener(Savvy.ENTER, function(){
 	// fired every time a screen "enter" event is published
 });
 
-window.subscribe(Savvy.EXIT, function(){
+window.addEventListener(Savvy.EXIT, function(e){
 	// fired every time a screen "exit" event is published
 });

@@ -3,7 +3,7 @@
 var audio = document.querySelector("audio");
 var img = this.querySelector("img");
 
-this.subscribe(Savvy.READY, function(){
+this.addEventListener(Savvy.READY, function(){
 	// fired when the "ready" event is published to the Home screen
 	window.addEventListener("resize", scalePirateImage);
 	this.querySelector("#version").innerHTML = config.version;
@@ -11,7 +11,7 @@ this.subscribe(Savvy.READY, function(){
 	setPirateImageOpacity();
 });
 
-this.subscribe(Savvy.ENTER, function(){
+this.addEventListener(Savvy.ENTER, function(){
 	// fired when the "enter" event is published to the Home screen
 	img.onclick = playPause;
 	img.animate("tada");
@@ -20,13 +20,15 @@ this.subscribe(Savvy.ENTER, function(){
 	}
 });
 
-this.subscribe(Savvy.EXIT, function(){
+this.addEventListener(Savvy.EXIT, function(){
 	// fired when the "exit" event is published to the Home screen
 	window.removeEventListener("resize", scalePirateImage);
 });
 
 function scalePirateImage(){
-	var height = (document.body.getBoundingClientRect().height - 200);
+	var height = document.body.getBoundingClientRect().height;
+	height -= parseInt(window.getComputedStyle(Home.querySelector("h1")).height);
+	height -= parseInt(window.getComputedStyle(Home.querySelector("button")).height) * 3;
 	img.style.height = height + "px";
 }
 

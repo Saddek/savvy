@@ -1,20 +1,7 @@
-interface Window {
-    // Sub-Pub mechanism
-    subscribe(type:string, action:() => boolean, screen?:any):void;
-    unsubscribe(type:string, action:() => boolean):void;
-    publish(type:String, ...args : any[]):boolean;
-}
-
 interface Document {
     screen:HTMLElement;
     goto(path:string):void;
     continue:Function;
-}
-
-interface HTMLElement {
-    subscribe(type:string, action:() => boolean):void;
-    unsubscribe(type:string, action:() => boolean):void;
-    publish(type:String, ...args : any[]):boolean;
 }
 
 document.screen = null;
@@ -45,15 +32,7 @@ module Savvy {
      * The ExecutionContext: this is the object that will be populated and executed each screen's JavaScript
      */
 	function extendHTMLElementAsExecutionContext(element:HTMLElement) {
-        element.subscribe = (type:string, action:() => boolean):void => {
-            window.subscribe.call(Savvy, type, action, element);
-        }
-        element.unsubscribe = (type:string, action:() => boolean):void => {
-            window.unsubscribe.call(Savvy, type, action);
-        }
-        element.publish = (type:String, ...args : any[]):boolean => {
-            return publish2.apply(element, arguments);
-        }
+        // FIXME: is this needed?
     }
 
     // an array of screens in the app
@@ -106,7 +85,7 @@ module Savvy {
         var screen:Screen = getScreenWithID(id);
 
         if (screen == null) {
-            console.error("No screen with ID of \"" + id + "\".");
+            throw new Error("No screen with ID of \"" + id + "\".");
         } else {
             load.call(Savvy, {screen: screen, path: "/" + path}, false);
         }
@@ -127,113 +106,11 @@ module Savvy {
         return null;
     }
 
-    /**
-     * Implements a basic subscription service:
-     * Used in window.subscribe() and window.unsubscribe()
-     */
-	class Subscription {
-		type:string;
-		action:() => boolean;
-        screen:any;
-		constructor (type:string, action:() => boolean, screen:any = window){
-			this.type = type;
-			this.action = action;
-            this.screen = screen;
-		}
-	}
-
-    // An array of subscriptions
-	var subscriptions:Subscription[] = [];
-
-    /**
-     * Enables an application to subscribe to Savvy events
-     * @param type A String corresponding to the messages to be subscribed to
-     * @param action A function to be called when the message occurs, return false to block the event
-     * @param screen A screen object to associate the subscription with (usually left to default)
-     */
-	function subscribe(type:string, action:() => boolean, screen:any = window):void {
-        unsubscribe(type, action); // attempt to unsubscribe, so as to ensure that functions don't get called twice
-		var sub = new Subscription(type, action, screen);
-		subscriptions.push(sub);
-	}
-    // expose to window object
-    window.subscribe = subscribe;
-
-    /**
-     * Enables an application to unsubscribe from Savvy events
-     * @param type A String corresponding to the message to be unsubscibed from
-     * @param action The function that is called when the subscription is called
-     */
-	function unsubscribe(type:string, action:() => boolean):void {
-        for (var i:number = 0; i < subscriptions.length; i++) {
-            if (subscriptions[i].type === type && subscriptions[i].action === action) {
-                subscriptions.splice(i, 1);
-                i--;
-            }
-        }
-	}
-    // expose to window object
-    window.unsubscribe = unsubscribe;
-
-
-    /**
-     * Removes all subscriptions associated with a given screen
-     * @param screen The screen to which the subscriptions to be removed belong
-     */
-    function unsubscribe2(screen:any):void {
-        for (var i:number = 0; i < subscriptions.length; i++) {
-            if (subscriptions[i].screen === screen) {
-                subscriptions.splice(i, 1);
-                i--;
-            }
-        }
-    }
-
-    /**
-     * Calls the associated function of all subscriptions for a given String
-     * @param type A String corresponding to the subscription
-     * @param arg An object of any kind that will be passed to subscribing functions
-     * @returns {boolean} Will be false if any of the subscription functions returned false
-     */
-	function publish(type:String, ...args:any[]):boolean {
-		var ret:boolean = true;
-		subscriptions.forEach((element:Subscription, index:number, array:Subscription[]):void => {
-            switch (element.screen) {
-                case window:
-                case document.screen:
-                    if (element.type === type && typeof element.action === "function") {
-                        ret = !(element.action.apply(element.screen, args) === false || ret === false);
-                    }
-                    break;
-                default:
-                    // ignore all calls not to the current screen or window
-                    break;
-            }
-		});
-		return ret;
-	}
-
-    /**
-     * A public API to the publish method with safeguards against publishing private messages
-     * @param type A String corresponding to the subscription
-     * @param arg An object of any kind that will be passed to subscribing functions
-     * @returns {boolean} Will be false if any of the subscription functions returned false
-     */
-    function publish2(type:String, ...args:any[]):boolean {
-        if (type === Savvy.READY || type === Savvy.ENTER || type === Savvy.EXIT || type === Savvy.LOAD) {
-            throw new Error("Illegal. Only Savvy may publish a Savvy event (i.e. Savvy.READY, Savvy.ENTER, Savvy.EXIT or Savvy.LOAD).");
-        }
-        return publish.apply(Savvy, arguments);
-    }
-    // expose to Window object
-    window.publish = publish2;
-    
-
     // these are Strings so that they can be compared exactly agaisnt themselves (i.e. "ready" !== new String("ready"))
-    export var READY:String = new String("ready");
-    export var ENTER:String = new String("enter");
-    export var EXIT:String = new String("exit");
-    export var LOAD:String = new String("load");    
+    export var READY:string = "savvy-ready";
+    export var ENTER:string = "savvy-enter";
+    export var EXIT:string = "savvy-exit";
+    export var LOAD:string = "savvy-load";    
     /**
      * A JXONNode class, used as a container object when parsing XML to a JavaScript object.
      */
@@ -255,7 +132,7 @@ module Savvy {
 
     var xmlData:any = getJXONTree(readFile("data/app.xml", true));
     if (xmlData.app === undefined) {
-        console.error("Could not parse app.xml. \"app\" node missing.");
+        throw new Error("Could not parse app.xml. \"app\" node missing.");
     } else {
         // first assume window.load
         var event:string = "load";
@@ -284,7 +161,7 @@ module Savvy {
             
             parseAppXML(xmlData.app);
     
-            load.call(Savvy, getRoute(), true);
+            load.call(Savvy, getRouteFromURLHash(), true);
         }, false);
     }
 
@@ -293,7 +170,7 @@ module Savvy {
         if (ignoreHashChange) {
             ignoreHashChange = false;
         } else {
-            var route:Route = getRoute();
+            var route:Route = getRouteFromURLHash();
             if (typeof route.screen == "object") {
                 // don't load a route that doesn't exist
                 load.call(Savvy, route, true);
@@ -322,18 +199,19 @@ module Savvy {
         }
         */
 
-        var resp; // we might fire Savvy.LOAD or Savvy.EXIT here, this var will contain the result
+        var event:CustomEvent = <CustomEvent> document.createEvent("CustomEvent"); // we might fire Savvy.LOAD or Savvy.EXIT here, this var will contain the result
         if (isFirstLoad) {
-            resp = publish(Savvy.LOAD);
+            event.initCustomEvent(Savvy.LOAD, true, true, {});
             isFirstLoad = false;
         } else {
-            resp = publish(Savvy.EXIT);
+            event.initCustomEvent(Savvy.EXIT, true, true, {});
         }
+        (document.screen || document.body).dispatchEvent(event);
 
-        if (resp) { // check if that transition wasn't stalled
-            prepareTransition.call(Savvy); // NB: make sure 'this' is Savvy
-        } else {
+        if (event.defaultPrevented) { // check if that transition wasn't stalled
             continueTransition = prepareTransition;
+        } else {
+            prepareTransition.call(Savvy); // NB: make sure 'this' is Savvy
         }
 
         function prepareTransition() {
@@ -342,10 +220,15 @@ module Savvy {
             this.getInfo = () => {
                 return getInfo2(route); // update getInfo to get current screen info
             }
-            if (publish(Savvy.READY)) { // check if that transition wasn't stalled
-                doTransition.call(Savvy); // NB: make sure 'this' is Savvy
-            } else {
+
+            var event:CustomEvent = <CustomEvent> document.createEvent("CustomEvent");
+            event.initCustomEvent(Savvy.READY, true, true, {});
+            route.screen.html.dispatchEvent(event);
+            
+            if (event.defaultPrevented) { // check if that transition wasn't stalled
                 continueTransition = doTransition;
+            } else {
+                doTransition.call(Savvy); // NB: make sure 'this' is Savvy
             }
         }
 
@@ -368,7 +251,9 @@ module Savvy {
                 window.location.hash = "!" + route.path;
             }
 
-            publish(Savvy.ENTER);
+            var event:CustomEvent = <CustomEvent> document.createEvent("CustomEvent");
+            event.initCustomEvent(Savvy.ENTER, true, true, {});
+            route.screen.html.dispatchEvent(event);
         }
 	}
 
@@ -387,10 +272,10 @@ module Savvy {
      * Creates a Route object for the current URL
      * @returns {{screen: Screen, path: string}}
      */
-	function getRoute():Route {
+	function getRouteFromURLHash():Route {
 		var hash:string = window.location.hash;
 		var screen:Screen;
-        if(hash == "" || hash == "#" || hash == "#!") {
+        if(hash == "" || hash == "#" || hash == "#!" || hash == "#!/") {
             screen = defaultScreen;
         } else {
 			// loop through screens matching hash
@@ -417,7 +302,7 @@ module Savvy {
         return getInfo2();
     }
 
-    function getInfo2(route:Route = getRoute()) {
+    function getInfo2(route:Route = getRouteFromURLHash()) {
         return {
             id: route.screen.id,
             title: route.screen.title,
@@ -448,7 +333,7 @@ module Savvy {
             if (typeof target == "string") {
                 parseJSONToTarget(element, target);
             } else {
-                console.error("No target attribute provided for JSON (\"" + element + "\")");
+                throw new Error("No target attribute provided for JSON (\"" + element + "\")");
             }
         });
 
@@ -504,7 +389,7 @@ module Savvy {
             }
             document.getElementsByTagName("head")[0].appendChild(node);
         } catch(err) {
-	    	console.error("Error appending CSS file (" + url + "): " + err.toString());
+	    	throw new Error("Error appending CSS file (" + url + "): " + err.toString());
         }
     }
     
@@ -518,7 +403,7 @@ module Savvy {
         try  {
             Savvy._eval(code, context);
         } catch (err) {
-	    	console.error(err.toString() + "(" + url + ")");
+	    	throw new Error(err.toString() + " (" + url + ")");
     	}
     }
 
@@ -700,7 +585,7 @@ module Savvy {
     	}
 
         if (defaultScreen === null) {
-            throw "No default screen set.";
+            throw new Error("No default screen set.");
         }
 	}
 
