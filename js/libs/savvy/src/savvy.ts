@@ -557,6 +557,7 @@ module Savvy {
 			guaranteeArray(screens[i].html).forEach((url:string, index:number, array:Screen[]):void => {
                 screen.html.insertAdjacentHTML("beforeend", readFile(url));
 			});
+            document.body.appendChild(screen.html);
 
             guaranteeArray(screens[i].json).forEach((element:any, index:number, array:Screen[]):void => {
                 var target = element["@target"];
@@ -581,7 +582,6 @@ module Savvy {
             }
 
             model.push(screen);
-            document.body.appendChild(screen.html);
     	}
 
         if (defaultScreen === null) {
