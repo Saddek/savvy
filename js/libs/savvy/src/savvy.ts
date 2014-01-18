@@ -206,10 +206,6 @@ module Savvy {
         function prepareTransition() {
             document.screen = route.screen.html;
             
-            this.getInfo = () => {
-                return getInfo2(route); // update getInfo to get current screen info
-            }
-
             var event:CustomEvent = <CustomEvent> document.createEvent("CustomEvent");
             event.initCustomEvent(Savvy.READY, true, true, {});
             route.screen.html.dispatchEvent(event);
@@ -286,19 +282,6 @@ module Savvy {
 
 		return {screen: screen, path: path};
 	}
-
-    export function getInfo():any{
-        return getInfo2();
-    }
-
-    function getInfo2(route:Route = getRouteFromURLHash()) {
-        return {
-            id: route.screen.id,
-            title: route.screen.title,
-            isDefault:  defaultScreen == route.screen,
-            path: route.path
-        }
-    }
 
     /**
      * Parses the app XML creating the screen model and executing global HTML, CSS, JS, etc.
