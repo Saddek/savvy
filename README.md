@@ -1,5 +1,3 @@
-[![Views in the last 24 hours](https://sourcegraph.com/api/repos/github.com/avoca-learning/savvy/counters/views-24h.png)](https://sourcegraph.com/github.com/avoca-learning/savvy)
-
 # Savvy #
 
 [Savvy](http://en.wiktionary.org/wiki/savvy) is an easy-to-use framework for developing [single-page](http://en.wikipedia.org/wiki/Single-page_application) [HTML5](http://www.w3.org/TR/html5/) applications. Its primary intention is for development of tablet, smart phone and smart TV apps.
