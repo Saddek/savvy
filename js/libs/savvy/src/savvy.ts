@@ -313,7 +313,7 @@ module Savvy {
 			executeJavaScript(url);
 		});
         
-        createModel(guaranteeArray(app.deck.card));
+        createModel(guaranteeArray(app.card));
         
         delete Savvy._eval; // no longer needed
     }
