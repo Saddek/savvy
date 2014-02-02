@@ -1,10 +1,10 @@
 interface Document {
-    screen:HTMLElement;
+    card:HTMLElement;
     goto(path:string):void;
     continue:Function;
 }
 
-document.screen = null;
+document.card = null;
 
 /**
  * The main Savvy object
@@ -12,33 +12,33 @@ document.screen = null;
 module Savvy {
 
     /**
-     * The Screen interface: used to describe screens (id, title, html, etc.)
+     * The Card interface: used to describe cards (id, title, html, etc.)
      */
-	interface Screen {
+	interface Card {
 	    id:string;
 	    title:string;
         html:HTMLElement;
 	}
 
     /**
-     * The Route interface: used to store the route data (path and screen data) being called
+     * The Route interface: used to store the route data (path and card data) being called
      */
 	interface Route {
-		screen:Screen;
+		card:Card;
 		path:string;
 	}
 
     /**
-     * The ExecutionContext: this is the object that will be populated and executed each screen's JavaScript
+     * The ExecutionContext: this is the object that will be populated and executed each card's JavaScript
      */
 	function extendHTMLElementAsExecutionContext(element:HTMLElement) {
         // FIXME: is this needed?
     }
 
-    // an array of screens in the app
-	var model:Screen[] = [];
-    // the default screen for the app (this will reference one in the array)
-    var defaultScreen:Screen = null;
+    // an array of cards in the app
+	var model:Card[] = [];
+    // the default card for the app (this will reference one in the array)
+    var defaultCard:Card = null;
 
 	// define all regexes one in a static variable to save computation time
 	var regex = {
@@ -58,8 +58,8 @@ module Savvy {
 	var noop:Function = ():void => {};
 
     /**
-     * Loads a screen in the app corresponding to id
-     * @param path A path to a new screen. This must be a screen ID or a string beginning with a screen ID followed by a slash. Further characters may follow the slash.
+     * Loads a card in the app corresponding to id
+     * @param path A path to a new card. This must be a card ID or a string beginning with a card ID followed by a slash. Further characters may follow the slash.
      */
     document["goto"] = (path:string):void => {
         goto2.call(Savvy, path);
@@ -67,14 +67,14 @@ module Savvy {
 
     /**
      * The function called by document.goto
-     * @param path A path to a new screen. This must be a screen ID or a string beginning with a screen ID followed by a slash. Further characters may follow the slash.
+     * @param path A path to a new card. This must be a card ID or a string beginning with a card ID followed by a slash. Further characters may follow the slash.
      */
     function goto2(path:string):void {
         try {
             // normalise
             path = path.toString();
         } catch (err) {
-            throw new Error("A string indicating a screen ID must be passed to document.goto method.");
+            throw new Error("A string indicating a card ID must be passed to document.goto method.");
             return;
         }
 
@@ -82,22 +82,22 @@ module Savvy {
         if (id.indexOf("/") != -1) {
             id = id.substring(0, id.indexOf("/"));
         }
-        var screen:Screen = getScreenWithID(id);
+        var card:Card = getCardWithID(id);
 
-        if (screen == null) {
-            throw new Error("No screen with ID of \"" + id + "\".");
+        if (card == null) {
+            throw new Error("No card with ID of \"" + id + "\".");
         } else {
-            load.call(Savvy, {screen: screen, path: "/" + path}, false);
+            load.call(Savvy, {card: card, path: "/" + path}, false);
         }
 	}
     
     /*
-     * Searches the model for a screen of a particular ID
-     * @param id A String ID for a screen
-     * @returns {Screen} the Screen for the given ID or null
+     * Searches the model for a card of a particular ID
+     * @param id A String ID for a card
+     * @returns {Card} the Card for the given ID or null
      */
-    function getScreenWithID(id:string):Screen {
-        // loop through screens matching hash
+    function getCardWithID(id:string):Card {
+        // loop through cards matching hash
         for (var i=0, ii=model.length; i<ii; i++) {
             if (model[i].id == id) {
                 return model[i];
@@ -171,7 +171,7 @@ module Savvy {
             ignoreHashChange = false;
         } else {
             var route:Route = getRouteFromURLHash();
-            if (typeof route.screen == "object") {
+            if (typeof route.card == "object") {
                 // don't load a route that doesn't exist
                 load.call(Savvy, route, true);
             }
@@ -183,7 +183,7 @@ module Savvy {
 
     /**
      * This function does the heavy lifting it loads the HTML, CSS and JS for a given route
-     * @param route A route object, containing the path and data of the screen data
+     * @param route A route object, containing the path and data of the card data
      * @param preventHistory A Boolean (optional), if false the hash element of the URL will not be updated
      * @private
      */
@@ -195,7 +195,7 @@ module Savvy {
         } else {
             event.initCustomEvent(Savvy.EXIT, true, true, {});
         }
-        (document.screen || document.body).dispatchEvent(event);
+        (document.card || document.body).dispatchEvent(event);
 
         if (event.defaultPrevented) { // check if that transition wasn't stalled
             continueTransition = prepareTransition;
@@ -204,11 +204,11 @@ module Savvy {
         }
 
         function prepareTransition() {
-            document.screen = route.screen.html;
+            document.card = route.card.html;
             
             var event:CustomEvent = <CustomEvent> document.createEvent("CustomEvent");
             event.initCustomEvent(Savvy.READY, true, true, {});
-            route.screen.html.dispatchEvent(event);
+            route.card.html.dispatchEvent(event);
             
             if (event.defaultPrevented) { // check if that transition wasn't stalled
                 continueTransition = doTransition;
@@ -220,17 +220,17 @@ module Savvy {
         function doTransition():void {
             continueTransition = noop;
 
-            // hide all screens, except the one to be nagivated to (just in case it's already visible)
-            var screens:NodeList = document.querySelectorAll("body > object[type='application/x-savvy']");
-            for (var i=0; i<screens.length; i++) {
-                var el:HTMLElement = <HTMLElement> screens[i];
-                if (el == route.screen.html) continue;
+            // hide all cards, except the one to be nagivated to (just in case it's already visible)
+            var cards:NodeList = document.querySelectorAll("body > object[type='application/x-savvy']");
+            for (var i=0; i<cards.length; i++) {
+                var el:HTMLElement = <HTMLElement> cards[i];
+                if (el == route.card.html) continue;
                 el.removeAttribute("data-display");
             }
             
-            route.screen.html.setAttribute("data-display", "visible");
+            route.card.html.setAttribute("data-display", "visible");
            
-            document.title = (route.screen.title || "");
+            document.title = (route.card.title || "");
             if(!preventHistory) {
                 ignoreHashChange = true;
                 window.location.hash = "!" + route.path;
@@ -238,7 +238,7 @@ module Savvy {
 
             var event:CustomEvent = <CustomEvent> document.createEvent("CustomEvent");
             event.initCustomEvent(Savvy.ENTER, true, true, {});
-            route.screen.html.dispatchEvent(event);
+            route.card.html.dispatchEvent(event);
         }
 	}
 
@@ -255,18 +255,18 @@ module Savvy {
 
     /**
      * Creates a Route object for the current URL
-     * @returns {{screen: Screen, path: string}}
+     * @returns {{card: Card, path: string}}
      */
 	function getRouteFromURLHash():Route {
 		var hash:string = window.location.hash;
-		var screen:Screen;
+		var card:Card;
         if(hash == "" || hash == "#" || hash == "#!" || hash == "#!/") {
-            screen = defaultScreen;
+            card = defaultCard;
         } else {
-			// loop through screens matching hash
+			// loop through cards matching hash
 			for (var i=0, ii=model.length; i<ii; i++) {
 				if ((new RegExp("#!/"+model[i].id+"(?=\/|$)")).test(hash)) {
-					screen = model[i];
+					card = model[i];
 					break;
 				}
 			}
@@ -280,11 +280,11 @@ module Savvy {
 			path = hash.substr(i)
 		}
 
-		return {screen: screen, path: path};
+		return {card: card, path: path};
 	}
 
     /**
-     * Parses the app XML creating the screen model and executing global HTML, CSS, JS, etc.
+     * Parses the app XML creating the card model and executing global HTML, CSS, JS, etc.
      * @param app
      */
     function parseAppXML(app:any):void {
@@ -313,7 +313,7 @@ module Savvy {
 			executeJavaScript(url);
 		});
         
-        createModel(guaranteeArray(app.screens.screen));
+        createModel(guaranteeArray(app.deck.card));
         
         delete Savvy._eval; // no longer needed
     }
@@ -323,12 +323,12 @@ module Savvy {
      * On some browsers (e.g. MSIE8) the CSS has to be linked from the head. And in the cases of external CSS URLs,
      * it needs to be linked from the head. Otherwise, we prefer adding the CSS to the head.
      * @param url The URL of the CSS file
-     * @param isScreenCSS A Boolean indicating that this CSS relates to the current screeen (optional)
+     * @param isCardCSS A Boolean indicating that this CSS relates to the current screeen (optional)
      */
     function appendCssToHeadFromUrl(url:string, forId?:string):void {
         var doLink:Boolean = (regex.isRemoteUrl.test(url) || window.navigator.appVersion.indexOf("MSIE 8") != -1);
         if (doLink && forId) {
-            throw new Error("Screen styles sheets cannot be remote (e.g. http://www.examples.com/style.css). Please include remote style sheets globally.");
+            throw new Error("Card styles sheets cannot be remote (e.g. http://www.examples.com/style.css). Please include remote style sheets globally.");
         }
         var node:HTMLElement;
         if (doLink) {
@@ -498,21 +498,21 @@ module Savvy {
     }
 
     /**
-     * Creates a model of the screens described in the app.xml. Populates the model array with Screen objects.
-     * @param screens An array subset of a JXON object describing the screens Array in app.xml.
+     * Creates a model of the cards described in the app.xml. Populates the model array with Card objects.
+     * @param cards An array subset of a JXON object describing the cards Array in app.xml.
      */
-    function createModel(screens:any):void {
-        for(var i = 0, ii = screens.length; i < ii; i++) {
+    function createModel(cards:any):void {
+        for(var i = 0, ii = cards.length; i < ii; i++) {
             // NB: this isn't added to the body until ready to be shown
             var htmlObject = document.createElement("object");
-            htmlObject.setAttribute("data", screens[i]["@id"]);
+            htmlObject.setAttribute("data", cards[i]["@id"]);
             htmlObject.setAttribute("type", "application/x-savvy");
 
             extendHTMLElementAsExecutionContext(htmlObject);
             
-            var screen:Screen = {
-	            id: screens[i]["@id"],
-	            title: screens[i]["@title"],
+            var card:Card = {
+	            id: cards[i]["@id"],
+	            title: cards[i]["@title"],
 	            html:htmlObject,
                 scroll: {
                     top: 0,
@@ -520,44 +520,44 @@ module Savvy {
                 }
         	};
 
-            window[screen.id] = screen.html;
+            window[card.id] = card.html;
 
-            guaranteeArray(screens[i].css).forEach((url:string, index:number, array:Screen[]):void => {
-                appendCssToHeadFromUrl(url, screen.id);
+            guaranteeArray(cards[i].css).forEach((url:string, index:number, array:Card[]):void => {
+                appendCssToHeadFromUrl(url, card.id);
             });
 
-			guaranteeArray(screens[i].html).forEach((url:string, index:number, array:Screen[]):void => {
-                screen.html.insertAdjacentHTML("beforeend", readFile(url));
+			guaranteeArray(cards[i].html).forEach((url:string, index:number, array:Card[]):void => {
+                card.html.insertAdjacentHTML("beforeend", readFile(url));
 			});
-            document.body.appendChild(screen.html);
+            document.body.appendChild(card.html);
 
-            guaranteeArray(screens[i].json).forEach((element:any, index:number, array:Screen[]):void => {
+            guaranteeArray(cards[i].json).forEach((element:any, index:number, array:Card[]):void => {
                 var target = element["@target"];
                 if (typeof target == "string") {
                     var target = element.target;
-                    parseJSONToTarget(element, target, screen.html);
+                    parseJSONToTarget(element, target, card.html);
                 } else {
                     console.error("No target attribute provided for JSON (\"" + element + "\")");
                 }
             });
 
-            guaranteeArray(screens[i].js).forEach((url:string, index:number, array:Screen[]):void => {
-                executeJavaScript(url, screen.html);
+            guaranteeArray(cards[i].js).forEach((url:string, index:number, array:Card[]):void => {
+                executeJavaScript(url, card.html);
             });
 
-            if (screens[i]['@default'] !== undefined) {
-                if (defaultScreen === null) {
-                    defaultScreen = screen;
+            if (cards[i]['@default'] !== undefined) {
+                if (defaultCard === null) {
+                    defaultCard = card;
                 } else {
-                    console.warn("More than one screen is set as the default in app.xml. Ignoring.");
+                    console.warn("More than one card is set as the default in app.xml. Ignoring.");
                 }
             }
 
-            model.push(screen);
+            model.push(card);
     	}
 
-        if (defaultScreen === null) {
-            throw new Error("No default screen set.");
+        if (defaultCard === null) {
+            throw new Error("No default card set.");
         }
 	}
 

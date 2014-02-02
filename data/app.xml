@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <app cordova="no">
-	<screens>
+	<deck>
 		<!-- Place <screen> elements here. Exactly one <screen> MUST be marked as default="yes". -->
-		<screen id="Home" title="Welcome to Savvy" default="yes">
+		<card id="Home" title="Welcome to Savvy" default="yes">
 			<!-- A <screen> MAY contain any number of <html>, <js> and <css> elements. -->
 			<html>html/home.html</html>
 			<css>css/home.css</css>
 			<js>js/home.js</js>
-		</screen>
-		<screen id="License" title="Licensing Info">
+		</card>
+		<card id="License" title="Licensing Info">
 			<html>html/license.html</html>
 			<css>css/license.css</css>
-		</screen>
-	</screens>
+		</card>
+	</deck>
 	<!-- An <app> MAY contain any number of global <html>, <json>, <js> and <css> elements. -->
 	<html>html/global.html</html>
 	<css>css/styles.css</css>
