@@ -347,7 +347,7 @@ module Savvy {
             if(!doLink) {
                 var content:string = readFile(url);
                 if (forId) {
-                    content = content.replace(regex.css.selector, "body > object[data=\""+forId+"\"] $1$2");
+                    content = content.replace(regex.css.selector, "body > object#"+forId+" $1$2");
                 }
                 var i:number = url.toString().lastIndexOf("/");
                 if(i != -1) {
@@ -505,7 +505,8 @@ module Savvy {
         for(var i = 0, ii = cards.length; i < ii; i++) {
             // NB: this isn't added to the body until ready to be shown
             var htmlObject = document.createElement("object");
-            htmlObject.setAttribute("data", cards[i]["@id"]);
+            htmlObject.setAttribute("id", cards[i]["@id"]);
+            htmlObject.setAttribute("data", "Savvy/" + cards[i]["@id"]);
             htmlObject.setAttribute("type", "application/x-savvy");
 
             extendHTMLElementAsExecutionContext(htmlObject);
