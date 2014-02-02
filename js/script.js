@@ -9,7 +9,7 @@ window.addEventListener(Savvy.READY, function(){
 	// fired every time a screen "ready" event is published
 });
 
-document.addEventListener(Savvy.ENTER, function(){
+window.addEventListener(Savvy.ENTER, function(){
 	// fired every time a screen "enter" event is published
 });
 
