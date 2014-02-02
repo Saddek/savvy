@@ -1,10 +1,10 @@
 interface Document {
-    card:HTMLElement;
+    cards:HTMLElement[];
     goto(path:string):void;
     continue:Function;
 }
 
-document.card = null;
+document.cards = [];
 
 /**
  * The main Savvy object
@@ -28,17 +28,12 @@ module Savvy {
 		path:string;
 	}
 
-    /**
-     * The ExecutionContext: this is the object that will be populated and executed each card's JavaScript
-     */
-	function extendHTMLElementAsExecutionContext(element:HTMLElement) {
-        // FIXME: is this needed?
-    }
-
     // an array of cards in the app
 	var model:Card[] = [];
     // the default card for the app (this will reference one in the array)
     var defaultCard:Card = null;
+    // the currently selected card in document.cards
+    var currentCard = null;
 
 	// define all regexes one in a static variable to save computation time
 	var regex = {
@@ -195,7 +190,7 @@ module Savvy {
         } else {
             event.initCustomEvent(Savvy.EXIT, true, true, {});
         }
-        (document.card || document.body).dispatchEvent(event);
+        (document.cards[currentCard] || document.body).dispatchEvent(event);
 
         if (event.defaultPrevented) { // check if that transition wasn't stalled
             continueTransition = prepareTransition;
@@ -204,8 +199,6 @@ module Savvy {
         }
 
         function prepareTransition() {
-            document.card = route.card.html;
-            
             var event:CustomEvent = <CustomEvent> document.createEvent("CustomEvent");
             event.initCustomEvent(Savvy.READY, true, true, {});
             route.card.html.dispatchEvent(event);
@@ -221,15 +214,15 @@ module Savvy {
             continueTransition = noop;
 
             // hide all cards, except the one to be nagivated to (just in case it's already visible)
-            var cards:NodeList = document.querySelectorAll("body > object[type='application/x-savvy']");
-            for (var i=0; i<cards.length; i++) {
-                var el:HTMLElement = <HTMLElement> cards[i];
-                if (el == route.card.html) continue;
-                el.removeAttribute("data-display");
+            for (var i=0; i<document.cards.length; i++) {
+                if (document.cards[i] == route.card.html) {
+                    currentCard = i;
+                    document.cards[i].style.visibility = "visible";                
+                } else {
+                    document.cards[i].style.visibility = "hidden";                
+                }
             }
             
-            route.card.html.setAttribute("data-display", "visible");
-           
             document.title = (route.card.title || "");
             if(!preventHistory) {
                 ignoreHashChange = true;
@@ -509,16 +502,10 @@ module Savvy {
             htmlObject.setAttribute("data", "Savvy/" + cards[i]["@id"]);
             htmlObject.setAttribute("type", "application/x-savvy");
 
-            extendHTMLElementAsExecutionContext(htmlObject);
-            
             var card:Card = {
 	            id: cards[i]["@id"],
 	            title: cards[i]["@title"],
-	            html:htmlObject,
-                scroll: {
-                    top: 0,
-                    left: 0
-                }
+	            html:htmlObject
         	};
 
             window[card.id] = card.html;
@@ -530,7 +517,7 @@ module Savvy {
 			guaranteeArray(cards[i].html).forEach((url:string, index:number, array:Card[]):void => {
                 card.html.insertAdjacentHTML("beforeend", readFile(url));
 			});
-            document.body.appendChild(card.html);
+            document.cards.push(<HTMLElement> document.body.appendChild(card.html)); // add to the array of cards
 
             guaranteeArray(cards[i].json).forEach((element:any, index:number, array:Card[]):void => {
                 var target = element["@target"];

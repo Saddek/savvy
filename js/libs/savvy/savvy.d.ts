@@ -1,10 +1,10 @@
 interface Document {
-    screen:HTMLElement;
+    cards:HTMLElement[];
     goto(path:string):void;
     continue:Function;
 }
 
-declare document.screen;
+declare document.cards;
 
 interface IStatic {
     READY:string;
