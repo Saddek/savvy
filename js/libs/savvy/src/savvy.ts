@@ -517,7 +517,14 @@ module Savvy {
 			guaranteeArray(cards[i].html).forEach((url:string, index:number, array:Card[]):void => {
                 card.html.insertAdjacentHTML("beforeend", readFile(url));
 			});
-            document.cards.push(<HTMLElement> document.body.appendChild(card.html)); // add to the array of cards
+            var node:HTMLElement = <HTMLElement> document.body.appendChild(card.html);
+            document.cards.push(node); // add to the array of cards
+            
+            // initialise essential values, a dev user can manually override these
+            node.style.top = "0%";
+            node.style.left = "0%";
+            node.style.zIndex = i.toString();
+      
 
             guaranteeArray(cards[i].json).forEach((element:any, index:number, array:Card[]):void => {
                 var target = element["@target"];
