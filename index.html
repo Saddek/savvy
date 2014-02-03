@@ -213,10 +213,10 @@
 			}
 		}
 	  
-    window.addEventListener(Savvy.LOAD, function() {
+    window.addEventListener(Savvy.LOAD, function(e) {
       // Remove the splash screen
-	  var style = document.getElementById("savvy-splash-css");
-	  style.parentNode.removeChild(style);
+   	  var style = document.getElementById("savvy-splash-css");
+   	  style.parentNode.removeChild(style);
     })
   })();
   </script>

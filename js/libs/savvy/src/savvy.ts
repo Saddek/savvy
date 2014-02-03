@@ -173,9 +173,6 @@ module Savvy {
         }
     }, false);
 
-    // a flag to say this is the first load (signal to fire Savvy.LOAD)
-    var isFirstLoad:Boolean = true;
-
     /**
      * This function does the heavy lifting it loads the HTML, CSS and JS for a given route
      * @param route A route object, containing the path and data of the card data
@@ -184,13 +181,13 @@ module Savvy {
      */
 	function load(route:Route, preventHistory:boolean):void {
         var event:CustomEvent = <CustomEvent> document.createEvent("CustomEvent"); // we might fire Savvy.LOAD or Savvy.EXIT here, this var will contain the result
-        if (isFirstLoad) {
+        if (currentCard == null) {
             event.initCustomEvent(Savvy.LOAD, true, true, {});
-            isFirstLoad = false;
+            document.body.dispatchEvent(event);
         } else {
             event.initCustomEvent(Savvy.EXIT, true, true, {});
+            document.cards[currentCard].dispatchEvent(event);
         }
-        (document.cards[currentCard] || document.body).dispatchEvent(event);
 
         if (event.defaultPrevented) { // check if that transition wasn't stalled
             continueTransition = prepareTransition;
