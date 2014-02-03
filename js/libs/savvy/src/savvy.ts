@@ -524,7 +524,6 @@ module Savvy {
             node.style.top = "0%";
             node.style.left = "0%";
             node.style.zIndex = i.toString();
-      
 
             guaranteeArray(cards[i].json).forEach((element:any, index:number, array:Card[]):void => {
                 var target = element["@target"];
