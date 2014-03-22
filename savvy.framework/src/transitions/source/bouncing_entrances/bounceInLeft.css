@@ -1,0 +1,21 @@
+@keyframes bounceInLeft {
+	0% {
+		transform: translateX(-100%);
+	}
+
+	60% {
+		transform: translateX(+33%);
+	}
+
+	80% {
+		transform: translateX(-10%);
+	}
+
+	100% {
+		transform: translateX(0);
+	}
+}
+
+body > object[type="application/x-savvy"].bounceInLeft {
+	animation-name: bounceInLeft;
+}

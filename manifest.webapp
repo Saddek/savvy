@@ -1,9 +1,9 @@
 {
   "name": "Savvy",
   "description": "A framework for HTML5 app development.",
-  "launch_path": "/development/open-source/savvy/",
+  "launch_path": "/",
   "icons": {
-    "128": "/development/open-source/savvy/firefox-os-icon.png"
+    "128": "/assets/icons/firefox-os-icon.png"
   },
   "developer": {
     "name": "Oliver Moran",

@@ -1,0 +1,17 @@
+@keyframes bounceOutLeft {
+	0% {
+		transform: translateX(0);
+	}
+
+	20% {
+		transform: translateX(+33%);
+	}
+
+	100% {
+		transform: translateX(-100%);
+	}
+}
+
+body > object[type="application/x-savvy"].bounceOutLeft {
+	animation-name: bounceOutLeft;
+}

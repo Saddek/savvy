@@ -1,5 +1,9 @@
 /* Use this file to set CSS styles for the Home screen (see data/app.xml). */
 
+{
+    background: url("../assets/images/backgrounds/shl.png");
+}
+
 h2, h3 {
 	font-family: 'Rock Salt', cursive;
 	color: #333;

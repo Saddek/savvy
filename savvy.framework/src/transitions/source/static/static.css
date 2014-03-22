@@ -1,0 +1,11 @@
+@keyframes static {
+	0% {
+	}
+
+	100% {
+	}
+}
+
+body > object[type="application/x-savvy"].static {
+	animation-name: static;
+}

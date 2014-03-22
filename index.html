@@ -10,12 +10,12 @@
   <title>Loading...</title>
   
   <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-  <link rel="apple-touch-icon-precomposed" href="apple-touch-icon.png">
-  <link rel="icon" type="image/png" href="favicon.png">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="apple-touch-icon-precomposed" type="image/png" href="assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="assets/icons/favicon.png">
+  <link rel="icon" type="image/x-icon" href="assets/icons/favicon.ico">
 
   <!-- Uncomment if human.txt is filled in - http://humanstxt.org/ -->
-  <link rel="author" href="humans.txt" />
+  <link rel="author" type="text/plain" href="humans.txt" />
 
   <!-- Mobile viewport optimized and user sclaing and zooming disabled: h5bp.com/viewport -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -23,7 +23,7 @@
   <!-- iPhone-specific settings suitable for HTML-based apps: https://developer.apple.com/library/safari/#codinghowtos/Mobile/UserExperience/_index.html -->
   <!-- Hide the URL bar when running the app from the iPhone Home screen -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   <!-- Do not attempt to automatically detect phone numbers -->
   <meta name="format-detection" content="telephone=no" />
@@ -33,191 +33,94 @@
 
   <!-- es5-shim.js patches a JavaScript context to contain all EcmaScript 5 methods 
   	   that can be faithfully emulated with a legacy JavaScript engine.s -->
-  <script src="js/libs/es5-shim/es5-shim.min.js" type="text/javascript"></script>
+  <script src="savvy.framework/libs/js/es5-shim/es5-shim.min.js" type="application/javascript"></script>
   <!-- es5-sham.js patches other ES5 methods as closely as possible. -->
-  <!-- <script src="js/libs/es5-shim/es5-sham.min.js" type="text/javascript"></script> -->
+  <!-- <script src="savvy.framework/libs/js/es5-shim/es5-sham.min.js" type="application/javascript"></script> -->
   
   <!-- energize.min.js remove the artificial 300ms delay from touch events -->
-  <script src="js/libs/energize.js/energize.min.js" type="text/javascript"></script>
+  <script src="savvy.framework/libs/js/energize.js/energize.min.js" type="application/javascript"></script>
 
   <!-- Monkey patches for older browsers (e.g. IE8) that are needed for Savvy -->
-  <script src="js/libs/plugins.js" type="text/javascript"></script>
+  <script src="savvy.framework/libs/js/plugins.js" type="application/javascript"></script>
   
   <!--[if gt IE 7]><!-->
     <!-- The Savvy library -->
-    <script src="js/libs/savvy/savvy.js" type="text/javascript"></script>
+    <script src="savvy.framework/savvy.js" type="application/javascript"></script>
   <!--<![endif]-->
 
   <!-- normalize.css: http://necolas.github.io/normalize.css/ -->
-  <link rel="stylesheet" href="css/libs/normalize/normalize.css" />
+  <link rel="stylesheet" type="text/css" href="savvy.framework/libs/css/normalize/normalize.css" />
   <!-- animate.css: https://github.com/daneden/animate.css -->
-  <link rel="stylesheet" href="css/libs/animate/animate.min.css" />
+  <link rel="stylesheet" type="text/css" href="savvy.framework/libs/css/animate/animate.min.css" />
+  <!-- savvy.css: https://github.com/daneden/animate.css -->
+  <link rel="stylesheet" type="text/css" href="savvy.framework/savvy.css" />
+  <link rel="stylesheet" type="text/css" href="savvy.framework/transitions.min.css" />
 
-  <style type="text/css">
-    * {
-      /* Disable the tap highlight on Andoid devices. */
-      -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-      -moz-tap-highlight-color: rgba(0, 0, 0, 0);
-      -ms-tap-highlight-color: rgba(0, 0, 0, 0);
-      -o-tap-highlight-color: rgba(0, 0, 0, 0);
-      tap-highlight-color: rgba(0, 0, 0, 0);
-       
-      /* Disable selection of all element (input fields enabled below). */
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      -o-user-select: none;
-      user-select: none;
-
-      /* Disable the iOS pop-up menu. */
-      -webkit-touch-callout: none;
-      -moz-touch-callout: none;
-      -ms-touch-callout: none;
-      -o-touch-callout: none;
-      touch-callout: none;
-      
-      /* Adds a satisfying bounce to scrolls */
-      -webkit-overflow-scrolling: touch;
-      -moz-overflow-scrolling: touch;
-      -ms-overflow-scrolling: touch;
-      -o-overflow-scrolling: touch;
-      overflow-scrolling: touch;
-    }
-
-    input, textarea {
-      /* Enable selection of input fields and text areas. */
-      -webkit-user-select: text;
-      -khtml-user-select: text;
-      -moz-user-select: text;
-      -ms-user-select: text;
-      user-select: text;
-    }
-
-    html {
-      /* Can approve appearance on iOS devices. */
-      -webkit-text-size-adjust: none;
-      -moz-text-size-adjust: none;
-      -ms-text-size-adjust: none;
-      -o-text-size-adjust: none;
-      text-size-adjust: none;
-
-      /* Fix for webkit rendering */
-      -webkit-font-smoothing: antialiased;
-      -moz-font-smoothing: antialiased;
-      -ms-font-smoothing: antialiased;
-      -o-font-smoothing: antialiased;
-      font-smoothing: antialiased;
-    }
-
-    body {
-      /* Force hardware acceloration */
-      -webkit-backface-visibility: hidden;
-      -moz-backface-visibility: hidden;
-      -ms-backface-visibility: hidden;
-      -o-backface-visibility: hidden;
-      backface-visibility: hidden;
-
-      -webkit-transform: -webkit-rotateZ(360deg);
-      -moz-transform: -moz-rotateZ(360deg);
-      -ms-transform: -ms-rotateZ(360deg);
-      -o-transform: -o-rotateZ(360deg);
-      transform: rotateZ(360deg);
-    }
-
-	html, body {
-		height:100% !important;
-		width: 100% !important;
-		overflow: hidden !important;
-	}
-	
-	body > object[type="application/x-savvy"] {
-	  position: absolute !important;
-	  /* top, left and z-index will be set programatically */
-      height: 100% !important;
-      width: 100% !important;
-      
-	  overflow: auto !important;
-	  visibility: hidden;
-    }
-    
-	body > object[type="application/x-savvy"].animated {
-	  visibility: visible;
-	}
-	
-  </style>
-
-  <!-- The splash screen CSS and JavaScript to remove it on load -->
-  <link rel="stylesheet" id="savvy-splash-css" href="css/splash.css">
-  <script type="text/javascript">
+    <script type="application/javascript">
   (function(){
 	  
-	  if (window.navigator.standalone) {
-		  // prevent scrolling of body on iOS standalone apps
-		  	var start = {x:0, y:0};
-			document.addEventListener('touchstart', function(e) {
-				start.x = e.touches[0].screenX;
-				start.y = e.touches[0].screenY;
-			});
-			document.addEventListener('touchmove', function(e) {
-		      if (e.target.type === 'range') { return; }
-		      var delta = {
-		 	 	 x: e.touches[0].screenX - start.x,
-		 	 	 y: e.touches[0].screenY - start.y
-		      }
+    if (window.navigator.standalone) {
+        // prevent scrolling of body on iOS standalone apps
+        var start = {x:0, y:0};
+        document.addEventListener('touchstart', function(e) {
+            start.x = e.touches[0].screenX;
+            start.y = e.touches[0].screenY;
+        });
+        document.addEventListener('touchmove', function(e) {
+          if (e.target.type === 'range') { return; }
+          var delta = {
+             x: e.touches[0].screenX - start.x,
+             y: e.touches[0].screenY - start.y
+          }
 
-		      // test on the vertical
-		      var obj = e.target;
-		      while(obj != document.body && !canScrollVertical(obj) && !canScrollHorizontal(obj)) {
-		    	  obj = obj.parentNode;
-		      }
+          // test on the vertical
+          var obj = e.target;
+          while(obj != document.body && !canScrollVertical(obj) && !canScrollHorizontal(obj)) {
+              obj = obj.parentNode;
+          }
 
-		      if (obj == document.body) {
-		    	  // didn't find any scroll-able element
-		    	  e.preventDefault();
-		    	  return;
-		      }
-		      
-		      if (Math.abs(delta.y) > Math.abs(delta.x)) {
-		          if ( delta.y > 0 && canScrollUp(obj) ) { return; }
-		          if ( delta.y < 0 && canScrollDown(obj) ) { return; }
-	        	  e.preventDefault();
-		      } else {
-		          if ( delta.x > 0 && canScrollLeft(obj) ) { return; }
-		          if ( delta.x < 0 && canScrollRight(obj) ) { return; }
-	        	  e.preventDefault();
-		      }
-		    });
-			
-			function canScrollVertical(el) {
-				return el.scrollHeight > el.getBoundingClientRect().height;
-			}
+          if (obj == document.body) {
+              // didn't find any scroll-able element
+              e.preventDefault();
+              return;
+          }
 
-			function canScrollHorizontal(el) {
-				return el.scrollWidth > el.getBoundingClientRect().width;
-			}
-			
-			function canScrollUp(el) {
-				return el.scrollTop != 0;
-			}
-			
-			function canScrollDown(el) {
-				return el.scrollTop != el.scrollHeight - el.getBoundingClientRect().height;
-			}
-			
-			function canScrollLeft(el) {
-				return el.scrollLeft != 0;
-			}
-			
-			function canScrollRight(el) {
-				return el.scrollLeft != el.scrollWidth - el.getBoundingClientRect().width;
-			}
-		}
+          if (Math.abs(delta.y) > Math.abs(delta.x)) {
+              if ( delta.y > 0 && canScrollUp(obj) ) { return; }
+              if ( delta.y < 0 && canScrollDown(obj) ) { return; }
+              e.preventDefault();
+          } else {
+              if ( delta.x > 0 && canScrollLeft(obj) ) { return; }
+              if ( delta.x < 0 && canScrollRight(obj) ) { return; }
+              e.preventDefault();
+          }
+        });
+
+        function canScrollVertical(el) {
+            return el.scrollHeight > el.getBoundingClientRect().height;
+        }
+
+        function canScrollHorizontal(el) {
+            return el.scrollWidth > el.getBoundingClientRect().width;
+        }
+
+        function canScrollUp(el) {
+            return el.scrollTop != 0;
+        }
+
+        function canScrollDown(el) {
+            return el.scrollTop != el.scrollHeight - el.getBoundingClientRect().height;
+        }
+
+        function canScrollLeft(el) {
+            return el.scrollLeft != 0;
+        }
+
+        function canScrollRight(el) {
+            return el.scrollLeft != el.scrollWidth - el.getBoundingClientRect().width;
+        }
+    }
 	  
-    window.addEventListener(Savvy.LOAD, function(e) {
-      // Remove the splash screen
-   	  var style = document.getElementById("savvy-splash-css");
-   	  style.parentNode.removeChild(style);
-    })
   })();
   </script>
 </head>

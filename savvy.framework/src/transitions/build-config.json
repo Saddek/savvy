@@ -1,0 +1,39 @@
+{
+
+    "bouncing_entrances": {
+        "bounceInDown": true,
+        "bounceInLeft": true,
+        "bounceInRight": true,
+        "bounceInUp": true
+    },
+
+    "bouncing_exits": {
+        "bounceOutDown": true,
+        "bounceOutLeft": true,
+        "bounceOutRight": true,
+        "bounceOutUp": true
+    },
+
+    "sliders": {
+        "slideInDown": true,
+        "slideInLeft": true,
+        "slideInRight": true,
+        "slideInUp": true,
+        "slideOutDown": true,
+        "slideOutLeft": true,
+        "slideOutRight": true,
+        "slideOutUp": true
+    },
+    
+    "flippers": {
+        "flipInX": true,
+        "flipInY": true,
+        "flipOutX": true,
+        "flipOutY": true
+    },
+    
+    "static": {
+        "static": true
+    }
+
+}

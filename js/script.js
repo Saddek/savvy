@@ -1,18 +1,14 @@
-/* This script will be available on every screen as a child of the window object (see data/app.xml). */
+/* This script will be available on every screen as a child of the window object (see app.xml). */
 
-window.addEventListener(Savvy.LOAD, function(){
+window.addEventListener(Savvy.LOAD, function(event){
 	// fired once when Savvy loads first
 	document.querySelector("audio").play();		
 });
 
-window.addEventListener(Savvy.READY, function(){
-	// fired every time a screen "ready" event is published
-});
-
-window.addEventListener(Savvy.ENTER, function(){
-	// fired every time a screen "enter" event is published
-});
-
-window.addEventListener(Savvy.EXIT, function(e){
-	// fired every time a screen "exit" event is published
+window.addEventListener(Savvy.READY, function(event){
+    if (event.detail.to == License) {
+        event.setTransition(Savvy.COVER_RIGHT);
+    } else {
+        event.setTransition(Savvy.UNCOVER_RIGHT);
+    }
 });

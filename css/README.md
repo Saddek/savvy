@@ -1,1 +1,0 @@
-Place CSS files in this directory and CSS libraries in the libs directory. The h5bp library is linked from index.html and should never be removed.

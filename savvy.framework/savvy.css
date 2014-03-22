@@ -1,0 +1,88 @@
+* {
+    /* Disable the tap highlight on Andoid devices. */
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -moz-tap-highlight-color: rgba(0, 0, 0, 0);
+    -ms-tap-highlight-color: rgba(0, 0, 0, 0);
+    -o-tap-highlight-color: rgba(0, 0, 0, 0);
+    tap-highlight-color: rgba(0, 0, 0, 0);
+
+    /* Disable selection of all element (input fields enabled below). */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+
+    /* Disable the iOS pop-up menu. */
+    -webkit-touch-callout: none;
+    -moz-touch-callout: none;
+    -ms-touch-callout: none;
+    -o-touch-callout: none;
+    touch-callout: none;
+
+    /* Adds a satisfying bounce to scrolls */
+    -webkit-overflow-scrolling: touch;
+    -moz-overflow-scrolling: touch;
+    -ms-overflow-scrolling: touch;
+    -o-overflow-scrolling: touch;
+    overflow-scrolling: touch;
+}
+
+input, textarea {
+    /* Enable selection of input fields and text areas. */
+    -webkit-user-select: text;
+    -khtml-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+
+html {
+    /* Can approve appearance on iOS devices. */
+    -webkit-text-size-adjust: none;
+    -moz-text-size-adjust: none;
+    -ms-text-size-adjust: none;
+    -o-text-size-adjust: none;
+    text-size-adjust: none;
+
+    /* Fix for webkit rendering */
+    -webkit-font-smoothing: antialiased;
+    -moz-font-smoothing: antialiased;
+    -ms-font-smoothing: antialiased;
+    -o-font-smoothing: antialiased;
+    font-smoothing: antialiased;
+}
+
+body {
+    /* Force hardware acceloration */
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    -ms-backface-visibility: hidden;
+    -o-backface-visibility: hidden;
+    backface-visibility: hidden;
+
+    -webkit-transform: -webkit-rotateZ(360deg);
+    -moz-transform: -moz-rotateZ(360deg);
+    -ms-transform: -ms-rotateZ(360deg);
+    -o-transform: -o-rotateZ(360deg);
+    transform: rotateZ(360deg);
+    
+	/* http://subtlepatterns.com/fabric-of-squares/ */
+	background-image: url("img/dark_fish_skin/dark_fish_skin.png");
+}
+
+html, body {
+    height:100% !important;
+    width: 100% !important;
+    overflow: hidden !important;
+}
+
+body > object[type="application/x-savvy"] {
+    position: absolute !important;
+    /* top, left, z-index and visibility will be set programatically */
+    height: 100% !important;
+    width: 100% !important;
+
+    overflow: auto !important;
+    visibility: hidden;
+}

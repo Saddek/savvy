@@ -1,0 +1,14 @@
+@keyframes flipInX {
+    0% {
+        transform: perspective(400px) rotateX(-180deg);
+    }
+
+    100% {
+        transform: perspective(400px) rotateX(0deg);
+    }
+}
+
+.flipInX {
+	backface-visibility: hidden !important;
+	animation-name: flipInX;
+}
