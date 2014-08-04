@@ -20,6 +20,6 @@ r=/[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u20
 "]").replace(/(?:^|:|,)(?:\s*\[)+/g,"")))return d=eval("("+a+")"),"function"===typeof e?c({"":d},""):d;throw new SyntaxError("JSON.parse");})})();
 
 // Animate.css.js: extends JS's HTMLElement prototype to enable Animate.css animations directly on HTML Elements
-// https://github.com/oliver-moran/animate.css.js>
+// https://github.com/oliver-moran/animate.css.js
 // https://daneden.me/animate/
 HTMLElement.prototype.animate=function(a,b,c){if("string"==typeof a){var d=this;this.className+=" animated "+a;setTimeout(function(){d.className=d.className.replace(" animated "+a,"");"function"==typeof b&&b.call(c?c:window)},"hinge"==a?2E3:1E3)}};

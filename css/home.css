@@ -1,6 +1,6 @@
 /* Use this file to set CSS styles for the Home screen (see data/app.xml). */
 
-{
+body {
     background: url("../assets/images/backgrounds/shattered.png");
 }
 

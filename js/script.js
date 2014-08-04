@@ -1,14 +1,14 @@
 /* This script will be available on every screen as a child of the window object (see app.xml). */
 
-window.addEventListener(Savvy.LOAD, function(event){
+window.addEventListener(Card.LOAD, function(event){
 	// fired once when Savvy loads first
 	document.querySelector("audio").play();		
 });
 
-window.addEventListener(Savvy.READY, function(event){
+window.addEventListener(Card.READY, function(event){
     if (event.detail.to == License) {
-        event.setTransition(Savvy.COVER_RIGHT);
+        event.detail.transition = Transition.UNCOVER_LEFT;
     } else {
-        event.setTransition(Savvy.UNCOVER_RIGHT);
+        event.detail.transition = Transition.COVER_LEFT;
     }
 });
