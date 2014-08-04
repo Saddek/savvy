@@ -13,15 +13,15 @@ module Savvy {
     }
 
     /**
-     * The function called by application.goto
+     * The function called by document.goto
      * @param path A path to a new card. This must be a card ID or a string beginning with a card ID followed by a slash. Further characters may follow the slash.
      */
-    export function _goto(path:string, transition:SavvyTransition = Transition.CUT, preventHistory:boolean = false):void {
+    export function _goto(path:string, transition:ITransition = Transition.CUT, preventHistory:boolean = false):void {
         var id:string = Savvy.history._getIdForPath(path);
         var to:HTMLElement = document.getElementById(id);
         var from:HTMLElement = Savvy.history._currentCard;
 
-        if (application.cards.indexOf(to) > -1) {
+        if (document.cards.indexOf(to) > -1) {
             var detail:any = {
                 from: from,
                 to: to,
@@ -55,6 +55,11 @@ module Savvy {
 	}
     
     function ready(detail:any, path:string, preventHistory:boolean) {
+        if (!!detail.to) {
+            detail.to.style.setProperty("visibility", "hidden", "important");
+            detail.to.style.setProperty("display", "block", "important");
+        }
+        
         var event:SavvyEvent = createSavvyEvent(detail, path, preventHistory);
         event.initCustomEvent(Card.READY, true, true, detail);
         detail.to.dispatchEvent(event);
@@ -70,27 +75,25 @@ module Savvy {
         // NB: prevent accidental future transitions
         continueTransition = noop;
         
-        // hide from and show to
-        if (!!detail.from) detail.from.style.visibility = "hidden";
-        if (!!detail.to) detail.to.style.visibility = "visible";
+        if (!!detail.to) detail.to.style.setProperty("visibility", "visible", "important");
         
         // fallback to static in case something was set up wrong in the transition
         if (!detail.transition) detail.transition = Transition.CUT;
-        applyTranstition(detail.to, detail.transition.to, detail.transition.toIsForemost, detail.transition.duration);
-        applyTranstition(detail.from, detail.transition.from, !detail.transition.toIsForemost, detail.transition.duration);
+        applyTranstition(detail.to, detail.transition.to, detail.transition.duration);
+        applyTranstition(detail.from, detail.transition.from, detail.transition.duration);
         setTimeout(function(){
+            // hide from and show to
+            if (!!detail.from) detail.from.style.removeProperty("display");
+            if (!!detail.to) detail.to.style.removeProperty("visibility");
             onEnter.call(Savvy, detail, path, preventHistory);
         }, detail.transition.duration);
     }
 
-    function applyTranstition(el:HTMLElement, transition:SavvyTransition, isOnTop:boolean, duration:number) {
+    function applyTranstition(el:HTMLElement, transition:string, duration:number) {
         if (el != null) { // may be the first transition
-            el.style.zIndex = (isOnTop) ? "0" : "-1";
-            var className = " transition transition-" + duration + " " + transition;
-            el.className += className;
+            el.className += transition;
             setTimeout(function(){
-                el.style.zIndex = "0";
-                el.className = el.className.replace(className, "");
+                el.className = el.className.replace(transition, "");
             }, duration);
         }
     }

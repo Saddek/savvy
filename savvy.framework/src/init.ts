@@ -2,7 +2,7 @@ module Savvy {
 
     var xmlData:any = JXON.parse(application.read("app.xml", true));
     if (xmlData.app === undefined) {
-        throw new Error("Could not parse app.xml. \"app\" node missing.");
+        throw "Could not parse app.xml. \"app\" node missing.";
     } else {
         application.id = (xmlData.app["@id"]) ? xmlData.app["@id"] : "application";
         application.version = (xmlData.app["@version"]) ? xmlData.app["@version"] : "";
@@ -58,7 +58,7 @@ module Savvy {
         guaranteeArray(app.json).forEach((element:any, index:number, array:any[]):void => {
             var target = element["@target"];
             if (typeof target == "string") {
-                Savvy._parseJSONToTarget(element, target);
+                parseJSONToTarget(element, target);
             } else {
                 throw new Error("No target attribute provided for JSON (\"" + element + "\")");
             }
@@ -112,20 +112,13 @@ module Savvy {
                 object.insertAdjacentHTML("beforeend", application.read(url));
 			});
             var node:HTMLElement = <HTMLElement> document.body.appendChild(object);
-            
-            // these can be over-ridden by a developer
-            node.style.top = "0%";
-            node.style.left = "0%";
-            node.style.visibility = "hidden";
-            node.style.zIndex = "0";
-
-            application.cards.push(node); // add to the array of cards
+            document.cards.push(node); // add to the array of cards
             
             guaranteeArray(cards[i].json).forEach((element:any):void => {
                 var target = element["@target"];
                 if (typeof target == "string") {
                     var target = element.target;
-                    Savvy._parseJSONToTarget(element, target, object);
+                    parseJSONToTarget(element, target, object);
                 } else {
                     console.error("No target attribute provided for JSON (\"" + element + "\")");
                 }
@@ -299,6 +292,55 @@ module Savvy {
             i++
         }
         return parts.join('/');
+    }
+    
+    
+    /* JSON */
+    
+        /**
+     * Parses a JSON file to a variable.
+     * @param url The URL of the JSON file to load.
+     * @param target The name of the variable to set with the data from the JSON file
+     * @param context The object within which target should exist (defaults to window)
+     */
+    function parseJSONToTarget(url:string, target:string, context:any = window):void {
+        var data:any;
+        try {
+            var src:any = application.read(url); // prevent caching always with JSON (presume it is an API)
+            data = JSON.parse(src);
+        } catch (err) {
+            console.error("Cannot parse data file (\"" + url + "\"). Please check that the file is valid JSON <http://json.org/>.");
+            return;
+        }
+        
+        try {
+            createObjectFromString(target, data, context);
+        } catch(err) {
+            console.error("Could not create object: " + ((context == window) ? "window." : "this.") + target);
+            return;
+        }
+    }
+    
+    /**
+     * Finds or attempts to create an object given an ancestor object and a path to a descendant
+     * @param target a String path to the descendant object (e.g. child.obj)
+     * @param context an Object to act as the ancestor (defaults to window)
+     * @return the child object or null if it could not be created
+     */
+    function createObjectFromString(target:string, data:any, context:any = window):any {
+        var arr:string[] = target.split(".");
+        
+        for (var i:number=0; i<arr.length - 1; i++) {
+            var id = arr[i];
+            if (typeof context[id] == "undefined") {
+                context[id] = {};
+            }
+            context = context[id];
+        }
+
+        context = context[arr[i]] = data;
+
+        return context;
     }
     
 }

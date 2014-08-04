@@ -15,175 +15,471 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 
 body > object[type="application/x-savvy"].transition {
-  -webkit-animation-fill-mode: none;
-  animation-fill-mode: none;
-  visibility: visible !important;
-  -webkit-animation-timing-function: ease-in-out;
-  animation-timing-function: ease-in-out;
+    -webkit-animation-fill-mode: both;
+    -moz-animation-fill-mode: both;
+    -ms-animation-fill-mode: both;
+    animation-fill-mode: both;
+    display: block !important;
 }
 
-body > object[type="application/x-savvy"].transition-0 {
-  -webkit-animation-duration: 0ms;
-  animation-duration: 0ms;
+body > object[type="application/x-savvy"].transition.-ease-in-out {
+    -webkit-animation-timing-function: ease-in-out;
+    -moz-animation-timing-function: ease-in-out;
+    -ms-animation-timing-function: ease-in-out;
+    animation-timing-function: ease-in-out;
 }
 
-body > object[type="application/x-savvy"].transition-250 {
-  -webkit-animation-duration: 250ms;
-  animation-duration: 250ms;
+body > object[type="application/x-savvy"].transition.-linear {
+    -webkit-animation-timing-function: linear;
+    -moz-animation-timing-function: linear;
+    -ms-animation-timing-function: linear;
+    animation-timing-function: linear;
 }
 
-body > object[type="application/x-savvy"].transition-333 {
-  -webkit-animation-duration: 333ms;
-  animation-duration: 333ms;
+body > object[type="application/x-savvy"].transition.-lower {
+    z-index: -1 !important;
 }
 
-body > object[type="application/x-savvy"].transition-500 {
-  -webkit-animation-duration: 500ms;
-  animation-duration: 500ms;
+body > object[type="application/x-savvy"].transition.-shadow {
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.66) !important;
 }
 
-body > object[type="application/x-savvy"].transition-1000 {
-  -webkit-animation-duration: 1000ms;
-  animation-duration: 1000ms;
+body > object[type="application/x-savvy"].transition.-d0ms {
+    -webkit-animation-duration: 0ms;
+    -moz-animation-duration: 0ms;
+    -ms-animation-duration: 0ms;
+    animation-duration: 0ms;
+
+    -webkit-transition: opacity 0ms;
+    -moz-transition: opacity 0ms;
+    -ms-transition: opacity 0ms;
+    transition: opacity 0ms;
 }
 
-@-webkit-keyframes static {
-  0% {}
-  100% {}
+body > object[type="application/x-savvy"].transition.-d250ms {
+    -webkit-animation-duration: 250ms;
+    -moz-animation-duration: 250ms;
+    -ms-animation-duration: 250ms;
+    animation-duration: 250ms;
+
+    -webkit-transition: opacity 250ms;
+    -moz-transition: opacity 250ms;
+    -ms-transition: opacity 250ms;
+    transition: opacity 250ms;
 }
 
-@keyframes static {
-  0% {}
-  100% {}
+body > object[type="application/x-savvy"].transition.-d333ms {
+    -webkit-animation-duration: 333ms;
+    -moz-animation-duration: 333ms;
+    -ms-animation-duration: 333ms;
+    animation-duration: 333ms;
+
+    -webkit-transition: opacity 333ms;
+    -moz-transition: opacity 333ms;
+    -ms-transition: opacity 333ms;
+    transition: opacity 333ms;
 }
 
-body > object[type="application/x-savvy"].transition.static {
-  -webkit-animation-name: static;
-  animation-name: static;
+body > object[type="application/x-savvy"].transition.-d500ms {
+    -webkit-animation-duration: 500ms;
+    -moz-animation-duration: 500ms;
+    -ms-animation-duration: 500ms;
+    animation-duration: 500ms;
+
+    -webkit-transition: opacity 500ms;
+    -moz-transition: opacity 500ms;
+    -ms-transition: opacity 500ms;
+    transition: opacity 500ms;
 }
 
-@-webkit-keyframes coverLeft {
-  0% {
-    -webkit-transform: translate3d(-100%, 0, 0);
-    transform: translate3d(-100%, 0, 0);
-  }
+body > object[type="application/x-savvy"].transition.-d1000ms {
+    -webkit-animation-duration: 1000ms;
+    -moz-animation-duration: 1000ms;
+    -ms-animation-duration: 1000ms;
+    animation-duration: 1000ms;
 
-  100% {
-    -webkit-transform: none;
-    transform: none;
-  }
+    -webkit-transition: opacity 1000ms;
+    -moz-transition: opacity 1000ms;
+    -ms-transition: opacity 1000ms;
+    transition: opacity 1000ms;
 }
 
-@keyframes coverLeft {
-  0% {
-    -webkit-transform: translate3d(-100%, 0, 0);
-    -ms-transform: translate3d(-100%, 0, 0);
-    transform: translate3d(-100%, 0, 0);
-  }
+/* STATIC */
 
-  100% {
-    -webkit-transform: none;
-    -ms-transform: none;
-    transform: none;
-  }
+@-webkit-keyframes -savvy-static {
+    0% {}
+    100% {}
 }
 
-body > object[type="application/x-savvy"].transition.coverLeft {
-  -webkit-animation-name: coverLeft;
-  animation-name: coverLeft;
+@-moz-keyframes -savvy-static {
+    0% {}
+    100% {}
 }
 
-
-@-webkit-keyframes uncoverLeft {
-  0% {
-    -webkit-transform: none;
-    transform: none;
-  }
-
-  100% {
-    -webkit-transform: translate3d(-100%, 0, 0);
-    transform: translate3d(-100%, 0, 0);
-  }
+@-ms-keyframes -savvy-static {
+    0% {}
+    100% {}
 }
 
-@keyframes uncoverLeft {
-  0% {
-    -webkit-transform: none;
-    -ms-transform: none;
-    transform: none;
-  }
-
-  100% {
-    -webkit-transform: translate3d(-100%, 0, 0);
-    -ms-transform: translate3d(-100%, 0, 0);
-    transform: translate3d(-100%, 0, 0);
-  }
+@keyframes -savvy-static {
+    0% {}
+    100% {}
 }
 
-body > object[type="application/x-savvy"].transition.uncoverLeft {
-  -webkit-animation-name: uncoverLeft;
-  animation-name: uncoverLeft;
+body > object[type="application/x-savvy"].transition.-static {
+    -webkit-animation-name: -savvy-static;
+    -moz-animation-name: -savvy-static;
+    -ms-animation-name: -savvy-static;
+    animation-name: -savvy-static;
 }
 
-@-webkit-keyframes coverRight {
-  0% {
-    -webkit-transform: translate3d(+100%, 0, 0);
-    transform: translate3d(+100%, 0, 0);
-  }
+/* EXIT */
 
-  100% {
-    -webkit-transform: none;
-    transform: none;
-  }
+@-webkit-keyframes -savvy-exit-left {
+    0% {
+        -webkit-transform: none;
+        -moz-transform: none;
+        -ms-transform: none;
+        transform: none;
+    }
+
+    100% {
+        -webkit-transform: translate3d(-100%, 0, 0);
+        -moz-transform: translate3d(-100%, 0, 0);
+        -ms-transform: translate3d(-100%, 0, 0);
+        transform: translate3d(-100%, 0, 0);
+    }
 }
 
-@keyframes coverRight {
-  0% {
-    -webkit-transform: translate3d(+100%, 0, 0);
-    -ms-transform: translate3d(+100%, 0, 0);
-    transform: translate3d(+100%, 0, 0);
-  }
+@-moz-keyframes -savvy-exit-left {
+    0% {
+        -webkit-transform: none;
+        -moz-transform: none;
+        -ms-transform: none;
+        transform: none;
+    }
 
-  100% {
-    -webkit-transform: none;
-    -ms-transform: none;
-    transform: none;
-  }
+    100% {
+        -webkit-transform: translate3d(-100%, 0, 0);
+        -moz-transform: translate3d(-100%, 0, 0);
+        -ms-transform: translate3d(-100%, 0, 0);
+        transform: translate3d(-100%, 0, 0);
+    }
 }
 
-body > object[type="application/x-savvy"].transition.coverRight {
-  -webkit-animation-name: coverRight;
-  animation-name: coverRight;
+@-ms-keyframes -savvy-exit-left {
+    0% {
+        -webkit-transform: none;
+        -moz-transform: none;
+        -ms-transform: none;
+        transform: none;
+    }
+
+    100% {
+        -webkit-transform: translate3d(-100%, 0, 0);
+        -moz-transform: translate3d(-100%, 0, 0);
+        -ms-transform: translate3d(-100%, 0, 0);
+        transform: translate3d(-100%, 0, 0);
+    }
 }
 
+@keyframes -savvy-exit-left {
+    0% {
+        -webkit-transform: none;
+        -moz-transform: none;
+        -ms-transform: none;
+        transform: none;
+    }
 
-@-webkit-keyframes uncoverRight {
-  0% {
-    -webkit-transform: none;
-    transform: none;
-  }
-
-  100% {
-    -webkit-transform: translate3d(+100%, 0, 0);
-    transform: translate3d(+100%, 0, 0);
-  }
+    100% {
+        -webkit-transform: translate3d(-100%, 0, 0);
+        -moz-transform: translate3d(-100%, 0, 0);
+        -ms-transform: translate3d(-100%, 0, 0);
+        transform: translate3d(-100%, 0, 0);
+    }
 }
 
-@keyframes uncoverRight {
-  0% {
-    -webkit-transform: none;
-    -ms-transform: none;
-    transform: none;
-  }
-
-  100% {
-    -webkit-transform: translate3d(+100%, 0, 0);
-    -ms-transform: translate3d(+100%, 0, 0);
-    transform: translate3d(+100%, 0, 0);
-  }
+body > object[type="application/x-savvy"].transition.-out.-left {
+  -webkit-animation-name: -savvy-exit-left;
+  -moz-animation-name: -savvy-exit-left;
+  -ms-animation-name: -savvy-exit-left;
+  animation-name: -savvy-exit-left;
 }
 
-body > object[type="application/x-savvy"].transition.uncoverRight {
-  -webkit-animation-name: uncoverRight;
-  animation-name: uncoverRight;
+@-webkit-keyframes -savvy-exit-right {
+    0% {
+        -webkit-transform: none;
+        -moz-transform: none;
+        -ms-transform: none;
+        transform: none;
+    }
+
+    100% {
+        -webkit-transform: translate3d(+100%, 0, 0);
+        -moz-transform: translate3d(+100%, 0, 0);
+        -ms-transform: translate3d(+100%, 0, 0);
+        transform: translate3d(+100%, 0, 0);
+    }
+}
+
+@-moz-keyframes -savvy-exit-right {
+    0% {
+        -webkit-transform: none;
+        -moz-transform: none;
+        -ms-transform: none;
+        transform: none;
+    }
+
+    100% {
+        -webkit-transform: translate3d(+100%, 0, 0);
+        -moz-transform: translate3d(+100%, 0, 0);
+        -ms-transform: translate3d(+100%, 0, 0);
+        transform: translate3d(+100%, 0, 0);
+    }
+}
+
+@-ms-keyframes -savvy-exit-right {
+    0% {
+        -webkit-transform: none;
+        -moz-transform: none;
+        -ms-transform: none;
+        transform: none;
+    }
+
+    100% {
+        -webkit-transform: translate3d(+100%, 0, 0);
+        -moz-transform: translate3d(+100%, 0, 0);
+        -ms-transform: translate3d(+100%, 0, 0);
+        transform: translate3d(+100%, 0, 0);
+    }
+}
+
+@keyframes -savvy-exit-right {
+    0% {
+        -webkit-transform: none;
+        -moz-transform: none;
+        -ms-transform: none;
+        transform: none;
+    }
+
+    100% {
+        -webkit-transform: translate3d(+100%, 0, 0);
+        -moz-transform: translate3d(+100%, 0, 0);
+        -ms-transform: translate3d(+100%, 0, 0);
+        transform: translate3d(+100%, 0, 0);
+    }
+}
+
+body > object[type="application/x-savvy"].transition.-out.-right {
+  -webkit-animation-name: -savvy-exit-right;
+  -moz-animation-name: -savvy-exit-right;
+  -ms-animation-name: -savvy-exit-right;
+  animation-name: -savvy-exit-right;
+}
+
+/* ENTER  */
+
+@-webkit-keyframes -savvy-enter-left {
+    0% {
+        -webkit-transform: translate3d(+100%, 0, 0);
+        -moz-transform: translate3d(+100%, 0, 0);
+        -ms-transform: translate3d(+100%, 0, 0);
+        transform: translate3d(+100%, 0, 0);
+    }
+
+    100% {
+        -webkit-transform: none;
+        -moz-transform: none;
+        -ms-transform: none;
+        transform: none;
+    }
+}
+
+@-moz-keyframes -savvy-enter-left {
+    0% {
+        -webkit-transform: translate3d(+100%, 0, 0);
+        -moz-transform: translate3d(+100%, 0, 0);
+        -ms-transform: translate3d(+100%, 0, 0);
+        transform: translate3d(+100%, 0, 0);
+    }
+
+    100% {
+        -webkit-transform: none;
+        -moz-transform: none;
+        -ms-transform: none;
+        transform: none;
+    }
+}
+
+@-ms-keyframes -savvy-enter-left {
+    0% {
+        -webkit-transform: translate3d(+100%, 0, 0);
+        -moz-transform: translate3d(+100%, 0, 0);
+        -ms-transform: translate3d(+100%, 0, 0);
+        transform: translate3d(+100%, 0, 0);
+    }
+
+    100% {
+        -webkit-transform: none;
+        -moz-transform: none;
+        -ms-transform: none;
+        transform: none;
+    }
+}
+
+@keyframes -savvy-enter-left {
+    0% {
+        -webkit-transform: translate3d(+100%, 0, 0);
+        -moz-transform: translate3d(+100%, 0, 0);
+        -ms-transform: translate3d(+100%, 0, 0);
+        transform: translate3d(+100%, 0, 0);
+    }
+
+    100% {
+        -webkit-transform: none;
+        -moz-transform: none;
+        -ms-transform: none;
+        transform: none;
+    }
+}
+
+body > object[type="application/x-savvy"].transition.-in.-left {
+    -webkit-animation-name: -savvy-enter-left;
+    -moz-animation-name: -savvy-enter-left;
+    -ms-animation-name: -savvy-enter-left;
+    animation-name: -savvy-enter-left;
+}
+
+@-webkit-keyframes -savvy-enter-right {
+    0% {
+        -webkit-transform: translate3d(-100%, 0, 0);
+        -moz-transform: translate3d(-100%, 0, 0);
+        -ms-transform: translate3d(-100%, 0, 0);
+        transform: translate3d(-100%, 0, 0);
+    }
+
+    100% {
+        -webkit-transform: none;
+        -moz-transform: none;
+        -ms-transform: none;
+        transform: none;
+    }
+}
+
+@-moz-keyframes -savvy-enter-right {
+    0% {
+        -webkit-transform: translate3d(-100%, 0, 0);
+        -moz-transform: translate3d(-100%, 0, 0);
+        -ms-transform: translate3d(-100%, 0, 0);
+        transform: translate3d(-100%, 0, 0);
+    }
+
+    100% {
+        -webkit-transform: none;
+        -moz-transform: none;
+        -ms-transform: none;
+        transform: none;
+    }
+}
+
+@-ms-keyframes -savvy-enter-right {
+    0% {
+        -webkit-transform: translate3d(-100%, 0, 0);
+        -moz-transform: translate3d(-100%, 0, 0);
+        -ms-transform: translate3d(-100%, 0, 0);
+        transform: translate3d(-100%, 0, 0);
+    }
+
+    100% {
+        -webkit-transform: none;
+        -moz-transform: none;
+        -ms-transform: none;
+        transform: none;
+    }
+}
+
+@keyframes -savvy-enter-right {
+    0% {
+        -webkit-transform: translate3d(-100%, 0, 0);
+        -moz-transform: translate3d(-100%, 0, 0);
+        -ms-transform: translate3d(-100%, 0, 0);
+        transform: translate3d(-100%, 0, 0);
+    }
+
+    100% {
+        -webkit-transform: none;
+        -moz-transform: none;
+        -ms-transform: none;
+        transform: none;
+    }
+}
+
+body > object[type="application/x-savvy"].transition.-in.-right {
+    -webkit-animation-name: -savvy-enter-right;
+    -moz-animation-name: -savvy-enter-right;
+    -ms-animation-name: -savvy-enter-right;
+    animation-name: -savvy-enter-right;
+}
+
+/* FADES */
+
+@-webkit-keyframes -savvy-fade-in {
+    0% {
+        opacity: 0;
+    }
+    
+    100% {
+        opacity: 1;
+    }
+}
+
+@-moz-keyframes -savvy-fade-in {
+    0% {
+        opacity: 0;
+    }
+    
+    100% {
+        opacity: 1;
+    }
+}
+
+@-ms-keyframes -savvy-fade-in {
+    0% {
+        opacity: 0;
+    }
+    
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes -savvy-fade-in {
+    0% {
+        opacity: 0;
+    }
+    
+    100% {
+        opacity: 1;
+    }
+}
+
+body > object[type="application/x-savvy"].transition.-in.-fade {
+    -webkit-animation-name: -savvy-fade-in;
+    -moz-animation-name: -savvy-fade-in;
+    -ms-animation-name: -savvy-fade-in;
+    animation-name: -savvy-fade-in;
+}
+
+body > object[type="application/x-savvy"].transition.-out.-fade {
+    -webkit-opacity: 0;
+    -moz-opacity: 0;
+    -ms-opacity: 0;
+    opacity: 0;
+}
+
+body > object[type="application/x-savvy"].transition.-in.-fade {
+    -webkit-opacity: 1;
+    -moz-opacity: 1;
+    -ms-opacity: 1;
+    opacity: 1;
 }

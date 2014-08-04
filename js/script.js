@@ -7,8 +7,8 @@ window.addEventListener(Card.LOAD, function(event){
 
 window.addEventListener(Card.READY, function(event){
     if (event.detail.to == License) {
-        event.detail.transition = Transition.UNCOVER_LEFT;
+        event.detail.transition = Transition.COVER_LEFT_FADE;
     } else {
-        event.detail.transition = Transition.COVER_LEFT;
+        event.detail.transition = Transition.COVER_LEFT_FADE.inverse;
     }
 });

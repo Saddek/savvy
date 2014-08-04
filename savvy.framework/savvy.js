@@ -40,26 +40,761 @@ THE SOFTWARE.
 
 */
 
-'use strict';var Card;(function(a){a.READY="savvy-ready";a.ENTER="savvy-enter";a.EXIT="savvy-exit";a.LOAD="savvy-load"})(Card||(Card={}));var JXON;
-(function(a){function n(a){function e(a){return/^\s*$/.test(a)?null:/^(?:true|false)$/i.test(a)?"true"===a.toLowerCase():isFinite(a)?parseFloat(a):a}var d=new h,l=0,b="";if(a.attributes&&0<a.attributes.length)for(l;l<a.attributes.length;l++){var c=a.attributes.item(l);d["@"+c.name.toLowerCase()]=e(c.value.trim())}if(a.childNodes&&0<a.childNodes.length)for(var g,m=0;m<a.childNodes.length;m++)g=a.childNodes.item(m),4===g.nodeType?b+=g.nodeValue:3===g.nodeType?b+=g.nodeValue.trim():1!==g.nodeType||g.prefix||
-(0===l&&(d={}),c=g.nodeName.toLowerCase(),g=n(g),d.hasOwnProperty(c)?(d[c].constructor!==Array&&(d[c]=[d[c]]),d[c].push(g)):(d[c]=g,l++));d.constructor===h&&d.setValue(e(b));0<l&&Object.freeze(d);return d}a.parse=function(a){return n(a)};var h=function(){function a(e){this._value=void 0===e?null:e}a.prototype.setValue=function(a){this._value=a};a.prototype.valueOf=function(){return this._value};a.prototype.toString=function(){return null===this._value?"null":this._value.toString()};return a}()})(JXON||
-(JXON={}));var application;
-(function(a){a.id=null;a.version=null;a.defaultPath=null;a.cards=[];a["goto"]=function(a,h){"undefined"===typeof h&&(h=Transition.CUT);if("string"==typeof a)Savvy._goto.call(Savvy,a,h);else throw"A string indicating a card ID must be passed to application.goto method.";};a.read=function(a,h){"undefined"===typeof h&&(h=!1);var f=new XMLHttpRequest;f.open("GET",a,!1);f.setRequestHeader("Cache-Control","no-store");f.send();return 200!==f.status&&0!==f.status?(console.error("HTTP status "+f.status+" returned for file: "+
-a),null):h?f.responseXML:f.responseText}})(application||(application={}));var Savvy;
-(function(a){a._parseJSONToTarget=function(a,h,f){"undefined"===typeof f&&(f=window);var e;try{var d=application.read(a);e=JSON.parse(d)}catch(l){console.error('Cannot parse data file ("'+a+'"). Please check that the file is valid JSON <http://json.org/>.');return}try{a=e;e=f;"undefined"===typeof e&&(e=window);for(var b=h.split("."),d=0;d<b.length-1;d++){var c=b[d];"undefined"==typeof e[c]&&(e[c]={});e=e[c]}e[b[d]]=a}catch(g){console.error("Could not create object: "+(f==window?"window.":"this.")+
-h)}}})(Savvy||(Savvy={}));
-(function(a){(function(n){function h(){var a=window.location.hash;return""==a||"#"==a||"#!"==a||"#!/"==a?application.defaultPath:a.substr(3)}function f(a){var d=a.indexOf("/");-1<d&&a.substr(0,d);return a}n._currentCard=null;n._ignoreHashChange=!1;window.addEventListener("hashchange",function(){if(n._ignoreHashChange)n._ignoreHashChange=!1;else{var e=h(),d=f(e),d=document.getElementById(d);application.cards.indexOf(d)&&a._goto(e,Transition.CUT,!0)}},!1);n._getPathFromURLHash=h;n._getIdForPath=f})(a.history||
-(a.history={}))})(Savvy||(Savvy={}));
-(function(a){function n(b){h(e(b.img));e(b.css).forEach(function(a,b,c){d(a)});e(b.html).forEach(function(a,b,c){document.body.insertAdjacentHTML("beforeend",application.read(a))});e(b.json).forEach(function(b,c,k){c=b["@target"];if("string"==typeof c)a._parseJSONToTarget(b,c);else throw Error('No target attribute provided for JSON ("'+b+'")');});e(b.js).forEach(function(a,b,c){l(a)});f(e(b.card));delete a._eval}function h(a){for(var b=0,c=a.length;b<c;b++){var k=new Image;k.src=a[b];t.push(k)}}function f(b){for(var c=
-0,g=b.length;c<g;c++){var k=document.createElement("object");k.setAttribute("id",b[c]["@id"]);k.setAttribute("title",b[c]["@title"]);k.setAttribute("data","savvy:"+application.id+"/"+b[c]["@id"]);k.setAttribute("type","application/x-savvy");var m=b[c]["@id"];window[m]=k;e(b[c].css).forEach(function(a){d(a,m)});e(b[c].html).forEach(function(a){k.insertAdjacentHTML("beforeend",application.read(a))});var f=document.body.appendChild(k);f.style.top="0%";f.style.left="0%";f.style.visibility="hidden";f.style.zIndex=
-"0";application.cards.push(f);e(b[c].json).forEach(function(b){var c=b["@target"];"string"==typeof c?(c=b.target,a._parseJSONToTarget(b,c,k)):console.error('No target attribute provided for JSON ("'+b+'")')});e(b[c].js).forEach(function(a){l(a,k)});void 0!==b[c]["@default"]&&(null===application.defaultPath?application.defaultPath=m:console.warn("More than one card is set as the default in app.xml. Ignoring."))}if(null===application.defaultPath)throw Error("No default card set.");}function e(a){return[].concat(a||
-[])}function d(a,b){var c=p.isRemoteUrl.test(a)||-1!=window.navigator.appVersion.indexOf("MSIE 8");if(c&&b)throw Error("Card styles sheets cannot be remote (e.g. http://www.examples.com/style.css). Please include remote style sheets globally.");var k;c?(k=document.createElement("link"),k.setAttribute("rel","stylesheet"),k.setAttribute("type","text/css"),k.setAttribute("href",a)):(k=document.createElement("style"),k.setAttribute("type","text/css"));b&&k.setAttribute("data-for",b);try{if(!c){var e=
-application.read(a);b&&(e=e.replace(p.css.body,"$1"),e=e.replace(p.css.selector,"body > object#"+b+" $1$2"));var g=a.toString().lastIndexOf("/");if(-1!=g)var d=a.toString().substr(0,g+1),e=e.replace(p.css.noQuotes,"url("+d).replace(p.css.doubleQuotes,'url("'+d).replace(p.css.singleQuotes,"url('"+d);k.appendChild(document.createTextNode(e))}document.getElementsByTagName("head")[0].appendChild(k)}catch(m){throw Error("Error appending CSS file ("+a+"): "+m.toString());}}function l(c,e){var d=b(c);try{a._eval(d,
-e)}catch(k){throw Error(k.toString()+" ("+c+")");}}function b(a){return application.read(a).replace(u,function(c,e){for(var d=a.toString().lastIndexOf("/"),d=(a.toString().substr(0,d+1)+e).split("/"),g=1;g<d.length;)if(!(0>g)){".."==d[g]&&".."!==d[g-1]&&0<g&&(d.splice(g-1,2),g-=2);if("."===d[g]||""==d[g])d.splice(g,1),g-=1;g++}d=d.join("/");return b(d)})}var c=JXON.parse(application.read("app.xml",!0));if(void 0===c.app)throw Error('Could not parse app.xml. "app" node missing.');application.id=c.app["@id"]?
-c.app["@id"]:"application";application.version=c.app["@version"]?c.app["@version"]:"";var g="load",m=window;if("yes"==c.app["@cordova"]){var g="deviceready",m=document,r=document.createElement("script");r.setAttribute("src","cordova.js");r.setAttribute("type","text/javascript");var q=document.createElement("script");q.setAttribute("src","cordova_plugins.js");q.setAttribute("type","text/javascript");document.head.appendChild(r);document.head.appendChild(q)}m.addEventListener(g,function s(){m.removeEventListener(g,
-s);n(c.app);a._goto(a.history._getPathFromURLHash(),Transition.CUT,!0)},!1);var t=[],p={isRemoteUrl:/(http|ftp|https):\/\/[a-z0-9-_]+(.[a-z0-9-_]+)+([a-z0-9-.,@?^=%&;:/~+#]*[a-z0-9-@?^=%&;/~+#])?/i,css:{singleQuotes:/url\('(?!https?:\/\/)(?!\/)/gi,doubleQuotes:/url\("(?!https?:\/\/)(?!\/)/gi,noQuotes:/url\((?!https?:\/\/)(?!['"]\/?)/gi,body:/\bbody\b(,(?=[^}]*{)|\s*{)/gi,selector:/([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/gi}},u=/^#include "(.*)"$/gm})(Savvy||(Savvy={}));
-(function(a){function n(b,c,d){var m=e(b,c,d);m.initCustomEvent(Card.READY,!0,!0,b);b.to.dispatchEvent(m);m.defaultPrevented?l=h:h.call(a,b,c,d)}function h(b,c,g){l=d;b.from&&(b.from.style.visibility="hidden");b.to&&(b.to.style.visibility="visible");b.transition||(b.transition=Transition.CUT);f(b.to,b.transition.to,b.transition.toIsForemost,b.transition.duration);f(b.from,b.transition.from,!b.transition.toIsForemost,b.transition.duration);setTimeout(function(){document.title=b.to.title||"";g||(a.history._ignoreHashChange=
-!0,window.location.hash="!/"+c);var d=e(b,c,g);a.history._currentCard=b.to;d.initCustomEvent(Card.ENTER,!0,!0,b);b.to.dispatchEvent(d)},b.transition.duration)}function f(a,c,d,e){if(null!=a){a.style.zIndex=d?"0":"-1";var f=" transition transition-"+e+" "+c;a.className+=f;setTimeout(function(){a.style.zIndex="0";a.className=a.className.replace(f,"")},e)}}function e(b,c,e){var f=document.createEvent("CustomEvent");l=d;f["continue"]=function(){l.call(a,b,c,e)};return f}var d=function(){},l=d;a._goto=
-function(b,c,d){"undefined"===typeof c&&(c=Transition.CUT);"undefined"===typeof d&&(d=!1);var f=a.history._getIdForPath(b),h=document.getElementById(f),q=a.history._currentCard;if(-1<application.cards.indexOf(h))c={from:q,to:h,transition:c},f=e(c,b,d),null==c.from?(f.initCustomEvent(Card.LOAD,!0,!0,c),document.body.dispatchEvent(f)):(f.initCustomEvent(Card.EXIT,!0,!0,c),c.from.dispatchEvent(f)),f.defaultPrevented?l=n:n.call(a,c,b,d);else throw'No card with ID of "'+f+'".';}})(Savvy||(Savvy={}));var Transition;
-(function(a){a.CUT={from:"static",to:"static",duration:0,toIsForemost:!0,inverse:a.CUT};a.COVER_LEFT={from:"static",to:"coverLeft",duration:250,toIsForemost:!0,inverse:a.UNCOVER_LEFT};a.UNCOVER_LEFT={to:"static",from:"uncoverLeft",duration:333,toIsForemost:!1,inverse:a.COVER_LEFT};a.COVER_RIGHT={from:"static",to:"coverRight",duration:250,toIsForemost:!0,inverse:a.UNCOVER_RIGHT};a.UNCOVER_RIGHT={to:"static",from:"uncoverRight",duration:333,toIsForemost:!1,inverse:a.COVER_RIGHT}})(Transition||(Transition=
-{}));(function(a){a._eval=function(a,h){void 0===h?(window.execScript||function(a){window.eval.call(window,a)})(a):function(a){eval(a)}.call(h,a)}})(Savvy||(Savvy={}));
+var Card;
+(function (Card) {
+    // these are Strings so that they can be compared exactly agaisnt themselves (i.e. "ready" !== new String("ready"))
+    Card.READY = "savvy-ready";
+    Card.ENTER = "savvy-enter";
+    Card.EXIT = "savvy-exit";
+    Card.LOAD = "savvy-load";
+})(Card || (Card = {}));
+var JXON;
+(function (JXON) {
+    function parse(parent) {
+        return getJXONTree(parent);
+    }
+    JXON.parse = parse;
+    ;
+
+    /**
+    * A JXONNode class, used as a container object when parsing XML to a JavaScript object.
+    */
+    var JXONNode = (function () {
+        function JXONNode(val) {
+            this._value = (val === undefined) ? null : val;
+        }
+        JXONNode.prototype.setValue = function (val) {
+            this._value = val;
+        };
+        JXONNode.prototype.valueOf = function () {
+            return this._value;
+        };
+        JXONNode.prototype.toString = function () {
+            return (this._value === null) ? "null" : this._value.toString();
+        };
+        return JXONNode;
+    })();
+
+    /**
+    * JXON Snippet #3 - Mozilla Developer Network
+    * https://developer.mozilla.org/en-US/docs/JXON
+    */
+    function getJXONTree(oXMLParent) {
+        var vResult = new JXONNode();
+        var nLength = 0;
+        var sCollectedTxt = "";
+
+        if (oXMLParent.attributes && oXMLParent.attributes.length > 0) {
+            for (nLength; nLength < oXMLParent.attributes.length; nLength++) {
+                var oAttrib = oXMLParent.attributes.item(nLength);
+                vResult["@" + oAttrib.name.toLowerCase()] = parseText(oAttrib.value.trim());
+            }
+        }
+        if (oXMLParent.childNodes && oXMLParent.childNodes.length > 0) {
+            for (var oNode, sProp, vContent, nItem = 0; nItem < oXMLParent.childNodes.length; nItem++) {
+                oNode = oXMLParent.childNodes.item(nItem);
+                if (oNode.nodeType === 4) {
+                    sCollectedTxt += oNode.nodeValue;
+                } else if (oNode.nodeType === 3) {
+                    sCollectedTxt += oNode.nodeValue.trim();
+                } else if (oNode.nodeType === 1 && !oNode.prefix) {
+                    if (nLength === 0) {
+                        vResult = new Object();
+                    }
+                    sProp = oNode.nodeName.toLowerCase();
+                    vContent = getJXONTree(oNode);
+                    if (vResult.hasOwnProperty(sProp)) {
+                        if (vResult[sProp].constructor !== Array) {
+                            vResult[sProp] = [vResult[sProp]];
+                        }
+                        vResult[sProp].push(vContent);
+                    } else {
+                        vResult[sProp] = vContent;
+                        nLength++;
+                    }
+                }
+            }
+        }
+        if (vResult.constructor === JXONNode) {
+            vResult.setValue(parseText(sCollectedTxt));
+        }
+        if (nLength > 0) {
+            Object.freeze(vResult);
+        }
+        return vResult;
+
+        function parseText(sValue) {
+            if (/^\s*$/.test(sValue)) {
+                return null;
+            }
+            if (/^(?:true|false)$/i.test(sValue)) {
+                return sValue.toLowerCase() === "true";
+            }
+            if (isFinite(sValue)) {
+                return parseFloat(sValue);
+            }
+
+            /* if (isFinite(Date.parse(sValue))) { return new Date(sValue); } */ // produces false positives
+            return sValue;
+        }
+    }
+})(JXON || (JXON = {}));
+document.cards = [];
+document["goto"] = function (path, transition) {
+    if (typeof transition === "undefined") { transition = Transition.CUT; }
+    if (typeof path == "string") {
+        Savvy._goto.call(Savvy, path, transition);
+    } else {
+        throw "A string indicating a card ID must be passed to document.goto method.";
+    }
+};
+
+var application;
+(function (application) {
+    application.id = null;
+    application.version = null;
+    application.defaultPath = null;
+
+    function read(url, asXML) {
+        if (typeof asXML === "undefined") { asXML = false; }
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.open("GET", url, false);
+        xmlhttp.setRequestHeader("Cache-Control", "no-store"); // try not to cache the response
+        xmlhttp.send();
+        if (xmlhttp.status !== 200 && xmlhttp.status !== 0) {
+            console.error("HTTP status " + xmlhttp.status + " returned for file: " + url);
+            return null;
+        }
+
+        if (asXML) {
+            return xmlhttp.responseXML;
+        } else {
+            return xmlhttp.responseText;
+        }
+    }
+    application.read = read;
+})(application || (application = {}));
+var Savvy;
+(function (Savvy) {
+    (function (history) {
+        // the currently selected card in document.cards
+        history._currentCard = null;
+        history._ignoreHashChange = false;
+        window.addEventListener("hashchange", function () {
+            if (history._ignoreHashChange) {
+                history._ignoreHashChange = false;
+            } else {
+                var path = _getPathFromURLHash();
+                var id = _getIdForPath(path);
+                var card = document.getElementById(id);
+                if (document.cards.indexOf(card)) {
+                    // don't load a route that doesn't exist
+                    Savvy._goto(path, Transition.CUT, true);
+                }
+            }
+        }, false);
+
+        function _getPathFromURLHash() {
+            var hash = window.location.hash;
+            var path;
+            if (hash == "" || hash == "#" || hash == "#!" || hash == "#!/") {
+                path = application.defaultPath;
+            } else {
+                path = hash.substr(3);
+            }
+
+            return path;
+        }
+        history._getPathFromURLHash = _getPathFromURLHash;
+
+        function _getIdForPath(path) {
+            var i = path.indexOf("/");
+            var id = (i > -1) ? path.substr(0, i) : path;
+            return path;
+        }
+        history._getIdForPath = _getIdForPath;
+    })(Savvy.history || (Savvy.history = {}));
+    var history = Savvy.history;
+})(Savvy || (Savvy = {}));
+var Savvy;
+(function (Savvy) {
+    var xmlData = JXON.parse(application.read("app.xml", true));
+    if (xmlData.app === undefined) {
+        throw new Error("Could not parse app.xml. \"app\" node missing.");
+    } else {
+        application.id = (xmlData.app["@id"]) ? xmlData.app["@id"] : "application";
+        application.version = (xmlData.app["@version"]) ? xmlData.app["@version"] : "";
+
+        // first assume window.load
+        var event = "load";
+        var element = window;
+        if (xmlData.app["@cordova"] == "yes") {
+            // then modify to document.deviceready
+            event = "deviceready";
+            element = document;
+
+            // add the Cordova scritps (assume these are in the root directory)
+            var cordova_lib = document.createElement("script");
+            cordova_lib.setAttribute("src", "cordova.js");
+            cordova_lib.setAttribute("type", "text/javascript");
+
+            var cordova_plugins = document.createElement("script");
+            cordova_plugins.setAttribute("src", "cordova_plugins.js");
+            cordova_plugins.setAttribute("type", "text/javascript");
+
+            document.head.appendChild(cordova_lib);
+            document.head.appendChild(cordova_plugins);
+        }
+
+        // ordinarily, Savvy will be initialised when the DOM is ready
+        element.addEventListener(event, function deviceReadyEvent() {
+            element.removeEventListener(event, deviceReadyEvent);
+
+            parseAppXML(xmlData.app);
+
+            Savvy._goto(Savvy.history._getPathFromURLHash(), Transition.CUT, true);
+        }, false);
+    }
+
+    /**
+    * Parses the app XML creating the card model and executing global HTML, CSS, JS, etc.
+    * @param app
+    */
+    function parseAppXML(app) {
+        preloadImages(guaranteeArray(app.img));
+
+        // NB: Do before HTML so that HTML lands formatted
+        guaranteeArray(app.css).forEach(function (url, index, array) {
+            appendCssToHeadFromUrl(url);
+        });
+
+        guaranteeArray(app.html).forEach(function (url, index, array) {
+            document.body.insertAdjacentHTML("beforeend", application.read(url));
+        });
+
+        // NB: Do before JS so that data models are available to JS
+        guaranteeArray(app.json).forEach(function (element, index, array) {
+            var target = element["@target"];
+            if (typeof target == "string") {
+                parseJSONToTarget(element, target);
+            } else {
+                throw new Error("No target attribute provided for JSON (\"" + element + "\")");
+            }
+        });
+
+        guaranteeArray(app.js).forEach(function (url, index, array) {
+            executeJavaScript(url);
+        });
+
+        createModel(guaranteeArray(app.card));
+
+        delete Savvy._eval; // no longer needed
+    }
+
+    /**
+    * Preloads an array of images to the browser cache.
+    * @param images An array of URLs to load.
+    */
+    var imgCache = [];
+    function preloadImages(images) {
+        for (var i = 0, ii = images.length; i < ii; i++) {
+            var img = new Image();
+            img.src = images[i];
+            imgCache.push(img); // to keep in memory
+        }
+    }
+
+    /**
+    * Creates a model of the cards described in the app.xml. Populates the model array with Card objects.
+    * @param cards An array subset of a JXON object describing the cards Array in app.xml.
+    */
+    function createModel(cards) {
+        for (var i = 0, ii = cards.length; i < ii; i++) {
+            // NB: this isn't added to the body until ready to be shown
+            var object = document.createElement("object");
+            object.setAttribute("id", cards[i]["@id"]);
+            object.setAttribute("title", cards[i]["@title"]);
+            object.setAttribute("data", "savvy:" + application.id + "/" + cards[i]["@id"]);
+            object.setAttribute("type", "application/x-savvy");
+
+            var id = cards[i]["@id"];
+            var title = cards[i]["@title"];
+            window[id] = object;
+
+            guaranteeArray(cards[i].css).forEach(function (url) {
+                appendCssToHeadFromUrl(url, id);
+            });
+
+            guaranteeArray(cards[i].html).forEach(function (url) {
+                object.insertAdjacentHTML("beforeend", application.read(url));
+            });
+            var node = document.body.appendChild(object);
+            document.cards.push(node); // add to the array of cards
+
+            guaranteeArray(cards[i].json).forEach(function (element) {
+                var target = element["@target"];
+                if (typeof target == "string") {
+                    var target = element.target;
+                    parseJSONToTarget(element, target, object);
+                } else {
+                    console.error("No target attribute provided for JSON (\"" + element + "\")");
+                }
+            });
+
+            guaranteeArray(cards[i].js).forEach(function (url) {
+                executeJavaScript(url, object);
+            });
+
+            if (cards[i]['@default'] !== undefined) {
+                if (application.defaultPath === null) {
+                    application.defaultPath = id;
+                } else {
+                    console.warn("More than one card is set as the default in app.xml. Ignoring.");
+                }
+            }
+        }
+
+        if (application.defaultPath === null) {
+            throw new Error("No default card set.");
+        }
+    }
+
+    /**
+    * Accepts an object of any kind. If the object is an array it returns an identical object. If the object is not
+    * an array, it makes a new Array containing that object. If the object is falsey, it returns an empty array.
+    * @param arr The object to guarantee an array from.
+    * @returns {Array}
+    */
+    function guaranteeArray(arr) {
+        return [].concat(arr || []);
+    }
+
+    // CSS //
+    // define all regexes one in a static variable to save computation time
+    var regex = {
+        isRemoteUrl: new RegExp("(http|ftp|https)://[a-z0-9\-_]+(\.[a-z0-9\-_]+)+([a-z0-9\-\.,@\?^=%&;:/~\+#]*[a-z0-9\-@\?^=%&;/~\+#])?", "i"),
+        css: {
+            // used to find instances of url references in css files that need to be modified
+            // FIXME: gives a false positive for data URIs
+            singleQuotes: /url\('(?!https?:\/\/)(?!\/)/gi,
+            doubleQuotes: /url\("(?!https?:\/\/)(?!\/)/gi,
+            noQuotes: /url\((?!https?:\/\/)(?!['"]\/?)/gi,
+            body: /\bbody\b(,(?=[^}]*{)|\s*{)/gi,
+            selector: /([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/gi
+        }
+    };
+
+    /**
+    * Attempts to appends a given CSS to the head of the HTML document.
+    * On some browsers (e.g. MSIE8) the CSS has to be linked from the head. And in the cases of external CSS URLs,
+    * it needs to be linked from the head. Otherwise, we prefer adding the CSS to the head.
+    * @param url The URL of the CSS file
+    * @param isCardCSS A Boolean indicating that this CSS relates to the current screeen (optional)
+    */
+    function appendCssToHeadFromUrl(url, forId) {
+        var doLink = (regex.isRemoteUrl.test(url) || window.navigator.appVersion.indexOf("MSIE 8") != -1);
+        if (doLink && forId) {
+            throw new Error("Card styles sheets cannot be remote (e.g. http://www.examples.com/style.css). Please include remote style sheets globally.");
+        }
+        var node;
+        if (doLink) {
+            node = document.createElement("link");
+            node.setAttribute("rel", "stylesheet");
+            node.setAttribute("type", "text/css");
+            node.setAttribute("href", url);
+        } else {
+            node = document.createElement("style");
+            node.setAttribute("type", "text/css");
+        }
+        if (forId) {
+            node.setAttribute("data-for", forId);
+        }
+        try  {
+            if (!doLink) {
+                var content = application.read(url);
+                if (forId) {
+                    content = content.replace(regex.css.body, "$1");
+                    content = content.replace(regex.css.selector, "body > object#" + forId + " $1$2");
+                }
+                var i = url.toString().lastIndexOf("/");
+                if (i != -1) {
+                    var dir = url.toString().substr(0, i + 1);
+                    content = content.replace(regex.css.noQuotes, "url(" + dir).replace(regex.css.doubleQuotes, "url(\"" + dir).replace(regex.css.singleQuotes, "url('" + dir);
+                }
+                node.appendChild(document.createTextNode(content));
+            }
+            document.getElementsByTagName("head")[0].appendChild(node);
+        } catch (err) {
+            throw new Error("Error appending CSS file (" + url + "): " + err.toString());
+        }
+    }
+
+    // JAVASCRIPT //
+    var include = /^#include "(.*)"$/gm;
+
+    /**
+    * Loads a JavaScript file and executes it in a given context, otherwise with the window object
+    * @param url The URL of the JavaScript to execute
+    * @param context The context in which to execute the JavaScript
+    */
+    function executeJavaScript(url, context) {
+        var code = parseScriptFile(url);
+        try  {
+            Savvy._eval(code, context);
+        } catch (err) {
+            throw new Error(err.toString() + " (" + url + ")");
+        }
+    }
+
+    /**
+    * A recursive method that parses a script file and honors #include directives.
+    * @param file a File to parse
+    * @returns a String of the parse source code
+    */
+    function parseScriptFile(url) {
+        var src = application.read(url);
+
+        var code = src.replace(include, function (match, p1) {
+            var dir = getDirectoryFromFilePath(url);
+            var url2 = resolvePath(dir + p1);
+            var str = parseScriptFile(url2);
+            return str;
+        });
+
+        return code;
+    }
+
+    /**
+    * Returns the directory path from a file path (i.e. path to the containing directory)
+    * @param path a String path to a file
+    * @returns a String path to the containing directory
+    */
+    function getDirectoryFromFilePath(path) {
+        var i = path.toString().lastIndexOf("/");
+        return path.toString().substr(0, i + 1);
+    }
+
+    /**
+    * Resolves a complicated path (e.g. one containing .. and .) to a simple path
+    * http://stackoverflow.com/questions/17967705/how-to-use-javascript-regexp-to-resolve-relative-paths
+    * @params path a String path
+    * @returns a String path, which is functionally identical but simplified
+    */
+    function resolvePath(path) {
+        var parts = path.split('/');
+        var i = 1;
+        while (i < parts.length) {
+            // safeguard, may never happen
+            if (i < 0)
+                continue;
+
+            // if current part is '..' and previous part is different, remove both
+            if (parts[i] == ".." && parts[i - 1] !== '..' && i > 0) {
+                parts.splice(i - 1, 2);
+                i -= 2;
+            }
+
+            // if current part is '.' or '' simply remove it
+            if (parts[i] === '.' || parts[i] == '') {
+                parts.splice(i, 1);
+                i -= 1;
+            }
+
+            i++;
+        }
+        return parts.join('/');
+    }
+
+    /* JSON */
+    /**
+    * Parses a JSON file to a variable.
+    * @param url The URL of the JSON file to load.
+    * @param target The name of the variable to set with the data from the JSON file
+    * @param context The object within which target should exist (defaults to window)
+    */
+    function parseJSONToTarget(url, target, context) {
+        if (typeof context === "undefined") { context = window; }
+        var data;
+        try  {
+            var src = application.read(url);
+            data = JSON.parse(src);
+        } catch (err) {
+            console.error("Cannot parse data file (\"" + url + "\"). Please check that the file is valid JSON <http://json.org/>.");
+            return;
+        }
+
+        try  {
+            createObjectFromString(target, data, context);
+        } catch (err) {
+            console.error("Could not create object: " + ((context == window) ? "window." : "this.") + target);
+            return;
+        }
+    }
+
+    /**
+    * Finds or attempts to create an object given an ancestor object and a path to a descendant
+    * @param target a String path to the descendant object (e.g. child.obj)
+    * @param context an Object to act as the ancestor (defaults to window)
+    * @return the child object or null if it could not be created
+    */
+    function createObjectFromString(target, data, context) {
+        if (typeof context === "undefined") { context = window; }
+        var arr = target.split(".");
+
+        for (var i = 0; i < arr.length - 1; i++) {
+            var id = arr[i];
+            if (typeof context[id] == "undefined") {
+                context[id] = {};
+            }
+            context = context[id];
+        }
+
+        context = context[arr[i]] = data;
+
+        return context;
+    }
+})(Savvy || (Savvy = {}));
+/**
+* The main Savvy object
+*/
+var Savvy;
+(function (Savvy) {
+    // a blank function (defined here once to save memory and time)
+    var noop = function () {
+    };
+
+    // This function can be called to recommence the transition after it was caused
+    var continueTransition = noop;
+
+    /**
+    * The function called by document.goto
+    * @param path A path to a new card. This must be a card ID or a string beginning with a card ID followed by a slash. Further characters may follow the slash.
+    */
+    function _goto(path, transition, preventHistory) {
+        if (typeof transition === "undefined") { transition = Transition.CUT; }
+        if (typeof preventHistory === "undefined") { preventHistory = false; }
+        var id = Savvy.history._getIdForPath(path);
+        var to = document.getElementById(id);
+        var from = Savvy.history._currentCard;
+
+        if (document.cards.indexOf(to) > -1) {
+            var detail = {
+                from: from,
+                to: to,
+                transition: transition
+            };
+            load.call(Savvy, detail, path, preventHistory);
+        } else {
+            throw "No card with ID of \"" + id + "\".";
+        }
+    }
+    Savvy._goto = _goto;
+
+    /**
+    * @private
+    */
+    function load(detail, path, preventHistory) {
+        var event = createSavvyEvent(detail, path, preventHistory);
+
+        if (detail.from == null) {
+            event.initCustomEvent(Card.LOAD, true, true, detail);
+            document.body.dispatchEvent(event);
+        } else {
+            event.initCustomEvent(Card.EXIT, true, true, detail);
+            detail.from.dispatchEvent(event);
+        }
+
+        if (event.defaultPrevented) {
+            continueTransition = ready;
+        } else {
+            ready.call(Savvy, detail, path, preventHistory); // NB: make sure 'this' is Savvy
+        }
+    }
+
+    function ready(detail, path, preventHistory) {
+        if (!!detail.to) {
+            detail.to.style.setProperty("visibility", "hidden", "important");
+            detail.to.style.setProperty("display", "block", "important");
+        }
+
+        var event = createSavvyEvent(detail, path, preventHistory);
+        event.initCustomEvent(Card.READY, true, true, detail);
+        detail.to.dispatchEvent(event);
+
+        if (event.defaultPrevented) {
+            continueTransition = onTransition;
+        } else {
+            onTransition.call(Savvy, detail, path, preventHistory); // NB: make sure 'this' is Savvy
+        }
+    }
+
+    function onTransition(detail, path, preventHistory) {
+        // NB: prevent accidental future transitions
+        continueTransition = noop;
+
+        if (!!detail.to)
+            detail.to.style.setProperty("visibility", "visible", "important");
+
+        // fallback to static in case something was set up wrong in the transition
+        if (!detail.transition)
+            detail.transition = Transition.CUT;
+        applyTranstition(detail.to, detail.transition.to, detail.transition.duration);
+        applyTranstition(detail.from, detail.transition.from, detail.transition.duration);
+        setTimeout(function () {
+            // hide from and show to
+            if (!!detail.from)
+                detail.from.style.removeProperty("display");
+            if (!!detail.to)
+                detail.to.style.removeProperty("visibility");
+            onEnter.call(Savvy, detail, path, preventHistory);
+        }, detail.transition.duration);
+    }
+
+    function applyTranstition(el, transition, duration) {
+        if (el != null) {
+            el.className += transition;
+            setTimeout(function () {
+                el.className = el.className.replace(transition, "");
+            }, duration);
+        }
+    }
+
+    function onEnter(detail, path, preventHistory) {
+        document.title = (detail.to.title || "");
+        if (!preventHistory) {
+            Savvy.history._ignoreHashChange = true;
+            window.location.hash = "!/" + path;
+        }
+
+        var event = createSavvyEvent(detail, path, preventHistory);
+
+        Savvy.history._currentCard = detail.to;
+        event.initCustomEvent(Card.ENTER, true, true, detail);
+        detail.to.dispatchEvent(event);
+    }
+
+    function createSavvyEvent(detail, path, preventHistory) {
+        var event = document.createEvent("CustomEvent");
+        continueTransition = noop;
+        event["continue"] = function () {
+            continueTransition.call(Savvy, detail, path, preventHistory); // NB: make sure 'this' is Savvy
+        };
+        return event;
+    }
+})(Savvy || (Savvy = {}));
+var Transition;
+(function (Transition) {
+    /* CUT */
+    Transition.CUT = {
+        from: "transition -d0ms -static",
+        to: "transition -d0ms -static",
+        duration: 0,
+        inverse: null
+    };
+
+    /* SLIDE */
+    Transition.SLIDE_LEFT = {
+        from: "transition -d333ms -ease-in-out -out -left",
+        to: "transition -d333ms -ease-in-out -in -left",
+        duration: 333,
+        inverse: null
+    };
+
+    Transition.SLIDE_RIGHT = {
+        from: "transition -d500ms -ease-in-out -out -right",
+        to: "transition -d500ms -ease-in-out -in -right",
+        duration: 500,
+        inverse: null
+    };
+
+    /* COVER */
+    Transition.COVER_LEFT = {
+        from: "transition -d250ms -static -lower",
+        to: "transition -d250ms -ease-in-out -in -left -shadow",
+        duration: 250,
+        inverse: null
+    };
+
+    Transition.COVER_RIGHT = {
+        from: "transition -d250ms -static -lower",
+        to: "transition -d250ms -ease-in-out -in -right -shadow",
+        duration: 250,
+        inverse: null
+    };
+
+    /* UNCOVER */
+    Transition.UNCOVER_LEFT = {
+        from: "transition -d333ms -ease-in-out -out -left -shadow",
+        to: "transition -d333ms -static -lower",
+        duration: 333,
+        inverse: null
+    };
+
+    Transition.UNCOVER_RIGHT = {
+        from: "transition -d333ms -ease-in-out -out -right -shadow",
+        to: "transition -d333ms -static -lower",
+        duration: 333,
+        inverse: null
+    };
+
+    /* COVER FADE */
+    Transition.COVER_LEFT_FADE = {
+        from: "transition -d1000ms -linear -out -left -fade -lower",
+        to: "transition -d250ms -ease-in-out -in -left -shadow",
+        duration: 250,
+        inverse: null
+    };
+
+    Transition.COVER_RIGHT_FADE = {
+        from: "transition -d1000ms -linear -out -right -fade -lower",
+        to: "transition -d250ms -ease-in-out -in -right -shadow",
+        duration: 250,
+        inverse: null
+    };
+
+    /* UNCOVER FADE */
+    Transition.UNCOVER_LEFT_FADE = {
+        from: "transition -d333ms -ease-in-out -out -left -shadow",
+        to: "transition -d333ms -linear -in -right -fade -lower",
+        duration: 333,
+        inverse: null
+    };
+
+    Transition.UNCOVER_RIGHT_FADE = {
+        from: "transition -d333ms -ease-in-out -out -right -shadow",
+        to: "transition -d333ms -linear -in -right -fade -lower",
+        duration: 333,
+        inverse: null
+    };
+
+    /* INVERSE */
+    Transition.CUT.inverse = Transition.CUT;
+    Transition.SLIDE_LEFT.inverse = Transition.SLIDE_RIGHT;
+    Transition.SLIDE_RIGHT.inverse = Transition.SLIDE_LEFT;
+    Transition.COVER_LEFT.inverse = Transition.UNCOVER_RIGHT;
+    Transition.COVER_RIGHT.inverse = Transition.UNCOVER_LEFT;
+    Transition.UNCOVER_LEFT.inverse = Transition.COVER_RIGHT;
+    Transition.UNCOVER_RIGHT.inverse = Transition.COVER_LEFT;
+    Transition.COVER_LEFT_FADE.inverse = Transition.UNCOVER_RIGHT_FADE;
+    Transition.COVER_RIGHT_FADE.inverse = Transition.UNCOVER_LEFT_FADE;
+    Transition.UNCOVER_LEFT_FADE.inverse = Transition.COVER_RIGHT_FADE;
+    Transition.UNCOVER_RIGHT_FADE.inverse = Transition.COVER_LEFT_FADE;
+})(Transition || (Transition = {}));
+// Evaling scripts in the main Savvy block captures internal Savvy
+// methods and properties in the closure. Scripts are evaluated in
+// their own block in order to provide a "clean" closure
+var Savvy;
+(function (Savvy) {
+    function _eval(code, context) {
+        if (context === undefined) {
+            (window.execScript || function (code) {
+                window["eval"].call(window, code);
+            })(code);
+        } else {
+            (function (code) {
+                eval(code);
+            }).call(context, code);
+        }
+    }
+    Savvy._eval = _eval;
+})(Savvy || (Savvy = {}));

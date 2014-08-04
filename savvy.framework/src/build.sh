@@ -1,7 +1,7 @@
 version="0.3.0"
 output="../savvy.js"
 declarations="../savvy.d.ts"
-input="card.ts jxon.ts application.ts json.ts history.ts init.ts main.ts transitions.ts eval.ts"
+input="card.ts jxon.ts application.ts history.ts init.ts main.ts transitions.ts eval.ts"
 
 function clean {
 	echo "Preparing output files"

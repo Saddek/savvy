@@ -9,7 +9,7 @@ module Savvy.history {
             var path:string = _getPathFromURLHash();
             var id:string = _getIdForPath(path);
             var card = document.getElementById(id);
-            if (application.cards.indexOf(card)) {
+            if (document.cards.indexOf(card)) {
                 // don't load a route that doesn't exist
                 Savvy._goto(path, Transition.CUT, true);
             }

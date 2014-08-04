@@ -79,12 +79,11 @@ html, body {
 
 body > object[type="application/x-savvy"] {
     position: absolute !important;
-    /* top, left, z-index and visibility will be set programatically */
     height: 100% !important;
     width: 100% !important;
-
+    top: 0% !important;
+    left: 0% !important;
+    display: none !important;
+    z-index: 0 !important;
     overflow: auto !important;
-    visibility: hidden;
-    
-    box-shadow: 0 0 2px rgba(0,0,0,0.66);
 }
