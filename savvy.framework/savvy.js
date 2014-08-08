@@ -139,96 +139,64 @@ var JXON;
         }
     }
 })(JXON || (JXON = {}));
-document.cards = [];
-document["goto"] = function (path, transition) {
-    if (typeof transition === "undefined") { transition = Transition.CUT; }
-    if (typeof path == "string") {
-        Savvy._goto.call(Savvy, path, transition);
-    } else {
-        throw "A string indicating a card ID must be passed to document.goto method.";
-    }
-};
-
 var application;
 (function (application) {
     application.id = null;
+    application.isCordova = false;
     application.version = null;
-    application.defaultPath = null;
+    application.cards = [];
+    application.defaultCard = null;
+    application.currentCard = null;
 
-    function read(url, asXML) {
-        if (typeof asXML === "undefined") { asXML = false; }
-        var xmlhttp = new XMLHttpRequest();
-        xmlhttp.open("GET", url, false);
-        xmlhttp.setRequestHeader("Cache-Control", "no-store"); // try not to cache the response
-        xmlhttp.send();
-        if (xmlhttp.status !== 200 && xmlhttp.status !== 0) {
-            console.error("HTTP status " + xmlhttp.status + " returned for file: " + url);
-            return null;
-        }
-
-        if (asXML) {
-            return xmlhttp.responseXML;
-        } else {
-            return xmlhttp.responseText;
-        }
+    function goto(path, transition, preventHistory) {
+        if (typeof transition === "undefined") { transition = Transition.CUT; }
+        if (typeof preventHistory === "undefined") { preventHistory = false; }
+        throw "application.goto has not been over-written. Is there a problem with the order that Savvy is built?";
     }
-    application.read = read;
+    application.goto = goto;
+
+    function getRoute() {
+        var hash = window.location.hash;
+        var path;
+        if (hash == "" || hash == "#" || hash == "#!" || hash == "#!/") {
+            path = application.defaultCard.id;
+        } else {
+            path = hash.substr(3);
+        }
+
+        return path;
+    }
+    application.getRoute = getRoute;
+
+    function offCanvas(left) {
+        if (typeof left == "undefined") {
+            if (document.body.style.left == "" || document.body.style.left == "0px")
+                left = Transition.OFF_CANVASS_LEFT;
+            else
+                left = "0px";
+        }
+
+        // shortcut to handle quick toggling
+        if (document.body.style.left == left)
+            left = "0px";
+        document.body.style.left = left;
+    }
+    application.offCanvas = offCanvas;
 })(application || (application = {}));
 var Savvy;
 (function (Savvy) {
-    (function (history) {
-        // the currently selected card in document.cards
-        history._currentCard = null;
-        history._ignoreHashChange = false;
-        window.addEventListener("hashchange", function () {
-            if (history._ignoreHashChange) {
-                history._ignoreHashChange = false;
-            } else {
-                var path = _getPathFromURLHash();
-                var id = _getIdForPath(path);
-                var card = document.getElementById(id);
-                if (document.cards.indexOf(card)) {
-                    // don't load a route that doesn't exist
-                    Savvy._goto(path, Transition.CUT, true);
-                }
-            }
-        }, false);
-
-        function _getPathFromURLHash() {
-            var hash = window.location.hash;
-            var path;
-            if (hash == "" || hash == "#" || hash == "#!" || hash == "#!/") {
-                path = application.defaultPath;
-            } else {
-                path = hash.substr(3);
-            }
-
-            return path;
-        }
-        history._getPathFromURLHash = _getPathFromURLHash;
-
-        function _getIdForPath(path) {
-            var i = path.indexOf("/");
-            var id = (i > -1) ? path.substr(0, i) : path;
-            return path;
-        }
-        history._getIdForPath = _getIdForPath;
-    })(Savvy.history || (Savvy.history = {}));
-    var history = Savvy.history;
-})(Savvy || (Savvy = {}));
-var Savvy;
-(function (Savvy) {
-    var xmlData = JXON.parse(application.read("app.xml", true));
+    var xmlData = JXON.parse(read("app.xml", true));
     if (xmlData.app === undefined) {
-        throw new Error("Could not parse app.xml. \"app\" node missing.");
+        throw "Could not parse app.xml. \"app\" node missing.";
     } else {
         application.id = (xmlData.app["@id"]) ? xmlData.app["@id"] : "application";
         application.version = (xmlData.app["@version"]) ? xmlData.app["@version"] : "";
+        application.isCordova = (xmlData.app["@cordova"] == "yes");
 
         // first assume window.load
         var event = "load";
         var element = window;
-        if (xmlData.app["@cordova"] == "yes") {
+        if (application.isCordova) {
             // then modify to document.deviceready
             event = "deviceready";
             element = document;
@@ -252,7 +220,7 @@ var Savvy;
 
             parseAppXML(xmlData.app);
 
-            Savvy._goto(Savvy.history._getPathFromURLHash(), Transition.CUT, true);
+            application.goto(application.getRoute(), Transition.CUT, true);
         }, false);
     }
 
@@ -269,7 +237,7 @@ var Savvy;
         });
 
         guaranteeArray(app.html).forEach(function (url, index, array) {
-            document.body.insertAdjacentHTML("beforeend", application.read(url));
+            document.body.insertAdjacentHTML("beforeend", read(url));
         });
 
         // NB: Do before JS so that data models are available to JS
@@ -286,7 +254,7 @@ var Savvy;
             executeJavaScript(url);
         });
 
-        createModel(guaranteeArray(app.card));
+        initCards(guaranteeArray(app.card));
 
         delete Savvy._eval; // no longer needed
     }
@@ -304,11 +272,7 @@ var Savvy;
         }
     }
 
-    /**
-    * Creates a model of the cards described in the app.xml. Populates the model array with Card objects.
-    * @param cards An array subset of a JXON object describing the cards Array in app.xml.
-    */
-    function createModel(cards) {
+    function initCards(cards) {
         for (var i = 0, ii = cards.length; i < ii; i++) {
             // NB: this isn't added to the body until ready to be shown
             var object = document.createElement("object");
@@ -326,10 +290,18 @@ var Savvy;
             });
 
             guaranteeArray(cards[i].html).forEach(function (url) {
-                object.insertAdjacentHTML("beforeend", application.read(url));
+                object.insertAdjacentHTML("beforeend", read(url));
             });
+
             var node = document.body.appendChild(object);
-            document.cards.push(node); // add to the array of cards
+            application.cards.push(node); // add to the array of cards
+            if (cards[i]['@default'] !== undefined) {
+                if (application.defaultCard === null) {
+                    application.defaultCard = node;
+                } else {
+                    console.warn("More than one card is set as the default in app.xml. Ignoring.");
+                }
+            }
 
             guaranteeArray(cards[i].json).forEach(function (element) {
                 var target = element["@target"];
@@ -344,17 +316,9 @@ var Savvy;
             guaranteeArray(cards[i].js).forEach(function (url) {
                 executeJavaScript(url, object);
             });
-
-            if (cards[i]['@default'] !== undefined) {
-                if (application.defaultPath === null) {
-                    application.defaultPath = id;
-                } else {
-                    console.warn("More than one card is set as the default in app.xml. Ignoring.");
-                }
-            }
         }
 
-        if (application.defaultPath === null) {
+        if (application.defaultCard === null) {
             throw new Error("No default card set.");
         }
     }
@@ -411,7 +375,7 @@ var Savvy;
         }
         try  {
             if (!doLink) {
-                var content = application.read(url);
+                var content = read(url);
                 if (forId) {
                     content = content.replace(regex.css.body, "$1");
                     content = content.replace(regex.css.selector, "body > object#" + forId + " $1$2");
@@ -452,7 +416,7 @@ var Savvy;
     * @returns a String of the parse source code
     */
     function parseScriptFile(url) {
-        var src = application.read(url);
+        var src = read(url);
 
         var code = src.replace(include, function (match, p1) {
             var dir = getDirectoryFromFilePath(url);
@@ -516,7 +480,7 @@ var Savvy;
         if (typeof context === "undefined") { context = window; }
         var data;
         try  {
-            var src = application.read(url);
+            var src = read(url);
             data = JSON.parse(src);
         } catch (err) {
             console.error("Cannot parse data file (\"" + url + "\"). Please check that the file is valid JSON <http://json.org/>.");
@@ -553,12 +517,60 @@ var Savvy;
 
         return context;
     }
+
+    // read a file from a URL
+    function read(url, asXML) {
+        if (typeof asXML === "undefined") { asXML = false; }
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.open("GET", url, false);
+        xmlhttp.setRequestHeader("Cache-Control", "no-store"); // try not to cache the response
+        xmlhttp.send();
+        if (xmlhttp.status !== 200 && xmlhttp.status !== 0) {
+            console.error("HTTP status " + xmlhttp.status + " returned for file: " + url);
+            return null;
+        }
+
+        if (asXML) {
+            return xmlhttp.responseXML;
+        } else {
+            return xmlhttp.responseText;
+        }
+    }
 })(Savvy || (Savvy = {}));
-/**
-* The main Savvy object
-*/
 var Savvy;
 (function (Savvy) {
+    application["goto"] = function (path, transition, preventHistory) {
+        if (typeof transition === "undefined") { transition = Transition.CUT; }
+        if (typeof preventHistory === "undefined") { preventHistory = false; }
+        if (typeof path == "string") {
+            goto.call(Savvy, path, transition, preventHistory);
+        } else {
+            throw "A string indicating a card ID must be passed to document.goto method.";
+        }
+    };
+
+    var ignoreHashChange = false;
+    window.addEventListener("hashchange", function () {
+        if (ignoreHashChange) {
+            ignoreHashChange = false;
+        } else {
+            var path = application.getRoute();
+            var id = getIdForPath(path);
+            var card = document.getElementById(id);
+            console.log(application.cards.indexOf(card));
+            if (application.cards.indexOf(card) > -1) {
+                // don't load a route that doesn't exist
+                application.goto(path, Transition.CUT, true);
+            }
+        }
+    }, false);
+
+    function getIdForPath(path) {
+        var i = path.indexOf("/");
+        var id = (i > -1) ? path.substr(0, i) : path;
+        return id;
+    }
+
     // a blank function (defined here once to save memory and time)
     var noop = function () {
     };
@@ -570,14 +582,14 @@ var Savvy;
     * The function called by document.goto
     * @param path A path to a new card. This must be a card ID or a string beginning with a card ID followed by a slash. Further characters may follow the slash.
     */
-    function _goto(path, transition, preventHistory) {
+    function goto(path, transition, preventHistory) {
         if (typeof transition === "undefined") { transition = Transition.CUT; }
         if (typeof preventHistory === "undefined") { preventHistory = false; }
-        var id = Savvy.history._getIdForPath(path);
+        var id = getIdForPath(path);
         var to = document.getElementById(id);
-        var from = Savvy.history._currentCard;
+        var from = application.currentCard;
 
-        if (document.cards.indexOf(to) > -1) {
+        if (application.cards.indexOf(to) > -1) {
             var detail = {
                 from: from,
                 to: to,
@@ -588,7 +600,6 @@ var Savvy;
             throw "No card with ID of \"" + id + "\".";
         }
     }
-    Savvy._goto = _goto;
 
     /**
     * @private
@@ -662,13 +673,13 @@ var Savvy;
     function onEnter(detail, path, preventHistory) {
         document.title = (detail.to.title || "");
         if (!preventHistory) {
-            Savvy.history._ignoreHashChange = true;
+            ignoreHashChange = true;
             window.location.hash = "!/" + path;
         }
 
         var event = createSavvyEvent(detail, path, preventHistory);
 
-        Savvy.history._currentCard = detail.to;
+        application.currentCard = detail.to;
         event.initCustomEvent(Card.ENTER, true, true, detail);
         detail.to.dispatchEvent(event);
     }
@@ -779,6 +790,10 @@ var Transition;
     Transition.COVER_RIGHT_FADE.inverse = Transition.UNCOVER_LEFT_FADE;
     Transition.UNCOVER_LEFT_FADE.inverse = Transition.COVER_RIGHT_FADE;
     Transition.UNCOVER_RIGHT_FADE.inverse = Transition.COVER_LEFT_FADE;
+
+    /* OFF-CAVAS DISTANCES */
+    Transition.OFF_CANVASS_LEFT = "260px";
+    Transition.OFF_CANVASS_RIGHT = "-260px";
 })(Transition || (Transition = {}));
 // Evaling scripts in the main Savvy block captures internal Savvy
 // methods and properties in the closure. Scripts are evaluated in

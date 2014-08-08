@@ -1,8 +1,35 @@
-/**
- * The main Savvy object
- */
 module Savvy {
 
+    application["goto"] = (path:string, transition:Transition = Transition.CUT, preventHistory:boolean = false):void => {
+        if (typeof path == "string") {
+            goto.call(Savvy, path, transition, preventHistory);
+        } else {
+            throw "A string indicating a card ID must be passed to document.goto method.";
+        }
+    }
+
+    var ignoreHashChange:boolean = false;
+    window.addEventListener("hashchange", function () {
+        if (ignoreHashChange) {
+            ignoreHashChange = false;
+        } else {
+            var path:string = application.getRoute();
+            var id:string = getIdForPath(path);
+            var card = document.getElementById(id);
+            console.log(application.cards.indexOf(card));
+            if (application.cards.indexOf(card) > -1) {
+                // don't load a route that doesn't exist
+                application.goto(path, Transition.CUT, true);
+            }
+        }
+    }, false);
+
+    function getIdForPath(path:string):string {
+        var i:number = path.indexOf("/");
+        var id:string = (i > -1) ? path.substr(0, i) : path;
+        return id;
+    }
+    
     // a blank function (defined here once to save memory and time)
 	var noop:Function = ():void => {};
     // This function can be called to recommence the transition after it was caused
@@ -16,12 +43,12 @@ module Savvy {
      * The function called by document.goto
      * @param path A path to a new card. This must be a card ID or a string beginning with a card ID followed by a slash. Further characters may follow the slash.
      */
-    export function _goto(path:string, transition:ITransition = Transition.CUT, preventHistory:boolean = false):void {
-        var id:string = Savvy.history._getIdForPath(path);
+    function goto(path:string, transition:Transition = Transition.CUT, preventHistory:boolean = false):void {
+        var id:string = getIdForPath(path);
         var to:HTMLElement = document.getElementById(id);
-        var from:HTMLElement = Savvy.history._currentCard;
+        var from:HTMLElement = application.currentCard;
 
-        if (document.cards.indexOf(to) > -1) {
+        if (application.cards.indexOf(to) > -1) {
             var detail:any = {
                 from: from,
                 to: to,
@@ -101,13 +128,13 @@ module Savvy {
     function onEnter(detail:any, path:string, preventHistory:boolean) {
         document.title = (detail.to.title || "");
         if(!preventHistory) {
-            Savvy.history._ignoreHashChange = true;
+            ignoreHashChange = true;
             window.location.hash = "!/" + path;
         }
 
         var event:SavvyEvent = createSavvyEvent(detail, path, preventHistory);
 
-        Savvy.history._currentCard = detail.to;
+        application.currentCard = detail.to;
         event.initCustomEvent(Card.ENTER, true, true, detail);
         detail.to.dispatchEvent(event);
     }

@@ -7,52 +7,41 @@ declare module Card {
 declare module JXON {
     function parse(parent: any): any;
 }
-interface Document {
-    cards: HTMLElement[];
-    goto(path: string): void;
-}
 declare module application {
     var id: string;
+    var isCordova: boolean;
     var version: string;
-    var defaultPath: any;
-    function read(url: string, asXML?: boolean): any;
-}
-declare module Savvy.history {
-    var _currentCard: HTMLElement;
-    var _ignoreHashChange: boolean;
-    function _getPathFromURLHash(): string;
-    function _getIdForPath(path: string): string;
+    var cards: HTMLElement[];
+    var defaultCard: HTMLElement;
+    var currentCard: HTMLElement;
+    function goto(path: string, transition?: Transition, preventHistory?: boolean): void;
+    function getRoute(): string;
+    function offCanvas(left?: string): void;
 }
 declare module Savvy {
 }
-/**
-* The main Savvy object
-*/
 declare module Savvy {
-    /**
-    * The function called by document.goto
-    * @param path A path to a new card. This must be a card ID or a string beginning with a card ID followed by a slash. Further characters may follow the slash.
-    */
-    function _goto(path: string, transition?: ITransition, preventHistory?: boolean): void;
 }
-interface ITransition {
+interface Transition {
     from: string;
     to: string;
     duration: number;
-    inverse: ITransition;
+    inverse: Transition;
 }
 declare module Transition {
-    var CUT: ITransition;
-    var SLIDE_LEFT: ITransition;
-    var SLIDE_RIGHT: ITransition;
-    var COVER_LEFT: ITransition;
-    var COVER_RIGHT: ITransition;
-    var UNCOVER_LEFT: ITransition;
-    var UNCOVER_RIGHT: ITransition;
-    var COVER_LEFT_FADE: ITransition;
-    var COVER_RIGHT_FADE: ITransition;
-    var UNCOVER_LEFT_FADE: ITransition;
-    var UNCOVER_RIGHT_FADE: ITransition;
+    var CUT: Transition;
+    var SLIDE_LEFT: Transition;
+    var SLIDE_RIGHT: Transition;
+    var COVER_LEFT: Transition;
+    var COVER_RIGHT: Transition;
+    var UNCOVER_LEFT: Transition;
+    var UNCOVER_RIGHT: Transition;
+    var COVER_LEFT_FADE: Transition;
+    var COVER_RIGHT_FADE: Transition;
+    var UNCOVER_LEFT_FADE: Transition;
+    var UNCOVER_RIGHT_FADE: Transition;
+    var OFF_CANVASS_LEFT: string;
+    var OFF_CANVASS_RIGHT: string;
 }
 declare module Savvy {
     function _eval(code: string, context?: any): void;

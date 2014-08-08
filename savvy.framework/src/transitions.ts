@@ -1,15 +1,15 @@
-interface ITransition {
+interface Transition {
     from:string;
     to:string;
     duration:number;
-    inverse:ITransition;
+    inverse:Transition;
 }
 
 module Transition {
     
     /* CUT */
     
-    export var CUT:ITransition = {
+    export var CUT:Transition = {
         from: "transition -d0ms -static",
         to: "transition -d0ms -static",
         duration: 0,
@@ -18,7 +18,7 @@ module Transition {
 
     /* SLIDE */
     
-    export var SLIDE_LEFT:ITransition = {
+    export var SLIDE_LEFT:Transition = {
         from: "transition -d333ms -ease-in-out -out -left",
         to: "transition -d333ms -ease-in-out -in -left",
         duration: 333,
@@ -26,7 +26,7 @@ module Transition {
     }
 
 
-    export var SLIDE_RIGHT:ITransition = {
+    export var SLIDE_RIGHT:Transition = {
         from: "transition -d500ms -ease-in-out -out -right",
         to: "transition -d500ms -ease-in-out -in -right",
         duration: 500,
@@ -35,14 +35,14 @@ module Transition {
     
     /* COVER */
 
-    export var COVER_LEFT:ITransition = {
+    export var COVER_LEFT:Transition = {
         from: "transition -d250ms -static -lower",
         to: "transition -d250ms -ease-in-out -in -left -shadow",
         duration: 250,
         inverse: null
     }
 
-    export var COVER_RIGHT:ITransition = {
+    export var COVER_RIGHT:Transition = {
         from: "transition -d250ms -static -lower",
         to: "transition -d250ms -ease-in-out -in -right -shadow",
         duration: 250,
@@ -51,14 +51,14 @@ module Transition {
     
     /* UNCOVER */
 
-    export var UNCOVER_LEFT:ITransition = {
+    export var UNCOVER_LEFT:Transition = {
         from: "transition -d333ms -ease-in-out -out -left -shadow",
         to: "transition -d333ms -static -lower",
         duration: 333,
         inverse: null
     }
 
-    export var UNCOVER_RIGHT:ITransition = {
+    export var UNCOVER_RIGHT:Transition = {
         from: "transition -d333ms -ease-in-out -out -right -shadow",
         to: "transition -d333ms -static -lower",
         duration: 333,
@@ -67,14 +67,14 @@ module Transition {
     
     /* COVER FADE */
 
-    export var COVER_LEFT_FADE:ITransition = {
+    export var COVER_LEFT_FADE:Transition = {
         from: "transition -d1000ms -linear -out -left -fade -lower",
         to: "transition -d250ms -ease-in-out -in -left -shadow",
         duration: 250,
         inverse: null
     }
 
-    export var COVER_RIGHT_FADE:ITransition = {
+    export var COVER_RIGHT_FADE:Transition = {
         from: "transition -d1000ms -linear -out -right -fade -lower",
         to: "transition -d250ms -ease-in-out -in -right -shadow",
         duration: 250,
@@ -83,14 +83,14 @@ module Transition {
     
     /* UNCOVER FADE */
 
-    export var UNCOVER_LEFT_FADE:ITransition = {
+    export var UNCOVER_LEFT_FADE:Transition = {
         from: "transition -d333ms -ease-in-out -out -left -shadow",
         to: "transition -d333ms -linear -in -right -fade -lower",
         duration: 333,
         inverse: null
     }
 
-    export var UNCOVER_RIGHT_FADE:ITransition = {
+    export var UNCOVER_RIGHT_FADE:Transition = {
         from: "transition -d333ms -ease-in-out -out -right -shadow",
         to: "transition -d333ms -linear -in -right -fade -lower",
         duration: 333,
@@ -110,4 +110,10 @@ module Transition {
     Transition.COVER_RIGHT_FADE.inverse = Transition.UNCOVER_LEFT_FADE;
     Transition.UNCOVER_LEFT_FADE.inverse = Transition.COVER_RIGHT_FADE;
     Transition.UNCOVER_RIGHT_FADE.inverse = Transition.COVER_LEFT_FADE;
+    
+    /* OFF-CAVAS DISTANCES */
+    
+    export var OFF_CANVASS_LEFT:string = "260px";
+    export var OFF_CANVASS_RIGHT:string = "-260px";
+
 }

@@ -1,16 +1,17 @@
 module Savvy {
 
-    var xmlData:any = JXON.parse(application.read("app.xml", true));
+    var xmlData:any = JXON.parse(read("app.xml", true));
     if (xmlData.app === undefined) {
         throw "Could not parse app.xml. \"app\" node missing.";
     } else {
         application.id = (xmlData.app["@id"]) ? xmlData.app["@id"] : "application";
         application.version = (xmlData.app["@version"]) ? xmlData.app["@version"] : "";
+        application.isCordova = (xmlData.app["@cordova"] == "yes");
         
         // first assume window.load
         var event:string = "load";
         var element:any = window;
-        if (xmlData.app["@cordova"] == "yes") {
+        if (application.isCordova) {
             // then modify to document.deviceready
             event = "deviceready";
             element = document;
@@ -34,7 +35,7 @@ module Savvy {
             
             parseAppXML(xmlData.app);
     
-            Savvy._goto(Savvy.history._getPathFromURLHash(), Transition.CUT, true);
+            application.goto(application.getRoute(), Transition.CUT, true);
         }, false);
     }
     
@@ -51,7 +52,7 @@ module Savvy {
 		});
 
 		guaranteeArray(app.html).forEach((url:string, index:number, array:string[]):void => {
-            document.body.insertAdjacentHTML("beforeend", application.read(url));
+            document.body.insertAdjacentHTML("beforeend", read(url));
 		});
 
         // NB: Do before JS so that data models are available to JS
@@ -68,7 +69,7 @@ module Savvy {
 			executeJavaScript(url);
 		});
         
-        createModel(guaranteeArray(app.card));
+        initCards(guaranteeArray(app.card));
         
         delete Savvy._eval; // no longer needed
     }
@@ -87,11 +88,7 @@ module Savvy {
         }
     }
 
-    /**
-     * Creates a model of the cards described in the app.xml. Populates the model array with Card objects.
-     * @param cards An array subset of a JXON object describing the cards Array in app.xml.
-     */
-    function createModel(cards:any):void {
+    function initCards(cards:any):void {
         for(var i = 0, ii = cards.length; i < ii; i++) {
             // NB: this isn't added to the body until ready to be shown
             var object = document.createElement("object");
@@ -109,10 +106,18 @@ module Savvy {
             });
 
 			guaranteeArray(cards[i].html).forEach((url:string):void => {
-                object.insertAdjacentHTML("beforeend", application.read(url));
+                object.insertAdjacentHTML("beforeend", read(url));
 			});
+            
             var node:HTMLElement = <HTMLElement> document.body.appendChild(object);
-            document.cards.push(node); // add to the array of cards
+            application.cards.push(node); // add to the array of cards
+            if (cards[i]['@default'] !== undefined) {
+                if (application.defaultCard === null) {
+                    application.defaultCard = node;
+                } else {
+                    console.warn("More than one card is set as the default in app.xml. Ignoring.");
+                }
+            }
             
             guaranteeArray(cards[i].json).forEach((element:any):void => {
                 var target = element["@target"];
@@ -127,17 +132,9 @@ module Savvy {
             guaranteeArray(cards[i].js).forEach((url:string):void => {
                 executeJavaScript(url, object);
             });
-
-            if (cards[i]['@default'] !== undefined) {
-                if (application.defaultPath === null) {
-                    application.defaultPath = id;
-                } else {
-                    console.warn("More than one card is set as the default in app.xml. Ignoring.");
-                }
-            }
     	}
 
-        if (application.defaultPath === null) {
+        if (application.defaultCard === null) {
             throw new Error("No default card set.");
         }
 	}
@@ -197,7 +194,7 @@ module Savvy {
         }
         try {
             if(!doLink) {
-                var content:string = application.read(url);
+                var content:string = read(url);
                 if (forId) {
                     content = content.replace(regex.css.body, "$1");
                     content = content.replace(regex.css.selector, "body > object#"+forId+" $1$2");
@@ -242,9 +239,9 @@ module Savvy {
      * @returns a String of the parse source code
      */
     function parseScriptFile(url):string {
-        var src = application.read(url);
+        var src:string = read(url);
 
-        var code = src.replace(include, function(match:string, p1:string):string {
+        var code:string = src.replace(include, function(match:string, p1:string):string {
             var dir = getDirectoryFromFilePath(url);
             var url2 = resolvePath(dir + p1);
             var str:string = parseScriptFile(url2);
@@ -306,7 +303,7 @@ module Savvy {
     function parseJSONToTarget(url:string, target:string, context:any = window):void {
         var data:any;
         try {
-            var src:any = application.read(url); // prevent caching always with JSON (presume it is an API)
+            var src:string = read(url); // prevent caching always with JSON (presume it is an API)
             data = JSON.parse(src);
         } catch (err) {
             console.error("Cannot parse data file (\"" + url + "\"). Please check that the file is valid JSON <http://json.org/>.");
@@ -343,4 +340,23 @@ module Savvy {
         return context;
     }
     
+    
+    // read a file from a URL
+    function read(url:string, asXML:boolean = false):any {
+		var xmlhttp:XMLHttpRequest = new XMLHttpRequest(); // create the XMLHttpRequest object
+		xmlhttp.open("GET", url, false);
+        xmlhttp.setRequestHeader("Cache-Control", "no-store"); // try not to cache the response
+		xmlhttp.send();
+		if (xmlhttp.status !== 200 && xmlhttp.status !== 0) {
+			console.error("HTTP status "+xmlhttp.status+" returned for file: " + url);
+			return null;
+		}
+
+        if (asXML) {
+            return xmlhttp.responseXML;
+        } else {
+            return xmlhttp.responseText;
+        }
+	}
+
 }

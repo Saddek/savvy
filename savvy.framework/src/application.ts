@@ -1,36 +1,36 @@
-interface Document {
-    cards:HTMLElement[];
-    goto(path:string):void;
-}
-
-document.cards = [];
-document["goto"] = (path:string, transition:ITransition = Transition.CUT):void => {
-    if (typeof path == "string") {
-        Savvy._goto.call(Savvy, path, transition);
-    } else {
-        throw "A string indicating a card ID must be passed to document.goto method.";
-    }
-}
-
 module application {
+    
     export var id:string = null;
+    export var isCordova:boolean = false;
     export var version:string = null;
-    export var defaultPath = null;
-
-	export function read(url:string, asXML:boolean = false):any {
-		var xmlhttp:XMLHttpRequest = new XMLHttpRequest(); // create the XMLHttpRequest object
-		xmlhttp.open("GET", url, false);
-        xmlhttp.setRequestHeader("Cache-Control", "no-store"); // try not to cache the response
-		xmlhttp.send();
-		if (xmlhttp.status !== 200 && xmlhttp.status !== 0) {
-			console.error("HTTP status "+xmlhttp.status+" returned for file: " + url);
-			return null;
-		}
-
-        if (asXML) {
-            return xmlhttp.responseXML;
+    export var cards:HTMLElement[] = [];
+    export var defaultCard:HTMLElement = null;
+    export var currentCard:HTMLElement = null;
+    
+    export function goto(path:string, transition:Transition = Transition.CUT, preventHistory:boolean = false):void {
+        throw "application.goto has not been over-written. Is there a problem with the order that Savvy is built?";
+    }
+    
+    export function getRoute():string {
+        var hash:string = window.location.hash;
+        var path:string;
+        if(hash == "" || hash == "#" || hash == "#!" || hash == "#!/") {
+            path = application.defaultCard.id;
         } else {
-            return xmlhttp.responseText;
+            path = hash.substr(3);
         }
-	}
+
+        return path;
+    }
+    
+    export function offCanvas(left?:string):void {
+        if (typeof left == "undefined") {
+            if (document.body.style.left == "" || document.body.style.left == "0px") left = Transition.OFF_CANVASS_LEFT;
+            else left = "0px";
+        }
+        // shortcut to handle quick toggling
+        if (document.body.style.left == left) left = "0px";
+        document.body.style.left = left;
+    }
+
 }

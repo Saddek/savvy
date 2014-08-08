@@ -71,6 +71,16 @@ body {
 	background-image: url("img/dark_fish_skin/dark_fish_skin.png");
 }
 
+body {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    -webkit-transition: left 250ms;
+    -moz-transition: left 250ms;
+    -ms-transition: left 250ms;
+    transition: left 250ms;
+}
+
 html, body {
     height:100% !important;
     width: 100% !important;
