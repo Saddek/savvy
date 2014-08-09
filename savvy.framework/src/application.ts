@@ -3,6 +3,7 @@ module application {
     export var id:string = null;
     export var isCordova:boolean = false;
     export var version:string = null;
+    
     export var cards:HTMLElement[] = [];
     export var defaultCard:HTMLElement = null;
     export var currentCard:HTMLElement = null;
@@ -24,13 +25,16 @@ module application {
     }
     
     export function offCanvas(left?:string):void {
+        var main:HTMLElement = <HTMLElement> document.body.querySelector("main");
         if (typeof left == "undefined") {
-            if (document.body.style.left == "" || document.body.style.left == "0px") left = Transition.OFF_CANVASS_LEFT;
+            if (main.style.left == "" || main.style.left == "0px") left = Transition.OFF_CANVASS_LEFT;
             else left = "0px";
         }
         // shortcut to handle quick toggling
-        if (document.body.style.left == left) left = "0px";
-        document.body.style.left = left;
+        if (main.style.left == left) left = "0px";
+        
+        // apply the style
+        main.style.left = left;
     }
 
 }

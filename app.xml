@@ -7,6 +7,14 @@
 	<js>js/script.js</js>
 	<json target="config">data/config.json</json>
 
+    <header>
+        <html>html/header.html</html>
+    </header>
+    
+    <footer>
+        <html>html/footer.html</html>
+    </footer>
+    
 	<card id="Home" title="Welcome to Savvy" default="yes">
 		<!-- A <card> MAY contain any number of <html>, <json>, <js> and <css> elements. -->
 		<html>html/home.html</html>

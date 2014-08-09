@@ -46,30 +46,24 @@ module Savvy {
     function parseAppXML(app:any):void {
     	preloadImages(guaranteeArray(app.img));
 
-        // NB: Do before HTML so that HTML lands formatted
-		guaranteeArray(app.css).forEach((url:string, index:number, array:string[]):void => {
-			appendCssToHeadFromUrl(url);
-		});
-
-		guaranteeArray(app.html).forEach((url:string, index:number, array:string[]):void => {
-            document.body.insertAdjacentHTML("beforeend", read(url));
-		});
-
-        // NB: Do before JS so that data models are available to JS
-        guaranteeArray(app.json).forEach((element:any, index:number, array:any[]):void => {
-            var target = element["@target"];
-            if (typeof target == "string") {
-                parseJSONToTarget(element, target);
-            } else {
-                throw new Error("No target attribute provided for JSON (\"" + element + "\")");
-            }
-        });
-
-        guaranteeArray(app.js).forEach((url:string, index:number, array:string[]):void => {
-			executeJavaScript(url);
-		});
+        initNode(app, document.body);
         
-        initCards(guaranteeArray(app.card));
+        var main = document.createElement("main");
+        document.body.appendChild(main);
+        
+        if (app.header) {
+            var header = document.createElement("header");
+            initNode(app.header, header);
+            main.appendChild(header);
+        }
+
+        initCards(guaranteeArray(app.card), main);
+        
+        if (app.footer) {
+            var footer = document.createElement("footer");
+            initNode(app.footer, footer);
+            main.appendChild(footer);
+        }
         
         delete Savvy._eval; // no longer needed
     }
@@ -88,55 +82,65 @@ module Savvy {
         }
     }
 
-    function initCards(cards:any):void {
+    function initCards(cards:any, main:HTMLElement):void {
+        var div = document.createElement("div");
+        main.appendChild(div);
+        
         for(var i = 0, ii = cards.length; i < ii; i++) {
-            // NB: this isn't added to the body until ready to be shown
-            var object = document.createElement("object");
-            object.setAttribute("id", cards[i]["@id"]);
-            object.setAttribute("title", cards[i]["@title"]);
-            object.setAttribute("data", "savvy:" + application.id + "/" + cards[i]["@id"]);
-            object.setAttribute("type", "application/x-savvy");
-
-            var id:string = cards[i]["@id"];
-            var title:string = cards[i]["@title"];
-            window[id] = object;
-
-            guaranteeArray(cards[i].css).forEach((url:string):void => {
-                appendCssToHeadFromUrl(url, id);
-            });
-
-			guaranteeArray(cards[i].html).forEach((url:string):void => {
-                object.insertAdjacentHTML("beforeend", read(url));
-			});
             
-            var node:HTMLElement = <HTMLElement> document.body.appendChild(object);
-            application.cards.push(node); // add to the array of cards
-            if (cards[i]['@default'] !== undefined) {
+            var node = cards[i];
+            var id = node["@id"];
+            var title = node["@title"];
+            
+            var section = document.createElement("section");
+            section.setAttribute("id", id);
+            section.setAttribute("title", title);
+
+            window[id] = section;
+
+            application.cards.push(section); // add to the array of cards
+            if (node['@default'] !== undefined) {
                 if (application.defaultCard === null) {
-                    application.defaultCard = node;
+                    application.defaultCard = section;
                 } else {
                     console.warn("More than one card is set as the default in app.xml. Ignoring.");
                 }
             }
             
-            guaranteeArray(cards[i].json).forEach((element:any):void => {
-                var target = element["@target"];
-                if (typeof target == "string") {
-                    var target = element.target;
-                    parseJSONToTarget(element, target, object);
-                } else {
-                    console.error("No target attribute provided for JSON (\"" + element + "\")");
-                }
-            });
-
-            guaranteeArray(cards[i].js).forEach((url:string):void => {
-                executeJavaScript(url, object);
-            });
+            initNode(node, section, id);
+        
+            // NB: this object SHOULD NOT added to the body until ready to be shown
+            div.appendChild(section);
     	}
 
         if (application.defaultCard === null) {
-            throw new Error("No default card set.");
+            throw "No default card set.";
         }
+	}
+
+    function initNode(node:any, element:HTMLElement, id?:string):void {
+        guaranteeArray(node.css).forEach((url:string):void => {
+            appendCssToHeadFromUrl(url, id);
+        });
+
+        guaranteeArray(node.html).forEach((url:string):void => {
+            element.insertAdjacentHTML("beforeend", read(url));
+        });
+
+        guaranteeArray(node.json).forEach((json:any):void => {
+            var target = json["@target"];
+            if (typeof target == "string") {
+                var context:any = (element == document.body) ? <any> window : <any> element;
+                parseJSONToTarget(json, target, context);
+            } else {
+                console.error("No target attribute provided for JSON (\"" + element + "\")");
+            }
+        });
+
+        guaranteeArray(node.js).forEach((url:string):void => {
+            var context:any = (element == document.body) ? <any> window : <any> element;
+            executeJavaScript(url, context);
+        });
 	}
 
     /**
@@ -177,7 +181,7 @@ module Savvy {
     function appendCssToHeadFromUrl(url:string, forId?:string):void {
         var doLink:Boolean = (regex.isRemoteUrl.test(url) || window.navigator.appVersion.indexOf("MSIE 8") != -1);
         if (doLink && forId) {
-            throw new Error("Card styles sheets cannot be remote (e.g. http://www.examples.com/style.css). Please include remote style sheets globally.");
+            throw "Card styles sheets cannot be remote (e.g. http://www.examples.com/style.css). Please include remote style sheets globally.";
         }
         var node:HTMLElement;
         if (doLink) {
@@ -197,7 +201,7 @@ module Savvy {
                 var content:string = read(url);
                 if (forId) {
                     content = content.replace(regex.css.body, "$1");
-                    content = content.replace(regex.css.selector, "body > object#"+forId+" $1$2");
+                    content = content.replace(regex.css.selector, "body > main > div > section#"+forId+" $1$2");
                 }
                 var i:number = url.toString().lastIndexOf("/");
                 if(i != -1) {
@@ -211,7 +215,7 @@ module Savvy {
             }
             document.getElementsByTagName("head")[0].appendChild(node);
         } catch(err) {
-	    	throw new Error("Error appending CSS file (" + url + "): " + err.toString());
+	    	throw "Error appending CSS file (" + url + "): " + err.toString();
         }
     }
 
@@ -229,7 +233,7 @@ module Savvy {
         try  {
             Savvy._eval(code, context);
         } catch (err) {
-	    	throw new Error(err.toString() + " (" + url + ")");
+	    	throw err.toString() + " (" + url + ")";
     	}
     }
 

@@ -144,6 +144,7 @@ var application;
     application.id = null;
     application.isCordova = false;
     application.version = null;
+
     application.cards = [];
     application.defaultCard = null;
     application.currentCard = null;
@@ -169,17 +170,20 @@ var application;
     application.getRoute = getRoute;
 
     function offCanvas(left) {
+        var main = document.body.querySelector("main");
         if (typeof left == "undefined") {
-            if (document.body.style.left == "" || document.body.style.left == "0px")
+            if (main.style.left == "" || main.style.left == "0px")
                 left = Transition.OFF_CANVASS_LEFT;
             else
                 left = "0px";
         }
 
         // shortcut to handle quick toggling
-        if (document.body.style.left == left)
+        if (main.style.left == left)
             left = "0px";
-        document.body.style.left = left;
+
+        // apply the style
+        main.style.left = left;
     }
     application.offCanvas = offCanvas;
 })(application || (application = {}));
@@ -231,30 +235,24 @@ var Savvy;
     function parseAppXML(app) {
         preloadImages(guaranteeArray(app.img));
 
-        // NB: Do before HTML so that HTML lands formatted
-        guaranteeArray(app.css).forEach(function (url, index, array) {
-            appendCssToHeadFromUrl(url);
-        });
+        initNode(app, document.body);
 
-        guaranteeArray(app.html).forEach(function (url, index, array) {
-            document.body.insertAdjacentHTML("beforeend", read(url));
-        });
+        var main = document.createElement("main");
+        document.body.appendChild(main);
 
-        // NB: Do before JS so that data models are available to JS
-        guaranteeArray(app.json).forEach(function (element, index, array) {
-            var target = element["@target"];
-            if (typeof target == "string") {
-                parseJSONToTarget(element, target);
-            } else {
-                throw new Error("No target attribute provided for JSON (\"" + element + "\")");
-            }
-        });
+        if (app.header) {
+            var header = document.createElement("header");
+            initNode(app.header, header);
+            main.appendChild(header);
+        }
 
-        guaranteeArray(app.js).forEach(function (url, index, array) {
-            executeJavaScript(url);
-        });
+        initCards(guaranteeArray(app.card), main);
 
-        initCards(guaranteeArray(app.card));
+        if (app.footer) {
+            var footer = document.createElement("footer");
+            initNode(app.footer, footer);
+            main.appendChild(footer);
+        }
 
         delete Savvy._eval; // no longer needed
     }
@@ -272,55 +270,64 @@ var Savvy;
         }
     }
 
-    function initCards(cards) {
+    function initCards(cards, main) {
+        var div = document.createElement("div");
+        main.appendChild(div);
+
         for (var i = 0, ii = cards.length; i < ii; i++) {
-            // NB: this isn't added to the body until ready to be shown
-            var object = document.createElement("object");
-            object.setAttribute("id", cards[i]["@id"]);
-            object.setAttribute("title", cards[i]["@title"]);
-            object.setAttribute("data", "savvy:" + application.id + "/" + cards[i]["@id"]);
-            object.setAttribute("type", "application/x-savvy");
+            var node = cards[i];
+            var id = node["@id"];
+            var title = node["@title"];
 
-            var id = cards[i]["@id"];
-            var title = cards[i]["@title"];
-            window[id] = object;
+            var section = document.createElement("section");
+            section.setAttribute("id", id);
+            section.setAttribute("title", title);
 
-            guaranteeArray(cards[i].css).forEach(function (url) {
-                appendCssToHeadFromUrl(url, id);
-            });
+            window[id] = section;
 
-            guaranteeArray(cards[i].html).forEach(function (url) {
-                object.insertAdjacentHTML("beforeend", read(url));
-            });
-
-            var node = document.body.appendChild(object);
-            application.cards.push(node); // add to the array of cards
-            if (cards[i]['@default'] !== undefined) {
+            application.cards.push(section); // add to the array of cards
+            if (node['@default'] !== undefined) {
                 if (application.defaultCard === null) {
-                    application.defaultCard = node;
+                    application.defaultCard = section;
                 } else {
                     console.warn("More than one card is set as the default in app.xml. Ignoring.");
                 }
             }
 
-            guaranteeArray(cards[i].json).forEach(function (element) {
-                var target = element["@target"];
-                if (typeof target == "string") {
-                    var target = element.target;
-                    parseJSONToTarget(element, target, object);
-                } else {
-                    console.error("No target attribute provided for JSON (\"" + element + "\")");
-                }
-            });
+            initNode(node, section, id);
 
-            guaranteeArray(cards[i].js).forEach(function (url) {
-                executeJavaScript(url, object);
-            });
+            // NB: this object SHOULD NOT added to the body until ready to be shown
+            div.appendChild(section);
         }
 
         if (application.defaultCard === null) {
-            throw new Error("No default card set.");
+            throw "No default card set.";
         }
+    }
+
+    function initNode(node, element, id) {
+        guaranteeArray(node.css).forEach(function (url) {
+            appendCssToHeadFromUrl(url, id);
+        });
+
+        guaranteeArray(node.html).forEach(function (url) {
+            element.insertAdjacentHTML("beforeend", read(url));
+        });
+
+        guaranteeArray(node.json).forEach(function (json) {
+            var target = json["@target"];
+            if (typeof target == "string") {
+                var context = (element == document.body) ? window : element;
+                parseJSONToTarget(json, target, context);
+            } else {
+                console.error("No target attribute provided for JSON (\"" + element + "\")");
+            }
+        });
+
+        guaranteeArray(node.js).forEach(function (url) {
+            var context = (element == document.body) ? window : element;
+            executeJavaScript(url, context);
+        });
     }
 
     /**
@@ -358,7 +365,7 @@ var Savvy;
     function appendCssToHeadFromUrl(url, forId) {
         var doLink = (regex.isRemoteUrl.test(url) || window.navigator.appVersion.indexOf("MSIE 8") != -1);
         if (doLink && forId) {
-            throw new Error("Card styles sheets cannot be remote (e.g. http://www.examples.com/style.css). Please include remote style sheets globally.");
+            throw "Card styles sheets cannot be remote (e.g. http://www.examples.com/style.css). Please include remote style sheets globally.";
         }
         var node;
         if (doLink) {
@@ -378,7 +385,7 @@ var Savvy;
                 var content = read(url);
                 if (forId) {
                     content = content.replace(regex.css.body, "$1");
-                    content = content.replace(regex.css.selector, "body > object#" + forId + " $1$2");
+                    content = content.replace(regex.css.selector, "body > main > div > section#" + forId + " $1$2");
                 }
                 var i = url.toString().lastIndexOf("/");
                 if (i != -1) {
@@ -389,7 +396,7 @@ var Savvy;
             }
             document.getElementsByTagName("head")[0].appendChild(node);
         } catch (err) {
-            throw new Error("Error appending CSS file (" + url + "): " + err.toString());
+            throw "Error appending CSS file (" + url + "): " + err.toString();
         }
     }
 
@@ -406,7 +413,7 @@ var Savvy;
         try  {
             Savvy._eval(code, context);
         } catch (err) {
-            throw new Error(err.toString() + " (" + url + ")");
+            throw err.toString() + " (" + url + ")";
         }
     }
 

@@ -14,7 +14,7 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-body > object[type="application/x-savvy"].transition {
+body > main > div > section.transition {
     -webkit-animation-fill-mode: both;
     -moz-animation-fill-mode: both;
     -ms-animation-fill-mode: both;
@@ -22,29 +22,29 @@ body > object[type="application/x-savvy"].transition {
     display: block !important;
 }
 
-body > object[type="application/x-savvy"].transition.-ease-in-out {
+body > main > div > section.transition.-ease-in-out {
     -webkit-animation-timing-function: ease-in-out;
     -moz-animation-timing-function: ease-in-out;
     -ms-animation-timing-function: ease-in-out;
     animation-timing-function: ease-in-out;
 }
 
-body > object[type="application/x-savvy"].transition.-linear {
+body > main > div > section.transition.-linear {
     -webkit-animation-timing-function: linear;
     -moz-animation-timing-function: linear;
     -ms-animation-timing-function: linear;
     animation-timing-function: linear;
 }
 
-body > object[type="application/x-savvy"].transition.-lower {
+body > main > div > section.transition.-lower {
     z-index: -1 !important;
 }
 
-body > object[type="application/x-savvy"].transition.-shadow {
+body > main > div > section.transition.-shadow {
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.66) !important;
 }
 
-body > object[type="application/x-savvy"].transition.-d0ms {
+body > main > div > section.transition.-d0ms {
     -webkit-animation-duration: 0ms;
     -moz-animation-duration: 0ms;
     -ms-animation-duration: 0ms;
@@ -56,7 +56,7 @@ body > object[type="application/x-savvy"].transition.-d0ms {
     transition: opacity 0ms;
 }
 
-body > object[type="application/x-savvy"].transition.-d250ms {
+body > main > div > section.transition.-d250ms {
     -webkit-animation-duration: 250ms;
     -moz-animation-duration: 250ms;
     -ms-animation-duration: 250ms;
@@ -68,7 +68,7 @@ body > object[type="application/x-savvy"].transition.-d250ms {
     transition: opacity 250ms;
 }
 
-body > object[type="application/x-savvy"].transition.-d333ms {
+body > main > div > section.transition.-d333ms {
     -webkit-animation-duration: 333ms;
     -moz-animation-duration: 333ms;
     -ms-animation-duration: 333ms;
@@ -80,7 +80,7 @@ body > object[type="application/x-savvy"].transition.-d333ms {
     transition: opacity 333ms;
 }
 
-body > object[type="application/x-savvy"].transition.-d500ms {
+body > main > div > section.transition.-d500ms {
     -webkit-animation-duration: 500ms;
     -moz-animation-duration: 500ms;
     -ms-animation-duration: 500ms;
@@ -92,7 +92,7 @@ body > object[type="application/x-savvy"].transition.-d500ms {
     transition: opacity 500ms;
 }
 
-body > object[type="application/x-savvy"].transition.-d1000ms {
+body > main > div > section.transition.-d1000ms {
     -webkit-animation-duration: 1000ms;
     -moz-animation-duration: 1000ms;
     -ms-animation-duration: 1000ms;
@@ -126,7 +126,7 @@ body > object[type="application/x-savvy"].transition.-d1000ms {
     100% {}
 }
 
-body > object[type="application/x-savvy"].transition.-static {
+body > main > div > section.transition.-static {
     -webkit-animation-name: -savvy-static;
     -moz-animation-name: -savvy-static;
     -ms-animation-name: -savvy-static;
@@ -199,7 +199,7 @@ body > object[type="application/x-savvy"].transition.-static {
     }
 }
 
-body > object[type="application/x-savvy"].transition.-out.-left {
+body > main > div > section.transition.-out.-left {
   -webkit-animation-name: -savvy-exit-left;
   -moz-animation-name: -savvy-exit-left;
   -ms-animation-name: -savvy-exit-left;
@@ -270,7 +270,7 @@ body > object[type="application/x-savvy"].transition.-out.-left {
     }
 }
 
-body > object[type="application/x-savvy"].transition.-out.-right {
+body > main > div > section.transition.-out.-right {
   -webkit-animation-name: -savvy-exit-right;
   -moz-animation-name: -savvy-exit-right;
   -ms-animation-name: -savvy-exit-right;
@@ -343,7 +343,7 @@ body > object[type="application/x-savvy"].transition.-out.-right {
     }
 }
 
-body > object[type="application/x-savvy"].transition.-in.-left {
+body > main > div > section.transition.-in.-left {
     -webkit-animation-name: -savvy-enter-left;
     -moz-animation-name: -savvy-enter-left;
     -ms-animation-name: -savvy-enter-left;
@@ -414,7 +414,7 @@ body > object[type="application/x-savvy"].transition.-in.-left {
     }
 }
 
-body > object[type="application/x-savvy"].transition.-in.-right {
+body > main > div > section.transition.-in.-right {
     -webkit-animation-name: -savvy-enter-right;
     -moz-animation-name: -savvy-enter-right;
     -ms-animation-name: -savvy-enter-right;
@@ -463,21 +463,21 @@ body > object[type="application/x-savvy"].transition.-in.-right {
     }
 }
 
-body > object[type="application/x-savvy"].transition.-in.-fade {
+body > main > div > section.transition.-in.-fade {
     -webkit-animation-name: -savvy-fade-in;
     -moz-animation-name: -savvy-fade-in;
     -ms-animation-name: -savvy-fade-in;
     animation-name: -savvy-fade-in;
 }
 
-body > object[type="application/x-savvy"].transition.-out.-fade {
+body > main > div > section.transition.-out.-fade {
     -webkit-opacity: 0;
     -moz-opacity: 0;
     -ms-opacity: 0;
     opacity: 0;
 }
 
-body > object[type="application/x-savvy"].transition.-in.-fade {
+body > main > div > section.transition.-in.-fade {
     -webkit-opacity: 1;
     -moz-opacity: 1;
     -ms-opacity: 1;
