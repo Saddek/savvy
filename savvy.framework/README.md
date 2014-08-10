@@ -16,4 +16,4 @@ The Savvy framework is released under the [Apache 2.0](http://opensource.org/lic
 
 The [pirate image](http://thenounproject.com/noun/pirate/#icon-No13422) used by the project was designed by [Anne Caroline Bittencourt Gonçalves](http://thenounproject.com/anne1003) from The Noun Project.
 
-The [Dark Fish Skin](http://subtlepatterns.com/dark-fish-skin/) pattern is by [Petr Šulc](http://www.petrsulc.com/) and [Blach Orchid](http://subtlepatterns.com/blach-orchid/) is by [Hybridixstudio](http://www.hybridixstudio.com/). Both from [Subtle Patterns](http://subtlepatterns.com/).
+The [Dark Fish Skin](http://subtlepatterns.com/dark-fish-skin/) pattern is by [Petr Šulc](http://www.petrsulc.com/) and [Blach Orchid](http://subtlepatterns.com/blach-orchid/) is by [Hybridixstudio](http://www.hybridixstudio.com/). Both are from [Subtle Patterns](http://subtlepatterns.com/).
