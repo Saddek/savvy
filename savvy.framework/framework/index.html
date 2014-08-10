@@ -9,6 +9,9 @@
 
   <title>Loading...</title>
   
+  <!-- open all links in a new window by default -->
+  <base target="_blank">
+    
   <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
   <link rel="apple-touch-icon-precomposed" type="image/png" href="assets/icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" href="assets/icons/favicon.png">
@@ -55,74 +58,6 @@
   <!-- savvy.css: https://github.com/daneden/animate.css -->
   <link rel="stylesheet" type="text/css" href="savvy.framework/savvy.min.css" />
   <link rel="stylesheet" type="text/css" href="savvy.framework/transitions.min.css" />
-
-  <script type="application/javascript">
-  (function(){
-	  
-    if (window.navigator.standalone) {
-        // prevent scrolling of body on iOS standalone apps
-        var start = {x:0, y:0};
-        document.addEventListener('touchstart', function(e) {
-            start.x = e.touches[0].screenX;
-            start.y = e.touches[0].screenY;
-        });
-        document.addEventListener('touchmove', function(e) {
-          if (e.target.type === 'range') { return; }
-          var delta = {
-             x: e.touches[0].screenX - start.x,
-             y: e.touches[0].screenY - start.y
-          }
-
-          // test on the vertical
-          var obj = e.target;
-          while(obj != document.body && !canScrollVertical(obj) && !canScrollHorizontal(obj)) {
-              obj = obj.parentNode;
-          }
-
-          if (obj == document.body) {
-              // didn't find any scroll-able element
-              e.preventDefault();
-              return;
-          }
-
-          if (Math.abs(delta.y) > Math.abs(delta.x)) {
-              if ( delta.y > 0 && canScrollUp(obj) ) { return; }
-              if ( delta.y < 0 && canScrollDown(obj) ) { return; }
-              e.preventDefault();
-          } else {
-              if ( delta.x > 0 && canScrollLeft(obj) ) { return; }
-              if ( delta.x < 0 && canScrollRight(obj) ) { return; }
-              e.preventDefault();
-          }
-        });
-
-        function canScrollVertical(el) {
-            return el.scrollHeight > el.getBoundingClientRect().height;
-        }
-
-        function canScrollHorizontal(el) {
-            return el.scrollWidth > el.getBoundingClientRect().width;
-        }
-
-        function canScrollUp(el) {
-            return el.scrollTop != 0;
-        }
-
-        function canScrollDown(el) {
-            return el.scrollTop != el.scrollHeight - el.getBoundingClientRect().height;
-        }
-
-        function canScrollLeft(el) {
-            return el.scrollLeft != 0;
-        }
-
-        function canScrollRight(el) {
-            return el.scrollLeft != el.scrollWidth - el.getBoundingClientRect().width;
-        }
-    }
-	  
-  })();
-  </script>
 </head>
 
 <body>

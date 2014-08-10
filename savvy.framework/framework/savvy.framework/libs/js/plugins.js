@@ -1,3 +1,39 @@
+/*
+
+   .x+=:.                  _            _                      
+  z`    ^%                u            u            ..         
+     .   <k              88Nu.   u.   88Nu.   u.   @L          
+   .@8Ned8"       u     '88888.o888c '88888.o888c 9888i   .dL  
+ .@^%8888"     us888u.   ^8888  8888  ^8888  8888 `Y888k:*888. 
+x88:  `)8b. .@88 "8888"   8888  8888   8888  8888   888E  888I 
+8888N=*8888 9888  9888    8888  8888   8888  8888   888E  888I 
+ %8"    R88 9888  9888    8888  8888   8888  8888   888E  888I 
+  @8Wou 9%  9888  9888   .8888b.888P  .8888b.888P   888E  888I 
+.888888P`   9888  9888    ^Y8888*""    ^Y8888*""   x888N><888' 
+`   ^"F     "888*""888"     `Y"          `Y"        "88"  888  
+             ^Y"   ^Y'                                    88F  
+                                                         98"   
+                                                       ./"     
+                                                      ~`       
+
+   Version: 0.3.0
+
+   Copyright 2014 Oliver Moran
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+*/
+
 // Monkey patches for various JavaScript objects (required for older browsers)
 
 // Create the console object if it doesn't exist
@@ -23,3 +59,8 @@ r=/[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u20
 // https://github.com/oliver-moran/animate.css.js
 // https://daneden.me/animate/
 HTMLElement.prototype.animate=function(a,b,c){if("string"==typeof a){var d=this;this.className+=" animated "+a;setTimeout(function(){d.className=d.className.replace(" animated "+a,"");"function"==typeof b&&b.call(c?c:window)},"hinge"==a?2E3:1E3)}};
+
+// prevent body scrolling on iOS standalone
+if (window.navigator.standalone) {
+    var start={x:0,y:0};document.addEventListener("touchstart",function(a){start.x=a.touches[0].screenX;start.y=a.touches[0].screenY}); document.addEventListener("touchmove",function(a){if("range"!==a.target.type){for(var c=a.touches[0].screenX-start.x,d=a.touches[0].screenY-start.y,b=a.target;b!=document.body&&!canScrollVertical(b)&&!canScrollHorizontal(b);)b=b.parentNode;b==document.body?a.preventDefault():Math.abs(d)>Math.abs(c)?0<d&&canScrollUp(b)||0>d&&canScrollDown(b)||a.preventDefault():0<c&&canScrollLeft(b)||0>c&&canScrollRight(b)||a.preventDefault()}}); function canScrollVertical(a){return a.scrollHeight>a.getBoundingClientRect().height}function canScrollHorizontal(a){return a.scrollWidth>a.getBoundingClientRect().width}function canScrollUp(a){return 0!=a.scrollTop}function canScrollDown(a){return a.scrollTop!=a.scrollHeight-a.getBoundingClientRect().height}function canScrollLeft(a){return 0!=a.scrollLeft}function canScrollRight(a){return a.scrollLeft!=a.scrollWidth-a.getBoundingClientRect().width};
+}
