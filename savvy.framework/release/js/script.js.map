@@ -1,1 +1,0 @@
-{"version":3,"file":"js/script.js.map","sources":["release/js/script.js"],"names":["window","addEventListener","Card","LOAD","document","querySelector","play","READY"],"mappings":"AAEAA,OAAOC,iBAAiBC,KAAKC,KAAM,WAElCC,SAASC,cAAc,SAASC,SAGjCN,OAAOC,iBAAiBC,KAAKK,MAAO"}
