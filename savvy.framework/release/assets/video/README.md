@@ -1,0 +1,1 @@
+Place video assets in this directory (e.g. .ogg, .mp4, etc.).
