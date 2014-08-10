@@ -1,0 +1,9 @@
+<widget id="{{id}}" version="{{version}}">
+    <name>{{name}}</name>
+    <description>{{description}}</description>
+    <author email="{{email}}" href="{{href}}">{{author}}</author>
+    <content src="index.html" />
+    <access origin="*" />
+    <preference name="BackgroundColor" value="0xff000000"/>
+    <preference name="HideKeyboardFormAccessoryBar" value="true"/>
+</widget>

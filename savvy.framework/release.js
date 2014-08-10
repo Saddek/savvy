@@ -43,6 +43,8 @@ var Walk = require("walk");
 var Sys = require("sys");
 var Exec = require("child_process").exec;
 var CleanCSS = require("clean-css");
+var Handlebars = require("Handlebars");
+var XML2JS = require("xml2js");
 
 var banner = FS.readFileSync("banner.txt");
 var package = require("./package.json");
@@ -83,8 +85,73 @@ function framework() {
     console.log("Copying framework files...");
     NCP("./framework", release, {filter: filter}, function (err) {
         if (err) return console.error(err);
-        compile();
+        xml();
     });
+}
+
+function xml() {
+    var app = Path.join(Path.join(release, "/data"), "app.xml");
+    
+    FS.readFile(app, function(err, data) {
+        if (err) return console.error(err);
+        var parser = new XML2JS.Parser();
+        parser.parseString(data, function (err, result) {
+            var name = (result.app.name) ? result.app.name.toString() : "Loading...";
+            var description = (result.app.description) ? result.app.description.toString() : "";
+            
+            var author = "";
+            var email = "";
+            var href = "";
+            if (result.app.author[0]) {
+                author = result.app.author[0]._.toString();
+                email = (result.app.author[0].$.email) ? result.app.author[0].$.email.toString() : "";
+                href = (result.app.author[0]) ? result.app.author[0].$.href.toString() : "";
+            }
+            
+            var author_long = author.trim();
+            if (email) author_long += " <" + email.trim() + ">";
+            if (href) author_long += " (" + href.trim() + ")";
+            
+            var html = Path.join(release, "/index.html");
+            var source = FS.readFileSync(html);
+            var template = Handlebars.compile(source.toString());
+            FS.writeFileSync(html, template({
+                title: escape2(name.trim()),
+                description: escape2(description.trim()),
+                author: escape2(author_long.trim())
+            }));
+
+            var config = Path.join(release, "/config.xml");
+            if (result.app.$.cordova.toString().toUpperCase() == "YES") {
+                var id = (result.app.$.id) ? result.app.$.id : "";
+                var version = (result.app.$.version) ? result.app.$.version : "";
+                
+                var source = FS.readFileSync(config);
+                var template = Handlebars.compile(source.toString());
+                FS.writeFileSync(config, template({
+                    id: id,
+                    version: version,
+                    name: name,
+                    description: description,
+                    author: author,
+                    email: email,
+                    href: href
+                }));
+            } else {
+                // remove config file if we are not using cordova
+                FS.unlinkSync(config);
+            }
+
+            compile();
+        });
+    });
+}
+
+function escape2(str){
+    str = str.replace("\n", " ");
+    str = str.replace("\r", " ");
+    str = str.replace("\"", "''");
+    return str;
 }
 
 var options = {
@@ -171,7 +238,7 @@ function clean() {
         if (isSourceFile) {
             var path = Path.join(root, file.name);
             console.log("Removing: " + path);
-            fs.unlinkSync(path);
+            FS.unlinkSync(path);
         }
         
         next();
@@ -181,7 +248,6 @@ function clean() {
         end();
     });
 }
-
 
 function end() {
     var t2 = new Date(); // end time

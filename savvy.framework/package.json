@@ -31,6 +31,8 @@
     "ncp": "~0.6.0",
     "rimraf": "~2.2.8",
     "walk": "~2.3.3",
-    "clean-css": "~2.2.12"
+    "clean-css": "~2.2.12",
+    "handlebars": "~2.0.0-alpha.4",
+    "xml2js": "~0.4.4"
   }
 }

@@ -46,22 +46,22 @@ module Savvy {
     function parseAppXML(app:any):void {
     	preloadImages(guaranteeArray(app.img));
 
-        initNode(app, document.body);
+        initNode(app.deck, document.body);
         
         var main = document.createElement("main");
         document.body.appendChild(main);
         
-        if (app.header) {
+        if (app.deck.header) {
             var header = document.createElement("header");
-            initNode(app.header, header);
+            initNode(app.deck.header, header);
             main.appendChild(header);
         }
 
-        initCards(guaranteeArray(app.card), main);
+        initCards(guaranteeArray(app.deck.card), main);
         
-        if (app.footer) {
+        if (app.deck.footer) {
             var footer = document.createElement("footer");
-            initNode(app.footer, footer);
+            initNode(app.deck.footer, footer);
             main.appendChild(footer);
         }
         
@@ -83,9 +83,6 @@ module Savvy {
     }
 
     function initCards(cards:any, main:HTMLElement):void {
-        var div = document.createElement("div");
-        main.appendChild(div);
-        
         for(var i = 0, ii = cards.length; i < ii; i++) {
             
             var node = cards[i];
@@ -110,7 +107,7 @@ module Savvy {
             initNode(node, section, id);
         
             // NB: this object SHOULD NOT added to the body until ready to be shown
-            div.appendChild(section);
+            main.appendChild(section);
     	}
 
         if (application.defaultCard === null) {
@@ -191,7 +188,7 @@ module Savvy {
             node.setAttribute("type", "text/css");
             var content:string = read(url);
             if (forId) {
-                content = content.replace(regex.css.selector, "body > main > div > section#"+forId+" $1$2");
+                content = content.replace(regex.css.selector, "body > main > section#"+forId+" $1$2");
                 content = content.replace(regex.css.card, "$1");
             }
             node.appendChild(document.createTextNode(content));
