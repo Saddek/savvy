@@ -67,7 +67,7 @@ function typescript() {
 
 function sass() {
 	console.log("Compiling using Sass");
-    exec("sass --update ./sass:./out --style compressed", function (error, stdout, stderr) {
+    exec("sass ./sass/savvy.scss ./out/savvy.min.css --style compressed", function (error, stdout, stderr) {
         if (error) sys.puts(stderr);
         else closure();
     });
@@ -92,8 +92,7 @@ function license() {
     
     prepend("./out/savvy.js", header)
     prepend("./out/savvy.min.js", header)
-    prepend("./out/savvy.css", header)
-    prepend("./out/transitions.css", header)
+    prepend("./out/savvy.min.css", header)
     
     copy();
 }
@@ -110,8 +109,7 @@ function copy() {
         {from: "./out/savvy.min.js", to: "../framework/savvy.framework/savvy.min.js"},
         {from: "./out/savvy.min.js.map", to: "../framework/savvy.framework/savvy.min.js.map"},
         {from: "./out/savvy.d.ts", to: "../framework/savvy.framework/savvy.d.ts"},
-        {from: "./out/savvy.css", to: "../framework/savvy.framework/savvy.min.css"},
-        {from: "./out/transitions.css", to: "../framework/savvy.framework/transitions.min.css"}
+        {from: "./out/savvy.min.css", to: "../framework/savvy.framework/savvy.min.css"},
     ];
     files.forEach(function (file) {
         fs.createReadStream(file.from).pipe(fs.createWriteStream(file.to));

@@ -12,6 +12,9 @@ declare module application {
     var isCordova: boolean;
     var version: string;
     var cards: HTMLElement[];
+    var header: HTMLElement;
+    var footer: HTMLElement;
+    var main: HTMLElement;
     var defaultCard: HTMLElement;
     var currentCard: HTMLElement;
     function goto(path: string, transition?: Transition, preventHistory?: boolean): void;

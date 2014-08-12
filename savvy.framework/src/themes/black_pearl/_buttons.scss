@@ -1,0 +1,80 @@
+@-webkit-keyframes pulsate {
+    0%   { background-color: $highlight-dark; }
+    50%  { background-color: $highlight-light; }
+    100% { background-color: $highlight-dark; }
+}
+
+@-moz-keyframes pulsate {
+    0%   { background-color: $highlight-dark; }
+    50%  { background-color: $highlight-light; }
+    100% { background-color: $highlight-dark; }
+}
+
+@-ms-keyframes pulsate {
+    0%   { background-color: $highlight-dark; }
+    50%  { background-color: $highlight-light; }
+    100% { background-color: $highlight-dark; }
+}
+
+@keyframes pulsate {
+    0%   { background-color: $highlight-dark; }
+    50%  { background-color: $highlight-light; }
+    100% { background-color: $highlight-dark; }
+}
+
+button:focus {
+    outline: none;
+}
+
+body > main > section {
+    button {
+        text-transform: uppercase;
+        font-size: $fontsize;
+        padding: ($fontsize * 0.6) ($fontsize * 0.8);
+        -moz-border-radius: ($fontsize * 0.3);
+        -webkit-border-radius: ($fontsize * 0.3);
+        border-radius: ($fontsize * 0.3);
+        border: none;
+    }
+
+    button {
+        background: $highlight;
+        color: $light;
+        font-weight: 500;
+    }
+
+    button:active,
+    button:active {
+        background: $highlight-dark;
+        color: $light;
+        font-weight: 500;
+    }
+
+    button[type="submit"] {
+        -webkit-animation: pulsate 2s ease-in-out infinite;
+        -moz-animation: pulsate 2s ease-in-out infinite;
+        -ms-animation: pulsate 2s ease-in-out infinite;
+        animation: pulsate 2s ease-in-out infinite;
+    }
+
+    button[type="submit"]:active,
+    button[type="submit"]:hover {
+        -webkit-animation: none;
+        -moz-animation: none;
+        -ms-animation: none;
+        animation: none;
+    }
+
+}
+
+body > main > header,
+body > main > footer {
+    button {
+        text-transform: uppercase;
+        font-size: $fontsize;
+        padding: ($header - $fontsize) / 2;;
+        border: none;
+        background: transparent;
+        color: $light;
+    }
+}

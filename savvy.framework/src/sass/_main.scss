@@ -1,0 +1,137 @@
+/*
+   Copyright 2014 Oliver Moran
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
+* {
+    /* Disable the tap highlight on Andoid devices. */
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -moz-tap-highlight-color: rgba(0, 0, 0, 0);
+    -ms-tap-highlight-color: rgba(0, 0, 0, 0);
+    -o-tap-highlight-color: rgba(0, 0, 0, 0);
+    tap-highlight-color: rgba(0, 0, 0, 0);
+
+    /* Disable selection of all element (input fields enabled below). */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+
+    /* Disable the iOS pop-up menu. */
+    -webkit-touch-callout: none;
+    -moz-touch-callout: none;
+    -ms-touch-callout: none;
+    -o-touch-callout: none;
+    touch-callout: none;
+
+    /* Adds a satisfying bounce to scrolls */
+    -webkit-overflow-scrolling: touch;
+    -moz-overflow-scrolling: touch;
+    -ms-overflow-scrolling: touch;
+    -o-overflow-scrolling: touch;
+    overflow-scrolling: touch;
+}
+
+input, textarea {
+    /* Enable selection of input fields and text areas. */
+    -webkit-user-select: text;
+    -khtml-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+
+html {
+    /* Can approve appearance on iOS devices. */
+    -webkit-text-size-adjust: none;
+    -moz-text-size-adjust: none;
+    -ms-text-size-adjust: none;
+    -o-text-size-adjust: none;
+    text-size-adjust: none;
+
+    /* Fix for webkit rendering */
+    -webkit-font-smoothing: antialiased;
+    -moz-font-smoothing: antialiased;
+    -ms-font-smoothing: antialiased;
+    -o-font-smoothing: antialiased;
+    font-smoothing: antialiased;
+}
+
+body {
+    /* Force hardware acceloration */
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    -ms-backface-visibility: hidden;
+    -o-backface-visibility: hidden;
+    backface-visibility: hidden;
+
+    -webkit-transform: -webkit-rotateZ(360deg);
+    -moz-transform: -moz-rotateZ(360deg);
+    -ms-transform: -ms-rotateZ(360deg);
+    -o-transform: -o-rotateZ(360deg);
+    transform: rotateZ(360deg);
+}
+
+html, body {
+    height:100% !important;
+    width: 100% !important;
+    overflow: hidden !important;
+}
+
+body > main {
+    position: fixed !important;
+    top: 0px !important;
+    left: 0px;
+    width: 100% !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    
+    box-shadow: 0 0 14px rgba(0, 0, 0, 0.66) !important;
+    -webkit-transition: left 250ms !important;
+    -moz-transition: left 250ms !important;
+    -ms-transition: left 250ms !important;
+    transition: left 250ms !important;
+}
+
+body > main > header,
+body > main > footer {
+    position: absolute !important;
+    width: 100% !important;
+    height: 0%;
+    overflow: hidden !important;
+}
+
+body > main > header {
+    top: 0% !important;
+    left: 0px !important;
+    z-index: 10;
+}
+
+body > main > footer {
+    bottom: 0% !important;
+    left: 0px !important;
+    z-index: 5;
+}
+
+body > main > section {
+    position: absolute !important;
+    top: 0px !important;
+    left: 0px !important;
+    width: 100% !important;
+    hieght: 100% !important;
+    display: none !important;
+    z-index: 0 !important;
+    overflow: auto !important;
+}

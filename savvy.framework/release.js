@@ -45,6 +45,7 @@ var Exec = require("child_process").exec;
 var CleanCSS = require("clean-css");
 var Handlebars = require("Handlebars");
 var XML2JS = require("xml2js");
+var HTMLMinify = require('html-minifier').minify;
 
 var banner = FS.readFileSync("banner.txt");
 var package = require("./package.json");
@@ -164,6 +165,7 @@ var coffeescript = /\.coffee$/;
 var dart = /\.dart$/;
 var sass = /\.scss$/;
 var less = /\.less$/;
+var handlebars = /\.handlebars$/;
 
 function compile() {
     var walker = Walk.walk(release_rel, options);
@@ -175,6 +177,7 @@ function compile() {
         if (dart.test(file.name)) cmd = "dart2js " + path + " --out=" + path.substr(0, path.length - 5) + ".js";
         if (sass.test(file.name)) cmd = "sass --style compressed " + path;
         if (less.test(file.name)) cmd = "lessc -x " + path;
+        if (handlebars.test(file.name)) cmd = "handlebars " + path;
 
         if (cmd) {
             console.log("Compiling: " + path);
@@ -192,6 +195,7 @@ function compile() {
 
 var css = /\.css$/;
 var javascript = /\.js$/;
+var html = /\.html$/;
 
 function compress() {
     var walker = Walk.walk(release_rel, options);
@@ -202,8 +206,8 @@ function compress() {
             var path = Path.join(root, file.name);
             console.log("Optomising: " + path);
             var source = FS.readFileSync(path);
-            var dir = Path.relative(Path.dirname(release), release)
-            var minimized = new CleanCSS({relativeTo: dir, target: dir}).minify(source);
+            var minimized = new CleanCSS().minify(source);
+            // FIXME: this doesn't catch any errors
             FS.writeFileSync(path, minimized);
         }
         
@@ -212,10 +216,42 @@ function compress() {
             var path = Path.join(root, file.name);
             console.log("Optomising: " + path);
             var rel = Path.relative(release, root);
-            var map = rel + "/" + file.name + ".map";
-            var result = UglifyJS.minify(path, { outSourceMap: map });
+            var map = Path.join(rel, file.name + ".map");
+            var result;
+            try {
+                result = UglifyJS.minify(path, { outSourceMap: map });
+            } catch (err) {
+                // FIXME: this always assumes the error is a JS parsing error
+                console.log("JavaScript error: " 
+                            + err.message + " ("
+                            + path + ":"
+                            + err.line + ":"
+                            + err.col + ")");
+                process.exit(-1);
+            }
             FS.writeFileSync(path, result.code);
             FS.writeFileSync(path + ".map", result.map);
+        }
+        
+        if (html.test(file.name)) {
+            // compress html
+            var path = Path.join(root, file.name);
+            if (path != Path.join(release_rel, "index.html")) {
+                // don't compress index.html because we want to keep
+                // the Savvy logo and pretty mark up in that
+                console.log("Optomising: " + path);
+                var source = FS.readFileSync(path);
+                var minimized = HTMLMinify(source.toString(), {
+                    removeComments: true,
+                    removeCommentsFromCDATA: true,
+                    collapseWhitespace: true,
+                    conservativeCollapse: true,
+                    minifyJS: true,
+                    minifyCSS: true
+                });
+                // FIXME: this doesn't catch any errors
+                FS.writeFileSync(path, minimized);
+            }
         }
         
         next();

@@ -5,6 +5,9 @@ module application {
     export var version:string = null;
     
     export var cards:HTMLElement[] = [];
+    export var header:HTMLElement = null;
+    export var footer:HTMLElement = null;
+    export var main:HTMLElement = null;
     export var defaultCard:HTMLElement = null;
     export var currentCard:HTMLElement = null;
     

@@ -1,0 +1,35 @@
+body {
+    background: black;
+	background-image: url("./images/dark_fish_skin/dark_fish_skin.png");
+    color: $light;
+}
+
+body > main > header {
+    height: $header;
+	background-image: url("./images/blackorchid/blackorchid.png");
+    box-shadow: 0 0 7px rgba(0, 0, 0, 0.66);
+    color: $light;
+}
+
+body > main > footer {
+    height: $footer;
+	background-image: url("./images/blackorchid/blackorchid.png");
+    box-shadow: 0 0 7px rgba(0, 0, 0, 0.66);
+    color: $light;
+}
+
+@mixin calc($property, $expression) {
+    #{$property}: -webkit-calc(#{$expression}); 
+    #{$property}: -moz-calc(#{$expression}); 
+    #{$property}: -ms-calc(#{$expression}); 
+    #{$property}: calc(#{$expression}); 
+} 
+
+body > main > section {
+    $sum: $header + $footer;
+    top: $header !important;
+    @include calc(height, "100% - " + $sum);
+	background-image: url("./images/debut_light/debut_light.png");
+    background-attachment: local;
+    color: $dark;
+}

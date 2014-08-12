@@ -48,21 +48,21 @@ module Savvy {
 
         initNode(app.deck, document.body);
         
-        var main = document.createElement("main");
-        document.body.appendChild(main);
+        application.main = document.createElement("main");
+        document.body.appendChild(application.main);
         
         if (app.deck.header) {
-            var header = document.createElement("header");
-            initNode(app.deck.header, header);
-            main.appendChild(header);
+            application.header = document.createElement("header");
+            initNode(app.deck.header, application.header);
+            application.main.appendChild(application.header);
         }
 
-        initCards(guaranteeArray(app.deck.card), main);
+        initCards(guaranteeArray(app.deck.card), application.main);
         
         if (app.deck.footer) {
-            var footer = document.createElement("footer");
-            initNode(app.deck.footer, footer);
-            main.appendChild(footer);
+            application.footer = document.createElement("footer");
+            initNode(app.deck.footer, application.footer);
+            application.main.appendChild(application.footer);
         }
         
         delete Savvy._eval; // no longer needed
@@ -157,6 +157,13 @@ module Savvy {
 	var regex = {
 		isRemoteUrl: new RegExp("(http|ftp|https)://[a-z0-9\-_]+(\.[a-z0-9\-_]+)+([a-z0-9\-\.,@\?^=%&;:/~\+#]*[a-z0-9\-@\?^=%&;/~\+#])?", "i"),
 		css: {
+            // used to find instances of url references in css files that need to be modified
+            // FIXME: gives a false positive for data URIs
+            url: {
+                singleQuotes: /url\('(?!https?:\/\/)(?!\/)/gi,
+                doubleQuotes: /url\("(?!https?:\/\/)(?!\/)/gi,
+                noQuotes: /url\((?!https?:\/\/)(?!['"]\/?)/gi
+            },
             card: /\bcard\b(,(?=[^}]*{)|\s*{)/gi,
             selector: /([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/gi
 		}
@@ -190,6 +197,13 @@ module Savvy {
             if (forId) {
                 content = content.replace(regex.css.selector, "body > main > section#"+forId+" $1$2");
                 content = content.replace(regex.css.card, "$1");
+            }
+            var i:number = url.toString().lastIndexOf("/");
+            if(i != -1) {
+                var dir:string = url.toString().substr(0, i + 1);
+                content = content.replace(regex.css.url.noQuotes, "url(" + dir)
+                          .replace(regex.css.url.doubleQuotes, "url(\"" + dir)
+                          .replace(regex.css.url.singleQuotes, "url('" + dir);
             }
             node.appendChild(document.createTextNode(content));
             document.querySelector("head").appendChild(node);
