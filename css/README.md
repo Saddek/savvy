@@ -1,1 +1,0 @@
-Put CSS, Less or Sass files in this directory.

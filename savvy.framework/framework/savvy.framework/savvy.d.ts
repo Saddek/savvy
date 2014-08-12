@@ -2,10 +2,12 @@ declare module Card {
     var READY: string;
     var ENTER: string;
     var EXIT: string;
-    var LOAD: string;
 }
 declare module JXON {
     function parse(parent: any): any;
+}
+declare module Application {
+    var LOAD: string;
 }
 declare module application {
     var id: string;
@@ -20,6 +22,10 @@ declare module application {
     function goto(path: string, transition?: Transition, preventHistory?: boolean): void;
     function getRoute(): string;
     function offCanvas(left?: string): void;
+    function getElementById(id: any): Element;
+    function querySelector(selector: any): Element;
+    function querySelectorAll(selector: any): NodeList;
+    function getElementsByName(name: any): NodeList;
 }
 declare module Savvy {
 }
@@ -43,6 +49,7 @@ declare module Transition {
     var COVER_RIGHT_FADE: Transition;
     var UNCOVER_LEFT_FADE: Transition;
     var UNCOVER_RIGHT_FADE: Transition;
+    var OFF_CANVASS_NONE: string;
     var OFF_CANVASS_LEFT: string;
     var OFF_CANVASS_RIGHT: string;
 }

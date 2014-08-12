@@ -3,5 +3,4 @@ module Card {
     export var READY:string = "savvy-ready";
     export var ENTER:string = "savvy-enter";
     export var EXIT:string = "savvy-exit";
-    export var LOAD:string = "savvy-load";
 }

@@ -113,6 +113,7 @@ module Transition {
     
     /* OFF-CAVAS DISTANCES */
     
+    export var OFF_CANVASS_NONE:string = "0px";
     export var OFF_CANVASS_LEFT:string = "260px";
     export var OFF_CANVASS_RIGHT:string = "-260px";
 

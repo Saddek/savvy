@@ -65,9 +65,33 @@ module Savvy {
             application.main.appendChild(application.footer);
         }
         
+        // programatically set the card height based on the header and footer
+        window.addEventListener("resize", setCardsCSS);
+        window.addEventListener(Application.LOAD, function init(){
+            // remove listener that is no longer needed
+            window.removeEventListener(Application.LOAD, init);
+            // FIXME: why doesn't the header and footer CSS apply immediately?
+            setTimeout(setCardsCSS, 1e3/12);
+        });
+        
         delete Savvy._eval; // no longer needed
     }
-
+    
+    function setCardsCSS():void {
+        var height = parseInt(window.getComputedStyle(document.body).height);
+        var top = 0;
+        if (application.header) {
+            top = parseInt(window.getComputedStyle(application.header).height);
+            height -= top;
+        }
+        if (application.footer) {
+            height -= parseInt(window.getComputedStyle(application.footer).height);
+        }
+        application.cards.forEach(function (card) {
+            card.style.top = top + "px";
+            card.style.height = height + "px";
+        });
+    }
 	
     /**
      * Preloads an array of images to the browser cache.
@@ -114,7 +138,7 @@ module Savvy {
             throw "No default card set.";
         }
 	}
-
+    
     function initNode(node:any, element:HTMLElement, id?:string):void {
         guaranteeArray(node.css).forEach((url:string):void => {
             appendCssToHeadFromUrl(url, id);

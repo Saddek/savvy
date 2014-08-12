@@ -6,6 +6,7 @@ body {
 
 body > main > header {
     height: $header;
+    background-color: black;
 	background-image: url("./images/blackorchid/blackorchid.png");
     box-shadow: 0 0 7px rgba(0, 0, 0, 0.66);
     color: $light;
@@ -13,6 +14,7 @@ body > main > header {
 
 body > main > footer {
     height: $footer;
+    background-color: black;
 	background-image: url("./images/blackorchid/blackorchid.png");
     box-shadow: 0 0 7px rgba(0, 0, 0, 0.66);
     color: $light;
@@ -27,8 +29,7 @@ body > main > footer {
 
 body > main > section {
     $sum: $header + $footer;
-    top: $header !important;
-    @include calc(height, "100% - " + $sum);
+    background-color: white;
 	background-image: url("./images/debut_light/debut_light.png");
     background-attachment: local;
     color: $dark;

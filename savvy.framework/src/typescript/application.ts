@@ -1,3 +1,7 @@
+module Application {
+    export var LOAD:string = "savvy-load";
+}
+
 module application {
     
     export var id:string = null;
@@ -28,16 +32,31 @@ module application {
     }
     
     export function offCanvas(left?:string):void {
-        var main:HTMLElement = <HTMLElement> document.body.querySelector("main");
         if (typeof left == "undefined") {
-            if (main.style.left == "" || main.style.left == "0px") left = Transition.OFF_CANVASS_LEFT;
-            else left = "0px";
+            left = (main.style.left == "" || main.style.left == Transition.OFF_CANVASS_NONE)
+                ? Transition.OFF_CANVASS_LEFT
+                : Transition.OFF_CANVASS_NONE;
         }
-        // shortcut to handle quick toggling
-        if (main.style.left == left) left = "0px";
         
         // apply the style
         main.style.left = left;
+    }
+    
+    /* psuedo methods to mimic the interaction of the standard HTML Document */
+    export function getElementById(id):Element {
+        return document.body.querySelector("#" + id);
+    }
+    
+    export function querySelector(selector):Element {
+        return document.body.querySelector(selector);
+    }
+    
+    export function querySelectorAll(selector):NodeList {
+        return document.body.querySelectorAll(selector);
+    }
+    
+    export function getElementsByName(name):NodeList {
+        return document.body.getElementsByTagName(name);
     }
 
 }

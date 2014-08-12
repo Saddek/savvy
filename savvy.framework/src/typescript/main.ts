@@ -44,6 +44,7 @@ module Savvy {
      * @param path A path to a new card. This must be a card ID or a string beginning with a card ID followed by a slash. Further characters may follow the slash.
      */
     function goto(path:string, transition:Transition = Transition.CUT, preventHistory:boolean = false):void {
+        // FIXME: need to add a queuing sytem so that transitions don't get muddled up if done in quick succession
         var id:string = getIdForPath(path);
         var to:HTMLElement = document.getElementById(id);
         var from:HTMLElement = application.currentCard;
@@ -67,7 +68,7 @@ module Savvy {
         var event:SavvyEvent = createSavvyEvent(detail, path, preventHistory);
         
         if (detail.from == null) {
-            event.initCustomEvent(Card.LOAD, true, true, detail);
+            event.initCustomEvent(Application.LOAD, true, true, detail);
             document.body.dispatchEvent(event);
         } else {
             event.initCustomEvent(Card.EXIT, true, true, detail);

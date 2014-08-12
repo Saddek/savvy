@@ -1,6 +1,6 @@
 body > main > section {
     * {
-        font-family: "Roboto", sans-serif;
+        font-family: "Roboto Regular", sans-serif;
         font-size: $fontsize;
         color: $dark;
     }
@@ -57,11 +57,16 @@ body > main > section {
 
 body > main > header,
 body > main > footer {
-    * {
+    h1, h2, h3, h4, h5, h6, p, a, span {
         font-family: "Roboto", sans-serif;
-        font-size: $fontsize;
+        font-size: round($header * 0.5);
+        line-height: $header;
         color: $light;
         font-weight: 500;
         text-transform: uppercase;
+        padding: 0;
+        margin: 0;
+        text-decoration: none;
+        text-align: center;
     }
 }

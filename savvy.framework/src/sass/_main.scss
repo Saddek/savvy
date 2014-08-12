@@ -99,6 +99,7 @@ body > main {
     overflow: hidden !important;
     
     box-shadow: 0 0 14px rgba(0, 0, 0, 0.66) !important;
+    
     -webkit-transition: left 250ms !important;
     -moz-transition: left 250ms !important;
     -ms-transition: left 250ms !important;
@@ -127,10 +128,10 @@ body > main > footer {
 
 body > main > section {
     position: absolute !important;
-    top: 0px !important;
+    top: 0px;
     left: 0px !important;
     width: 100% !important;
-    hieght: 100% !important;
+    hieght: 100%;
     display: none !important;
     z-index: 0 !important;
     overflow: auto !important;
