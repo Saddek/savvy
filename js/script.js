@@ -1,5 +1,5 @@
-// when the application loads, set up touch events
-this.addEventListener(Application.LOAD, function(e) {
+// when the application is ready, set up touch events
+this.addEventListener(Application.READY, function(e) {
     var hammertime = new Hammer(application.main, {});
     hammertime.on("swipeleft", function(ev) {
         application.offCanvas("0px");

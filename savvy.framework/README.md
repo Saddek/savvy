@@ -16,4 +16,6 @@ The Savvy framework is released under the [Apache 2.0](http://opensource.org/lic
 
 The [pirate image](http://thenounproject.com/noun/pirate/#icon-No13422) used by the project was designed by [Anne Caroline Bittencourt Gonçalves](http://thenounproject.com/anne1003) from The Noun Project.
 
-The [Dark Fish Skin](http://subtlepatterns.com/dark-fish-skin/) pattern is by [Petr Šulc](http://www.petrsulc.com/) and [Blach Orchid](http://subtlepatterns.com/blach-orchid/) is by [Hybridixstudio](http://www.hybridixstudio.com/). Both are from [Subtle Patterns](http://subtlepatterns.com/).
+The [Dark Fish Skin](http://subtlepatterns.com/dark-fish-skin/), [Debut Light](http://subtlepatterns.com/debut-light/) and [Noisy Net](http://subtlepatterns.com/noisy-net/) patterns were designed by [Petr Šulc](http://www.petrsulc.com/), [Luke McDonald](http://lukemcdonald.com/) and Tom McArdle respectively from [Subtle Patterns](http://subtlepatterns.com).
+
+The [Roboto](http://developer.android.com/design/style/typography.html) typeface is by [Christian Robertson](https://plus.google.com/110879635926653430880/about) and copyright [Google Inc.](http://www.google.com/)

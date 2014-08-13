@@ -1,5 +1,5 @@
 module Application {
-    export var LOAD:string = "savvy-load";
+    export var READY:string = "savvy-load";
 }
 
 module application {

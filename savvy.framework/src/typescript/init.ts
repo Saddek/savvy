@@ -35,7 +35,17 @@ module Savvy {
             
             parseAppXML(xmlData.app);
     
-            application.goto(application.getRoute(), Transition.CUT, true);
+            setTimeout(function(){
+                // FIXME: why doesn't the header and footer CSS apply immediately?
+                setCardsCSS(); // force the card css to fill the screen
+                // remove all the fouc prevention styles
+                var styles:NodeList = document.querySelectorAll("style[data-fouc='true']");
+                for (var i=0; i < styles.length; i++) {
+                    styles[i].parentNode.removeChild(styles[i]);
+                }
+                application.goto(application.getRoute(), Transition.CUT, true);
+            }, 250); // 250ms delay
+
         }, false);
     }
     
@@ -67,12 +77,6 @@ module Savvy {
         
         // programatically set the card height based on the header and footer
         window.addEventListener("resize", setCardsCSS);
-        window.addEventListener(Application.LOAD, function init(){
-            // remove listener that is no longer needed
-            window.removeEventListener(Application.LOAD, init);
-            // FIXME: why doesn't the header and footer CSS apply immediately?
-            setTimeout(setCardsCSS, 1e3/12);
-        });
         
         delete Savvy._eval; // no longer needed
     }

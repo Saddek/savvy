@@ -7,7 +7,7 @@ declare module JXON {
     function parse(parent: any): any;
 }
 declare module Application {
-    var LOAD: string;
+    var READY: string;
 }
 declare module application {
     var id: string;

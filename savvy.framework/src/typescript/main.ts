@@ -68,7 +68,7 @@ module Savvy {
         var event:SavvyEvent = createSavvyEvent(detail, path, preventHistory);
         
         if (detail.from == null) {
-            event.initCustomEvent(Application.LOAD, true, true, detail);
+            event.initCustomEvent(Application.READY, true, true, detail);
             document.body.dispatchEvent(event);
         } else {
             event.initCustomEvent(Card.EXIT, true, true, detail);
