@@ -14,6 +14,7 @@
                                                            ./"     
                                                           ~`       
 
-An MVP framework for HTML5 applications on mobile, tablet and smart TV.
+Made with ♡ and ☠ using Savvy: An MVP framework for HTML5 applications on
+mobile, tablet and smart TV.
 
 For documentation visit: https://github.com/nth-iteration/savvy/wiki
