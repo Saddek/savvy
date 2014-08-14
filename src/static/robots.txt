@@ -5,6 +5,7 @@ User-agent: *
 
 allow: /humans.txt
 allow: /index.html
+allow: /$
 
 disallow: /
 disallow: /savvy.framework/
