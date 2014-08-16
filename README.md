@@ -20,4 +20,4 @@ The [Dark Fish Skin](http://subtlepatterns.com/dark-fish-skin/), [Debut Light](h
 
 The [Roboto](http://developer.android.com/design/style/typography.html) typeface is by [Christian Robertson](https://plus.google.com/110879635926653430880/about) and copyright [Google Inc.](http://www.google.com/)
 
-These pirate image and patterns are licensed under the Createive Commons [CC-BY](http://creativecommons.org/licenses/by-sa/3.0/) license. The Roboto typeface is licensed under the [Apache 2.0](http://opensource.org/licenses/Apache-2.0) license.
+The pirate image and patterns are licensed under the Createive Commons [CC-BY](http://creativecommons.org/licenses/by-sa/3.0/) license. The Roboto typeface is licensed under the [Apache 2.0](http://opensource.org/licenses/Apache-2.0) license.
