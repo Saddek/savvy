@@ -250,6 +250,27 @@ var css = /\.css$/;
 var javascript = /\.js$/;
 var html = /\.html$/;
 
+var compressor_options = {
+    sequences: true,
+    properties: true,
+    dead_code: true,
+    drop_debugger: true,
+    conditionals: true,
+    comparisons: true,
+    evaluate: true,
+    booleans: true,
+    loops: true,
+    unused: true,
+    hoist_funs: false,
+    hoist_vars: false,
+    if_return: true,
+    join_vars: true,
+    cascade: true,
+    warnings: true,
+    negate_iife: true,
+    drop_console: true
+};
+
 function compress() {
     var walker = Walk.walk(out_rel, options);
     walker.on("file", function (root, file, next) {
@@ -272,7 +293,10 @@ function compress() {
             var map = Path.join(rel, file.name + ".map");
             var result;
             try {
-                result = UglifyJS.minify(path, { outSourceMap: map });
+                result = UglifyJS.minify(path, {
+                    outSourceMap: map,
+                    compress: compressor_options
+                });
             } catch (err) {
                 // FIXME: this always assumes the error is a JS parsing error
                 console.log("JavaScript error: " 
