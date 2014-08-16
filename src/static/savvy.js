@@ -36,18 +36,27 @@ x88:  `)8b. .@88 "8888"   8888  8888   8888  8888   888E  888I
 
 var t1 = new Date(); // start time
 
+var Path = require("path");
+var package = require(Path.resolve("package.json"));
+
 // console arguments
 var argv = require("yargs")
-           .usage("Usage: $0 --out [dir]")
-           .demand(1)
-           .demand(["out"])
-           .boolean("dev")
+           .example("$0 init [target]", "Create an new project")
+           .example("$0 [source] --out [target]", "Build an applicaiton")
+           .string("out")
+           .version(package.version, "version")
+           .boolean("clean")
+           .boolean("nocompress")
+           .describe("clean", "Emtpies the target directory before the operation.")
+           .describe("nocompress", "Disables HTML, CSS and JavaScript compression.")
+           .check(function (argv) {
+               if (typeof argv._[0] == "string" && typeof argv.out == "string") return true;
+               if (argv._[0] == "init" && typeof argv._[1] == "string") return true;
+               throw "";
+           })
            .argv;
 
-var Savvy = require("./src/build.js");
-
 var FS = require("fs");
-var Path = require("path");
 var NCP = require("ncp").ncp;
 var UglifyJS = require("uglify-js");
 var RMDIR = require("rimraf");
@@ -61,111 +70,80 @@ var HTMLMinify = require("html-minifier").minify;
 var MKDIRP = require("mkdirp");
 
 var banner = FS.readFileSync("banner.txt");
-var package = require("./package.json");
-
-console.log(banner.toString());
-console.log("Version: " + package.version);
-console.log("---");
-
-var frmwrk = Path.resolve("framework");
-var src = Path.resolve(argv._[0]);
-var out = Path.resolve(argv.out);
-var out_rel = Path.relative(__dirname, out);
-
-var git = /\.git$/;
 NCP.limit = 16;
 
+var git = /\.git$/;
 function filter(filename) {
     if (filename == __dirname) return false;
     if (git.test(filename)) return false;
     return true;
 }
 
-if (argv.dev) {
-    console.log("Cleaning framework directory...");
-    RMDIR(frmwrk, function(err){
-        if (err) return console.log(err);
-        console.log("Copying static framework files...");
-        NCP(Path.join("src", "static"), frmwrk, {filter: filter}, function (err) {
-            if (err) return console.error(err);
-            Savvy.build(Path.join(frmwrk, "savvy.framework"), function() {
-                theme();
-            });
-        });
-    });
+var src, out, out_rel;
+
+if (typeof argv.out == "string") {
+    console.log(banner.toString());
+    console.log("Version: " + package.version);
+    console.log("---");
+
+    src = Path.resolve(argv._[0]);
+    out = Path.resolve(argv.out);
+    // for some reason the walk library needs a relative path
+    out_rel = Path.relative(__dirname, out);
+
+    if (argv.clean) clean();
+    else source();
 } else {
-    theme();
-}
-
-function theme() {
-    if (argv.dev || argv.theme) {
-        console.log("Compiling themes...");
-        var themes = FS.readdirSync("./themes").filter(function (file) {
-            return FS.statSync(Path.resolve("./themes", file)).isDirectory() && file.substr(0, 1) != ".";
+    // init a directory
+    var dir = Path.resolve(argv._[1]);
+    if (argv.clean) {
+        RMDIR(dir, function(err){
+            if (err) return console.log(err);
+            init();
         });
-
-        var c = 0;
-        var themes_dir = Path.join(Path.join(frmwrk, "savvy.framework"), "themes");
-        themes.forEach(function(theme) {
-            var dir = Path.join(themes_dir, theme);;
-            MKDIRP(dir, function (err) {
-                if (err) return console.error(err)
-                var scss = Path.join(Path.resolve("themes", theme), "style.scss");
-                var css = Path.join(dir, "style.min.css");
-
-                Exec("sass " + scss + " " + css + " --style compressed", function (error, stdout, stderr) {
-                    if (error) Sys.puts(stderr);
-                    else {
-                        var sass = /\.scss$/;
-                        NCP(Path.resolve("themes", theme), dir, {filter: function(filename){
-                            if (sass.test(filename)) return false;
-                            return true;
-                        }}, function (err) {
-                            if (err) return console.error(err);
-                            c++;
-                            if (c == themes.length) clean();
-                        });
-
-                    }
-                });
+    }
+    else init();
+    
+    function init() {
+        MKDIRP(dir, function (err) {
+            if (err) return console.error(err);
+            NCP(Path.resolve("project"), dir, {filter: filter}, function (err) {
+                if (err) return console.error(err);
+                console.log("Created project at: " + dir);
             });
-
         });
-    } else {
-        clean();
     }
 }
 
 function clean() {
-    if (argv.clean) {
-        console.log("Cleaning output directory...");
-        RMDIR(out, function(err){
-            if (err) return console.log(err);
-            source();
-        });
-    } else {
+    console.log("Cleaning output directory...");
+    RMDIR(out, function(err){
+        if (err) return console.log(err);
         source();
-    }
+    });
 }
 
 function source() {
     console.log("Copying source files...");
-    NCP(src, out, {filter: filter}, function (err) {
+    MKDIRP(out, function (err) {
         if (err) return console.error(err);
-        framework();
+        NCP(src, out, {filter: filter}, function (err) {
+            if (err) return console.error(err);
+            framework();
+        });
     });
 }
 
 function framework() {
     console.log("Copying framework files...");
-    NCP("./framework", out, {filter: filter}, function (err) {
+    NCP(Path.resolve("framework"), out, {filter: filter}, function (err) {
         if (err) return console.error(err);
         xml();
     });
 }
 
 function xml() {
-    var app = Path.join(Path.join(out, "/data"), "app.xml");
+    var app = Path.join(out, "app.xml");
     
     FS.readFile(app, function(err, data) {
         if (err) return console.error(err);
@@ -187,7 +165,7 @@ function xml() {
             if (email) author_long += " <" + email.trim() + ">";
             if (href) author_long += " (" + href.trim() + ")";
             
-            var html = Path.join(out, "/index.html");
+            var html = Path.join(out, "index.html");
             var source = FS.readFileSync(html);
             var template = Handlebars.compile(source.toString());
             FS.writeFileSync(html, template({
@@ -196,7 +174,7 @@ function xml() {
                 author: escape2(author_long.trim())
             }));
 
-            var config = Path.join(out, "/config.xml");
+            var config = Path.join(out, "config.xml");
             if (result.app.$.cordova.toString().toUpperCase() == "YES") {
                 var id = (result.app.$.id) ? result.app.$.id : "";
                 var version = (result.app.$.version) ? result.app.$.version : "";
@@ -249,8 +227,8 @@ function compile() {
         if (typescript.test(file.name)) cmd = "tsc --declaration --target ES5 " + path;
         if (coffeescript.test(file.name)) cmd = "coffee --compile " + path;
         if (dart.test(file.name)) cmd = "dart2js " + path + " --out=" + path.substr(0, path.length - 5) + ".js";
-        if (sass.test(file.name)) cmd = "sass --style compressed " + path;
-        if (less.test(file.name)) cmd = "lessc -x " + path;
+        if (sass.test(file.name)) cmd = "sass " + path;
+        if (less.test(file.name)) cmd = "lessc " + path;
         if (handlebars.test(file.name)) cmd = "handlebars " + path;
 
         if (cmd) {
@@ -263,7 +241,8 @@ function compile() {
     });
 
     walker.on("end", function () {
-        compress();
+        if (argv.nocompress) remove();
+        else compress();
     });
 }
 
@@ -278,7 +257,7 @@ function compress() {
         if (css.test(file.name)) {
             // compress CSS
             var path = Path.join(root, file.name);
-            console.log("Optomising: " + path);
+            console.log("Optomising: " + Path.relative(out, path));
             var source = FS.readFileSync(path);
             var minimized = new CleanCSS().minify(source);
             // FIXME: this doesn't catch any errors
@@ -288,7 +267,7 @@ function compress() {
         if (javascript.test(file.name)) {
             // compress js
             var path = Path.join(root, file.name);
-            console.log("Optomising: " + path);
+            console.log("Optomising: " + Path.relative(out, path));
             var rel = Path.relative(out, root);
             var map = Path.join(rel, file.name + ".map");
             var result;
@@ -313,7 +292,7 @@ function compress() {
             if (path != Path.join(out_rel, "index.html")) {
                 // don't compress index.html because we want to keep
                 // the Savvy logo and pretty mark up in that
-                console.log("Optomising: " + path);
+                console.log("Optomising: " + Path.relative(out, path));
                 var source = FS.readFileSync(path);
                 var minimized = HTMLMinify(source.toString(), {
                     removeComments: true,
@@ -343,7 +322,8 @@ function remove() {
             || (coffeescript.test(file.name))
             || (dart.test(file.name))
             || (sass.test(file.name))
-            || (less.test(file.name));
+            || (less.test(file.name))
+            || (handlebars.test(file.name));
         
         if (isSourceFile) {
             var path = Path.join(root, file.name);
@@ -364,6 +344,6 @@ function end() {
     var sec = ((t2.getTime() - t1.getTime()) / 1e3).toFixed(2);
     console.log("---");
     console.log("Compilation complete in " + sec + " seconds.");
-    console.log("A out was created in:");
+    console.log("A release was created in:");
     console.log(out);
 }

@@ -1,1 +1,0 @@
-Place HTML snippets in this directory.

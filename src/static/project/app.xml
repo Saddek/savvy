@@ -11,12 +11,9 @@
 
     <deck cache="yes">
 
-        <css>assets/fonts/font-awesome-4.1.0/css/font-awesome.min.css</css>
-        <css>css/common.css</css>
-        <js>js/vendor/hammer-2.0.2.min.js</js>
-        <js>js/script.js</js>
-
         <css>savvy.framework/themes/black_pearl/style.min.css</css>
+        <css>assets/fonts/font-awesome-4.1.0/css/font-awesome.min.css</css>
+        <js>js/vendor/hammer-2.0.2.min.js</js>
 
         <header>
             <html>html/header.html</html>
@@ -24,18 +21,10 @@
         </header>
 
         <card id="Home" title="Welcome to Savvy" default="yes">
-            <!-- A <card> MAY contain any number of <html>, <json>, <js> and <css> elements. -->
             <html>html/home.html</html>
-        </card>
-
-        <card id="License" title="Licensing Info">
-            <html>html/license.html</html>
+            <js>js/home.js</js>
         </card>
         
-        <footer>
-            <html>html/footer.html</html>
-        </footer>
-
     </deck>
 
 </app>

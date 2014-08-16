@@ -1,1 +1,0 @@
-Put JavaScript, CoffeeScript, TypeScript, or Dart files in this directory.

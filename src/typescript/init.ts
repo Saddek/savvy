@@ -1,6 +1,6 @@
 module Savvy {
 
-    var xmlData:any = JXON.parse(read("data/app.xml", true));
+    var xmlData:any = JXON.parse(read("app.xml", true));
     if (xmlData.app === undefined) {
         throw "Could not parse app.xml. \"app\" node missing.";
     } else {

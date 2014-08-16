@@ -1,3 +1,2 @@
-/release/*
+/dist/*
 /node_modules/*
-/framework/*
