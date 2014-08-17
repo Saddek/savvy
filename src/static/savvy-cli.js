@@ -41,10 +41,12 @@ var package = require(Path.resolve("package.json"));
 
 // console arguments
 var argv = require("yargs")
-           .example("$0 init [target]", "Create an new project")
+           .usage("Builds a Savvy project or creates an empty Savvy project.")
+           .example("$0 init [target]", "Create an empty project")
            .example("$0 [source] --out [target]", "Build an applicaiton")
            .string("out")
            .version(package.version, "version")
+           .help("help")
            .boolean("clean")
            .boolean("nocompress")
            .describe("clean", "Emtpies the target directory before the operation.")

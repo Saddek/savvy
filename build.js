@@ -77,7 +77,10 @@ function static() {
 
 function pack() {
     var file = path.join(location.dist, "package.json");
-    package.dependencies = require(file).dependencies;
+    var _package = require(file);
+    package.dependencies = _package.dependencies;
+    package.main = _package.main;
+    package.preferGlobal = _package.preferGlobal;
     
     var json = JSON.stringify(package, null, 4);
     fs.writeFile(file, json, function (err) {
