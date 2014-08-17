@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<widget xmlns       = "http://www.w3.org/ns/widgets"
+        xmlns:gap   = "http://phonegap.com/ns/1.0"
+        xmlns:savvy = "https://github.com/nth-iteration/savvy"
+        id="com.example.savvy" version="1.0.0" cordova="no">
+    
+    <name>Savvy Example</name>
+    <description>
+        An example Savvy application.
+    </description>
+    <author email="j.smith@example.com" href="http://www.example.com">
+        John Smith
+    </author>
+    
+    <savvy:deck>
+
+        <css>savvy.framework/themes/black_pearl/style.min.css</css>
+        <css>assets/fonts/font-awesome-4.1.0/css/font-awesome.min.css</css>
+        <js>js/vendor/hammer-2.0.2.min.js</js>
+
+        <header>
+            <html>html/header.html</html>
+            <css>css/header.css</css>
+        </header>
+
+        <card id="Home" title="Welcome to Savvy" default="yes">
+            <html>html/home.html</html>
+            <js>js/home.js</js>
+        </card>
+        
+    </savvy:deck>
+    
+    <access origin="*" />
+    <preference name="HideKeyboardFormAccessoryBar" value="true"/>
+    <preference name="BackgroundColor" value="0xff000000"/>
+
+    <license href="http://www.apache.org/licenses/LICENSE-2.0">
+        Savvy framework copyright 2014 Oliver Moran
+
+        Licensed under the Apache License, Version 2.0 (the "License");
+        you may not use this file except in compliance with the License.
+        You may obtain a copy of the License at
+
+           http://www.apache.org/licenses/LICENSE-2.0
+
+        Unless required by applicable law or agreed to in writing, software
+        distributed under the License is distributed on an "AS IS" BASIS,
+        WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        See the License for the specific language governing permissions and
+        limitations under the License.
+
+        Attribution:
+
+        The pirate image was designed by Anne Caroline Bittencourt Gonçalves
+        from The Noun Project.
+
+        The Dark Fish Skin, Debut Light and Noisy Net patterns were designed
+        by Petr Šulc, Luke McDonald and Tom McArdle respectively from Subtle
+        Patterns.
+
+        These images are licensed under the Creative Commons
+        Attribution-ShareAlike 3.0 license. You may read a summary of that
+        license at:
+
+           http://creativecommons.org/licenses/by-sa/3.0/
+
+        The Roboto typeface is by Christian Robertson and copyright Google Inc.
+        It is released under the Apache License, Version 2.0.
+    </license>
+    
+</widget>

@@ -43,7 +43,7 @@ module JXON {
 				oNode = oXMLParent.childNodes.item(nItem);
 				if (oNode.nodeType === 4) { sCollectedTxt += oNode.nodeValue; } /* nodeType is "CDATASection" (4) */
 				else if (oNode.nodeType === 3) { sCollectedTxt += oNode.nodeValue.trim(); } /* nodeType is "Text" (3) */
-				else if (oNode.nodeType === 1 && !oNode.prefix) { /* nodeType is "Element" (1) */
+				else if (oNode.nodeType === 1) { // && !oNode.prefix) { /* nodeType is "Element" (1) */
 					if (nLength === 0) { vResult = new Object(); }
 					sProp = oNode.nodeName.toLowerCase();
 					vContent = getJXONTree(oNode);

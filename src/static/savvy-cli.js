@@ -310,21 +310,21 @@ function remove() {
 function xml() {
     console.log("Preparing configuration and manifest files...");
     
-    var app = Path.join(out, "app.xml");
-    FS.readFile(app, function(err, data) {
+    var config = Path.join(out, "config.xml");
+    FS.readFile(config, function(err, data) {
         if (err) return console.error(err);
         var parser = new XML2JS.Parser();
         parser.parseString(data, function (err, result) {
-            var name = (result.app.name) ? result.app.name.toString() : "Loading...";
-            var description = (result.app.description) ? result.app.description.toString() : "";
+            var name = (result.widget.name) ? result.widget.name.toString() : "Loading...";
+            var description = (result.widget.description) ? result.widget.description.toString() : "";
             
             var author = "";
             var email = "";
             var href = "";
-            if (result.app.author[0]) {
-                author = result.app.author[0]._.toString();
-                email = (result.app.author[0].$.email) ? result.app.author[0].$.email.toString() : "";
-                href = (result.app.author[0]) ? result.app.author[0].$.href.toString() : "";
+            if (result.widget.author[0]) {
+                author = result.widget.author[0]._.toString();
+                email = (result.widget.author[0].$.email) ? result.widget.author[0].$.email.toString() : "";
+                href = (result.widget.author[0]) ? result.widget.author[0].$.href.toString() : "";
             }
             
             var author_long = author.trim();
@@ -341,38 +341,11 @@ function xml() {
                 manifest: (argv.nocache) ? "" : "manifest.appcache"
             }));
 
-            var config = Path.join(out, "config.xml");
-            if (result.app.$.cordova.toString().toUpperCase() == "YES") {
-                var id = (result.app.$.id) ? result.app.$.id : "";
-                var version = (result.app.$.version) ? result.app.$.version : "";
-                var orientation = (result.app.$.orientation) ? result.app.$.orientation : "default";
-                var accessorybar = (result.app.$.accessorybar) ? result.app.$.accessorybar : "false";
-                var fullscreen = (result.app.$.fullscreen) ? result.app.$.fullscreen : "false";
-
-                var source = FS.readFileSync(config);
-                var template = Handlebars.compile(source.toString());
-                FS.writeFileSync(config, template({
-                    id: id,
-                    version: version,
-                    name: name,
-                    description: description,
-                    author: author,
-                    email: email,
-                    href: href,
-                    orientation: orientation,
-                    accessorybar: accessorybar,
-                    fullscreen: fullscreen
-                }));
-            } else {
-                // remove config file if we are not using cordova
-                FS.unlinkSync(config);
-            }
-            
             var cache = Path.join(out, "manifest.appcache");
             var cache_rel = Path.relative(__dirname, cache);
             if (argv.nocache) {
                 // don't cache
-                // remove config file if we are not using cordova
+                // remove app cache is the author doesn't want this
                 FS.unlinkSync(cache);
                 end();
             } else {
@@ -416,7 +389,7 @@ function xml() {
                     var files = fileList2.join("\n");
                     files += "\n# Count: " + fileList2.length + "\n";
                     files += "# Size: " + bytesToSize(bytes);
-                    var version = (result.app.$.version) ? result.app.$.version : "";
+                    var version = (result.widget.$.version) ? result.widget.$.version : "";
                     FS.writeFileSync(cache, template({
                         timestamp: (new Date()).toISOString(),
                         version: version,

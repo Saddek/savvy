@@ -1,12 +1,12 @@
 module Savvy {
 
-    var xmlData:any = JXON.parse(read("app.xml", true));
-    if (xmlData.app === undefined) {
-        throw "Could not parse app.xml. \"app\" node missing.";
+    var config:any = JXON.parse(read("config.xml", true));
+    if (config.widget === undefined) {
+        throw "Could not parse config.xml. \"widget\" node missing.";
     } else {
-        application.id = (xmlData.app["@id"]) ? xmlData.app["@id"] : "application";
-        application.version = (xmlData.app["@version"]) ? xmlData.app["@version"] : "";
-        application.isCordova = (xmlData.app["@cordova"] == "yes");
+        application.id = (config.widget["@id"]) ? config.widget["@id"] : null;
+        application.version = (config.widget["@version"]) ? config.widget["@version"] : null;
+        application.isCordova = (config.widget["@cordova"] == "yes");
         
         // first assume window.load
         var event:string = "load";
@@ -33,7 +33,7 @@ module Savvy {
         element.addEventListener(event, function deviceReadyEvent():void {
             element.removeEventListener(event, deviceReadyEvent);
             
-            parseAppXML(xmlData.app);
+            parseWidgetXML(config.widget["savvy:deck"]);
     
             setTimeout(function(){
                 // FIXME: why doesn't the header and footer CSS apply immediately?
@@ -50,28 +50,28 @@ module Savvy {
     }
     
     /**
-     * Parses the app XML creating the card model and executing global HTML, CSS, JS, etc.
-     * @param app
+     * Parses the a deck from config.xml, creating the card model and executing global HTML, CSS, JS, etc.
+     * @param deck
      */
-    function parseAppXML(app:any):void {
-    	preloadImages(guaranteeArray(app.img));
+    function parseWidgetXML(deck:any):void {
+    	preloadImages(guaranteeArray(deck.img));
 
-        initNode(app.deck, document.body);
+        initNode(deck, document.body);
         
         application.main = document.createElement("main");
         document.body.appendChild(application.main);
         
-        if (app.deck.header) {
+        if (deck.header) {
             application.header = document.createElement("header");
-            initNode(app.deck.header, application.header);
+            initNode(deck.header, application.header);
             application.main.appendChild(application.header);
         }
 
-        initCards(guaranteeArray(app.deck.card), application.main);
+        initCards(guaranteeArray(deck.card), application.main);
         
-        if (app.deck.footer) {
+        if (deck.footer) {
             application.footer = document.createElement("footer");
-            initNode(app.deck.footer, application.footer);
+            initNode(deck.footer, application.footer);
             application.main.appendChild(application.footer);
         }
         
@@ -128,7 +128,7 @@ module Savvy {
                 if (application.defaultCard === null) {
                     application.defaultCard = section;
                 } else {
-                    console.warn("More than one card is set as the default in app.xml. Ignoring.");
+                    console.warn("More than one card is set as the default in config.xml. Ignoring.");
                 }
             }
             
