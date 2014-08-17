@@ -77,12 +77,14 @@ NCP.limit = 16;
 
 var git = /\.git$/i;
 var dot = /^\..*$/i; // any dot file
+var pgbomit = /^\.pgbomit$/
 function filter(path) {
     if (path == __dirname) return false;
     if (git.test(path)) return false;
     
     var file = Path.basename(path);
-    if (dot.test(file)) return false;
+    if (dot.test(file) && !pgbomit.test(file)) return false;
+    
     return true;
 }
 
@@ -289,8 +291,7 @@ function remove() {
             || (dart.test(file.name))
             || (sass.test(file.name))
             || (less.test(file.name))
-            || (handlebars.test(file.name))
-            || (dot.test(file.name)); // remove dot files also
+            || (handlebars.test(file.name));
         
         if (isSourceFile) {
             var path = Path.join(root, file.name);
@@ -377,23 +378,43 @@ function xml() {
             } else {
                 var source = FS.readFileSync(cache);
                 var template = Handlebars.compile(source.toString());
-                var files = "";
-                var bytes = 0;
-                var c = 0;
+                var fileList = [];
+                var excludeList = [];
                 var walker = Walk.walk(out_rel);
+                
                 walker.on("file", function (root, file, next) {
                     var path = Path.join(root, file.name);
                     var path_rel = Path.relative(out, path);
                     if (path_rel != "manifest.appcache") {
                         // NB: don't cache the cache
-                        files += path_rel + "\n";
-                        c++;
-                        bytes += FS.statSync(path)["size"]
+                        fileList.push(path_rel);
+                    }
+                    if (pgbomit.test(file.name)) {
+                        // NB: don't cache files that will be removed
+                        var dir = Path.relative(out, root);
+                        excludeList.push(dir);
                     }
                     next();
                 });
                 walker.on("end", function () {
-                    files += "# Count: " + c + "\n";
+                    var bytes = 0;
+                    var fileList2 = [];
+                    fileList.forEach(function (file) {
+                        var exclude = false;
+                        for (var i=0; i<excludeList.length; i++) {
+                            if (file.indexOf(excludeList[i]) == 0) {
+                                exclude = true;
+                            }
+                        }
+                        if (!exclude) {
+                            var path = Path.join(out, file);
+                            bytes += FS.statSync(path)["size"];
+                            fileList2.push(file);
+                        }
+                    });
+                    
+                    var files = fileList2.join("\n");
+                    files += "\n# Count: " + fileList2.length + "\n";
                     files += "# Size: " + bytesToSize(bytes);
                     var version = (result.app.$.version) ? result.app.$.version : "";
                     FS.writeFileSync(cache, template({
