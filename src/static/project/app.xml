@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<app id="com.example.savvy" version="1.0.0" cordova="no">
+<app id="com.example.savvy" version="1.0.0" cordova="no"
+     orientation="default"
+     accessorybar="false"
+     fullscreen="false">
     
     <name>Savvy Example</name>
     <description>

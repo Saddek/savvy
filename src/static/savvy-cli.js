@@ -344,7 +344,10 @@ function xml() {
             if (result.app.$.cordova.toString().toUpperCase() == "YES") {
                 var id = (result.app.$.id) ? result.app.$.id : "";
                 var version = (result.app.$.version) ? result.app.$.version : "";
-                
+                var orientation = (result.app.$.orientation) ? result.app.$.orientation : "default";
+                var accessorybar = (result.app.$.accessorybar) ? result.app.$.accessorybar : "false";
+                var fullscreen = (result.app.$.fullscreen) ? result.app.$.fullscreen : "false";
+
                 var source = FS.readFileSync(config);
                 var template = Handlebars.compile(source.toString());
                 FS.writeFileSync(config, template({
@@ -354,7 +357,10 @@ function xml() {
                     description: description,
                     author: author,
                     email: email,
-                    href: href
+                    href: href,
+                    orientation: orientation,
+                    accessorybar: accessorybar,
+                    fullscreen: fullscreen
                 }));
             } else {
                 // remove config file if we are not using cordova
