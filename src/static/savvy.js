@@ -49,6 +49,7 @@ var argv = require("yargs")
            .boolean("nocompress")
            .describe("clean", "Emtpies the target directory before the operation.")
            .describe("nocompress", "Disables HTML, CSS and JavaScript compression.")
+           .describe("nocache", "Disables offline caching.")
            .check(function (argv) {
                if (typeof argv._[0] == "string" && typeof argv.out == "string") return true;
                if (argv._[0] == "init" && typeof argv._[1] == "string") return true;
@@ -72,10 +73,14 @@ var MKDIRP = require("mkdirp");
 var banner = FS.readFileSync("banner.txt");
 NCP.limit = 16;
 
-var git = /\.git$/;
-function filter(filename) {
-    if (filename == __dirname) return false;
-    if (git.test(filename)) return false;
+var git = /\.git$/i;
+var dot = /^\..*$/i; // any dot file
+function filter(path) {
+    if (path == __dirname) return false;
+    if (git.test(path)) return false;
+    
+    var file = Path.basename(path);
+    if (dot.test(file)) return false;
     return true;
 }
 
@@ -138,73 +143,8 @@ function framework() {
     console.log("Copying framework files...");
     NCP(Path.resolve("framework"), out, {filter: filter}, function (err) {
         if (err) return console.error(err);
-        xml();
+        compile();
     });
-}
-
-function xml() {
-    var app = Path.join(out, "app.xml");
-    
-    FS.readFile(app, function(err, data) {
-        if (err) return console.error(err);
-        var parser = new XML2JS.Parser();
-        parser.parseString(data, function (err, result) {
-            var name = (result.app.name) ? result.app.name.toString() : "Loading...";
-            var description = (result.app.description) ? result.app.description.toString() : "";
-            
-            var author = "";
-            var email = "";
-            var href = "";
-            if (result.app.author[0]) {
-                author = result.app.author[0]._.toString();
-                email = (result.app.author[0].$.email) ? result.app.author[0].$.email.toString() : "";
-                href = (result.app.author[0]) ? result.app.author[0].$.href.toString() : "";
-            }
-            
-            var author_long = author.trim();
-            if (email) author_long += " <" + email.trim() + ">";
-            if (href) author_long += " (" + href.trim() + ")";
-            
-            var html = Path.join(out, "index.html");
-            var source = FS.readFileSync(html);
-            var template = Handlebars.compile(source.toString());
-            FS.writeFileSync(html, template({
-                title: escape2(name.trim()),
-                description: escape2(description.trim()),
-                author: escape2(author_long.trim())
-            }));
-
-            var config = Path.join(out, "config.xml");
-            if (result.app.$.cordova.toString().toUpperCase() == "YES") {
-                var id = (result.app.$.id) ? result.app.$.id : "";
-                var version = (result.app.$.version) ? result.app.$.version : "";
-                
-                var source = FS.readFileSync(config);
-                var template = Handlebars.compile(source.toString());
-                FS.writeFileSync(config, template({
-                    id: id,
-                    version: version,
-                    name: name,
-                    description: description,
-                    author: author,
-                    email: email,
-                    href: href
-                }));
-            } else {
-                // remove config file if we are not using cordova
-                FS.unlinkSync(config);
-            }
-
-            compile();
-        });
-    });
-}
-
-function escape2(str){
-    str = str.replace("\n", " ");
-    str = str.replace("\r", " ");
-    str = str.replace("\"", "''");
-    return str;
 }
 
 var options = {
@@ -212,12 +152,12 @@ var options = {
     filters: ["savvy.framework"]
 };
 
-var typescript = /\.ts$/;
-var coffeescript = /\.coffee$/;
-var dart = /\.dart$/;
-var sass = /\.scss$/;
-var less = /\.less$/;
-var handlebars = /\.handlebars$/;
+var typescript = /\.ts$/i;
+var coffeescript = /\.coffee$/i;
+var dart = /\.dart$/i;
+var sass = /\.scss$/i;
+var less = /\.less$/i;
+var handlebars = /\.handlebars$/i;
 
 function compile() {
     var walker = Walk.walk(out_rel, options);
@@ -246,9 +186,9 @@ function compile() {
     });
 }
 
-var css = /\.css$/;
-var javascript = /\.js$/;
-var html = /\.html$/;
+var css = /\.css$/i;
+var javascript = /\.js$/i;
+var html = /\.html$/i;
 
 var compressor_options = {
     sequences: true,
@@ -340,14 +280,15 @@ function compress() {
 }
 
 function remove() {
-    var walker = Walk.walk(out_rel, options);
+    var walker = Walk.walk(out_rel);
     walker.on("file", function (root, file, next) {
         var isSourceFile = (typescript.test(file.name)) 
             || (coffeescript.test(file.name))
             || (dart.test(file.name))
             || (sass.test(file.name))
             || (less.test(file.name))
-            || (handlebars.test(file.name));
+            || (handlebars.test(file.name))
+            || (dot.test(file.name)); // remove dot files also
         
         if (isSourceFile) {
             var path = Path.join(root, file.name);
@@ -359,8 +300,121 @@ function remove() {
     });
 
     walker.on("end", function () {
-        end();
+        xml();
     });
+}
+
+function xml() {
+    console.log("Preparing configuration and manifest files...");
+    
+    var app = Path.join(out, "app.xml");
+    FS.readFile(app, function(err, data) {
+        if (err) return console.error(err);
+        var parser = new XML2JS.Parser();
+        parser.parseString(data, function (err, result) {
+            var name = (result.app.name) ? result.app.name.toString() : "Loading...";
+            var description = (result.app.description) ? result.app.description.toString() : "";
+            
+            var author = "";
+            var email = "";
+            var href = "";
+            if (result.app.author[0]) {
+                author = result.app.author[0]._.toString();
+                email = (result.app.author[0].$.email) ? result.app.author[0].$.email.toString() : "";
+                href = (result.app.author[0]) ? result.app.author[0].$.href.toString() : "";
+            }
+            
+            var author_long = author.trim();
+            if (email) author_long += " <" + email.trim() + ">";
+            if (href) author_long += " (" + href.trim() + ")";
+            
+            var html = Path.join(out, "index.html");
+            var source = FS.readFileSync(html);
+            var template = Handlebars.compile(source.toString());
+            FS.writeFileSync(html, template({
+                title: escape2(name.trim()),
+                description: escape2(description.trim()),
+                author: escape2(author_long.trim()),
+                manifest: (argv.nocache) ? "" : "manifest.appcache"
+            }));
+
+            var config = Path.join(out, "config.xml");
+            if (result.app.$.cordova.toString().toUpperCase() == "YES") {
+                var id = (result.app.$.id) ? result.app.$.id : "";
+                var version = (result.app.$.version) ? result.app.$.version : "";
+                
+                var source = FS.readFileSync(config);
+                var template = Handlebars.compile(source.toString());
+                FS.writeFileSync(config, template({
+                    id: id,
+                    version: version,
+                    name: name,
+                    description: description,
+                    author: author,
+                    email: email,
+                    href: href
+                }));
+            } else {
+                // remove config file if we are not using cordova
+                FS.unlinkSync(config);
+            }
+            
+            var cache = Path.join(out, "manifest.appcache");
+            var cache_rel = Path.relative(__dirname, cache);
+            if (argv.nocache) {
+                // don't cache
+                // remove config file if we are not using cordova
+                FS.unlinkSync(cache);
+                end();
+            } else {
+                var source = FS.readFileSync(cache);
+                var template = Handlebars.compile(source.toString());
+                var files = "";
+                var bytes = 0;
+                var c = 0;
+                var walker = Walk.walk(out_rel);
+                walker.on("file", function (root, file, next) {
+                    var path = Path.join(root, file.name);
+                    var path_rel = Path.relative(out, path);
+                    if (path_rel != "manifest.appcache") {
+                        // NB: don't cache the cache
+                        files += path_rel + "\n";
+                        c++;
+                        bytes += FS.statSync(path)["size"]
+                    }
+                    next();
+                });
+                walker.on("end", function () {
+                    files += "# Count: " + c + "\n";
+                    files += "# Size: " + bytesToSize(bytes);
+                    var version = (result.app.$.version) ? result.app.$.version : "";
+                    FS.writeFileSync(cache, template({
+                        timestamp: (new Date()).toISOString(),
+                        version: version,
+                        files: files
+                    }));
+
+                    end();
+                });
+            }
+        });
+    });
+}
+
+// http://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript
+function bytesToSize(bytes) {
+    if(bytes == 0) return '0 Byte';
+    var k = 1000;
+    var sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    var i = Math.floor(Math.log(bytes) / Math.log(k));
+    return (bytes / Math.pow(k, i)).toPrecision(3) + ' ' + sizes[i];
+}
+
+function escape2(str){
+    str = str.replace("\n", " ");
+    str = str.replace("\r", " ");
+    str = str.replace("\"", "''");
+    return str;
 }
 
 function end() {

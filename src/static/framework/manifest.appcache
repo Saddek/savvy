@@ -1,0 +1,10 @@
+CACHE MANIFEST
+# Version: {{version}}
+# Date: {{timestamp}}
+# NB: This file MUST be served as the MIME type "text/cache-manifest"
+
+CACHE:
+{{files}}
+
+NETWORK:
+*
