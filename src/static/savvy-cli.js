@@ -43,23 +43,30 @@ var package = require(Path.resolve("package.json"));
 var argv = require("yargs")
            .usage("Builds a Savvy project or creates an empty Savvy project.")
            .example("$0 init [target]", "Create an empty project")
-           .example("$0 [source] --out [target]", "Build an applicaiton")
-           .string("out")
+           .example("$0 [source] --out [target]", "Build an application")
+           .example("$0 [source] --zip [target]", "Build an zipped application")
            .version(package.version, "version")
            .help("help")
+           .string("out")
+           .string("zip")
            .boolean("clean")
            .boolean("nocompress")
-           .describe("clean", "Emtpies the target directory before the operation.")
+           .boolean("nocache")
+           .describe("out", "A directory to build the application in.")
+           .describe("zip", "A zip file to built the application in.")
+           .describe("clean", "Empties the target directory before the operation.")
            .describe("nocompress", "Disables HTML, CSS and JavaScript compression.")
            .describe("nocache", "Disables offline caching.")
            .check(function (argv) {
                if (typeof argv._[0] == "string" && typeof argv.out == "string") return true;
+               if (typeof argv._[0] == "string" && typeof argv.zip == "string") return true;
                if (argv._[0] == "init" && typeof argv._[1] == "string") return true;
                throw "";
            })
            .argv;
 
 var FS = require("fs");
+var OS = require('os')
 var NCP = require("ncp").ncp;
 var UglifyJS = require("uglify-js");
 var RMDIR = require("rimraf");
@@ -71,6 +78,8 @@ var Handlebars = require("Handlebars");
 var XML2JS = require("xml2js");
 var HTMLMinify = require("html-minifier").minify;
 var MKDIRP = require("mkdirp");
+var Archiver = require("archiver");
+var UUID = require('node-uuid');
 
 var banner = FS.readFileSync("banner.txt");
 NCP.limit = 16;
@@ -90,19 +99,7 @@ function filter(path) {
 
 var src, out, out_rel;
 
-if (typeof argv.out == "string") {
-    console.log(banner.toString());
-    console.log("Version: " + package.version);
-    console.log("---");
-
-    src = Path.resolve(argv._[0]);
-    out = Path.resolve(argv.out);
-    // for some reason the walk library needs a relative path
-    out_rel = Path.relative(__dirname, out);
-
-    if (argv.clean) clean();
-    else source();
-} else {
+if (argv._[0] == "init")  {
     // init a directory
     var dir = Path.resolve(argv._[1]);
     if (argv.clean) {
@@ -122,6 +119,18 @@ if (typeof argv.out == "string") {
             });
         });
     }
+} else {
+    console.log(banner.toString());
+    console.log("Version: " + package.version);
+    console.log("---");
+
+    src = Path.resolve(argv._[0]);
+    out = (argv.out) ? Path.resolve(argv.out) : Path.join(OS.tmpdir(), UUID.v4());
+    // for some reason the walk library needs a relative path
+    out_rel = Path.relative(__dirname, out);
+
+    if (argv.clean) clean();
+    else source();
 }
 
 function clean() {
@@ -210,7 +219,7 @@ var compressor_options = {
     if_return: true,
     join_vars: true,
     cascade: true,
-    warnings: true,
+    warnings: false, /* true, */
     negate_iife: true,
     drop_console: true
 };
@@ -239,10 +248,12 @@ function compress() {
             try {
                 result = UglifyJS.minify(path, {
                     outSourceMap: map,
+                    warnings: true,
                     compress: compressor_options
                 });
             } catch (err) {
                 // FIXME: this always assumes the error is a JS parsing error
+                //        and line and column come out as undefined
                 console.log("JavaScript error: " 
                             + err.message + " ("
                             + path + ":"
@@ -295,7 +306,7 @@ function remove() {
         
         if (isSourceFile) {
             var path = Path.join(root, file.name);
-            console.log("Removing: " + path);
+            console.log("Removing: " + Path.relative(out, path));
             FS.unlinkSync(path);
         }
         
@@ -347,7 +358,8 @@ function xml() {
                 // don't cache
                 // remove app cache is the author doesn't want this
                 FS.unlinkSync(cache);
-                end();
+                if (argv.zip) zip();
+                else end();
             } else {
                 var source = FS.readFileSync(cache);
                 var template = Handlebars.compile(source.toString());
@@ -396,7 +408,8 @@ function xml() {
                         files: files
                     }));
 
-                    end();
+                    if (argv.zip) zip();
+                    else end();
                 });
             }
         });
@@ -419,11 +432,40 @@ function escape2(str){
     return str;
 }
 
+
+function zip() {
+    console.log("Zipping output directory...");
+
+    var path = Path.resolve(argv.zip);
+    var output = FS.createWriteStream(path);
+    output.on("close", function () {
+        end();
+    });
+
+    var archive = Archiver("zip");
+    archive.on("error", function(err){
+        throw err;
+    });
+
+    archive.pipe(output);
+    archive.bulk([
+        { expand: true, cwd: out, src: ['**'] }
+    ]);
+    archive.finalize();
+}
+
 function end() {
     var t2 = new Date(); // end time
     var sec = ((t2.getTime() - t1.getTime()) / 1e3).toFixed(2);
     console.log("---");
     console.log("Compilation complete in " + sec + " seconds.");
-    console.log("A release was created in:");
-    console.log(out);
+    if (argv.out) {
+        console.log("A build was created at:");
+        console.log(out);
+    }
+    if (argv.zip) {
+        var path = Path.resolve(argv.zip);
+        console.log("A zipped package was created at:");
+        console.log(path);
+    }
 }

@@ -1,0 +1,5 @@
+{
+    "jscodehints.detectedExclusions": [
+        "/Users/Oliver/Development/open-source/savvy/dist/node_modules/archiver/node_modules/file-utils/tests/fixtures/banner2.js"
+    ]
+}
