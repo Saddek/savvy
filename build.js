@@ -45,6 +45,15 @@ var mkdirp = require("mkdirp");
 var ncp = require("ncp").ncp;
 var uglify = require("uglify-js");
 
+// console arguments
+var argv = require("yargs")
+           .usage("$0 init [--themes] [--noclean]")
+           .version(package.version, "version")
+           .help("help")
+           .boolean("themes", "Only build the theme's directory")
+           .boolean("noclean", "Don't clean any the target directory")
+           .argv;
+
 var location = {};
 location.dist = path.resolve("dist");
 location.src = path.resolve("src");
@@ -61,11 +70,21 @@ function filter(filename) {
     return true;
 }
 
-console.log("Cleaning dist directory...");
-rmdir(location.dist, function(err){
-    if (err) return console.log(err);
-    static();
-});
+if (argv.themes) {
+    if (argv.noclean) theme();
+    else cleanTheme();
+} else {
+    if (argv.noclean) static();
+    else clean();
+}
+
+function clean() {
+    console.log("Cleaning dist directory...");
+    rmdir(location.dist, function(err){
+        if (err) return console.log(err);
+        static();
+    });
+}
 
 function static() {
     console.log("Copying static files...");
@@ -197,6 +216,15 @@ function prepend(file, src) {
     var content = fs.readFileSync(file);
     fs.writeFileSync(file, src);
     fs.appendFileSync(file, content);
+}
+
+function cleanTheme() {
+    console.log("Cleaning themes directory...");
+    var dir = path.join(location.dist, "framework", "savvy.framework", "themes");
+    rmdir(dir, function(err){
+        if (err) return console.log(err);
+        themes();
+    });
 }
 
 function themes() {
