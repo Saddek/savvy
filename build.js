@@ -43,6 +43,7 @@ var package = require(path.resolve("package.json"));
 var rmdir = require("rimraf");
 var mkdirp = require("mkdirp");
 var ncp = require("ncp").ncp;
+var uglify = require("uglify-js");
 
 var location = {};
 location.dist = path.resolve("dist");
@@ -123,29 +124,57 @@ function sass() {
     var cmd = "sass --style compressed " + scss + " " + css;
     exec(cmd, function (error, stdout, stderr) {
         if (error) sys.puts(stderr);
-        else closure();
+        else ugly();
     });
 }
 
-function closure() {
-	console.log("Optomising JavaScript using Google Closure...");
+function ugly() {
+	console.log("Optomising JavaScript using UglifyJS...");
     
-    // NB: Java 7 required: https://code.google.com/p/closure-compiler/wiki/FAQ#The_compiler_crashes_with_UnsupportedClassVersionError_or_Unsupp
-    // Download from: http://java.com
-    // Path on OSX: /Library/Internet\ Plug-Ins/JavaAppletPlugin.plugin/Contents/Home/
-    
-    var closure = path.join(location.src, "bin", "closure", "compiler.jar");
     var js = path.join(location.dist, "framework", "savvy.framework", "savvy.js");
     var min = path.join(location.dist, "framework", "savvy.framework", "savvy.min.js");
     var map = path.join(location.dist, "framework", "savvy.framework", "savvy.min.js.map");
     
-    var cmd = "java -jar " + closure + " --compilation_level SIMPLE_OPTIMIZATIONS --language_in ECMASCRIPT5_STRICT --js " + js + " --js_output_file " + min + " --create_source_map " + map;
+    var result;
+    try {
+        result = uglify.minify(js, {
+            outSourceMap: "savvy.min.js.map",
+            compress: {
+                sequences: true,
+                properties: true,
+                dead_code: true,
+                drop_debugger: true,
+                conditionals: true,
+                comparisons: true,
+                evaluate: true,
+                booleans: true,
+                loops: true,
+                unused: true,
+                hoist_funs: false,
+                hoist_vars: false,
+                if_return: true,
+                join_vars: true,
+                cascade: true,
+                warnings: true,
+                negate_iife: true,
+                drop_console: true
+            }
+        });
+    } catch (err) {
+        // FIXME: this always assumes the error is a JS parsing error
+        //        and line and column come out as undefined
+        console.log("JavaScript error: " 
+                    + err.message + " ("
+                    + path + ":"
+                    + err.line + ":"
+                    + err.col + ")");
+        process.exit(-1);
+    }
     
-    exec(cmd, function (error, stdout, stderr) {
-             if (error) return sys.puts(stderr);
-             fs.unlinkSync(js);
-             license();
-    });
+    fs.writeFileSync(min, result.code);
+    fs.writeFileSync(map, result.map);
+    fs.unlinkSync(js);
+    license();
 }
 
 function license() {
