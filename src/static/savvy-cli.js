@@ -2,7 +2,7 @@
 
 /*
 
-   .x+=:.                  _            _                      
+   .x+=:.                  _dir            _                      
   z`    ^%                u            u            ..         
      .   <k              88Nu.   u.   88Nu.   u.   @L          
    .@8Ned8"       u     '88888.o888c '88888.o888c 9888i   .dL  
@@ -37,7 +37,7 @@ x88:  `)8b. .@88 "8888"   8888  8888   8888  8888   888E  888I
 var t1 = new Date(); // start time
 
 var Path = require("path");
-var package = require(Path.resolve("package.json"));
+var package = require(Path.resolve(__dirname, "package.json"));
 
 // console arguments
 var argv = require("yargs")
@@ -81,7 +81,7 @@ var MKDIRP = require("mkdirp");
 var Archiver = require("archiver");
 var UUID = require('node-uuid');
 
-var banner = FS.readFileSync("banner.txt");
+var banner = FS.readFileSync(Path.resolve(__dirname, "banner.txt"));
 NCP.limit = 16;
 
 var git = /\.git$/i;
@@ -463,7 +463,7 @@ function clean() {
 function copy(){
     if (argv.out) {
         console.log("Copying build to output directory...");
-        var path = Path.resolve(__dirname, argv.out);
+        var path = Path.resolve(process.cwd(), argv.out);
         NCP(out, path, {}, function (err) {
             if (err) return console.error(err);
             RMDIR(out, function(err){
