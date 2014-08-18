@@ -88,12 +88,12 @@ var git = /\.git$/i;
 var dot = /^\..*$/i; // any dot file
 var pgbomit = /^\.pgbomit$/
 function filter(path) {
+    // don't include the savvy CLI directory
     if (path == __dirname) return false;
-    if (git.test(path)) return false;
-    
     var file = Path.basename(path);
     if (dot.test(file) && !pgbomit.test(file)) return false;
-    
+    if (git.test(path)) return false;
+        
     return true;
 }
 
@@ -113,7 +113,7 @@ if (argv._[0] == "init")  {
     function init() {
         MKDIRP(dir, function (err) {
             if (err) return console.error(err);
-            NCP(Path.resolve("project"), dir, {filter: filter}, function (err) {
+            NCP(Path.resolve(__dirname, "project"), dir, {filter: filter}, function (err) {
                 if (err) return console.error(err);
                 console.log("Created project at: " + dir);
             });
@@ -125,18 +125,10 @@ if (argv._[0] == "init")  {
     console.log("---");
 
     src = Path.resolve(argv._[0]);
-    out = (argv.out) ? Path.resolve(argv.out) : Path.join(OS.tmpdir(), UUID.v4());
-    // for some reason the walk library needs a relative path
-    out_rel = Path.relative(__dirname, out);
-
-    if (argv.clean) clean();
-    else source();
-}
-
-function clean() {
-    console.log("Cleaning output directory...");
-    RMDIR(out, function(err){
-        if (err) return console.log(err);
+    out = Path.join(OS.tmpdir(), UUID.v4());
+    MKDIRP(out, function (err) {
+        // for some reason the walk library needs a relative path
+        out_rel = Path.relative(process.cwd(), out);
         source();
     });
 }
@@ -154,7 +146,7 @@ function source() {
 
 function framework() {
     console.log("Copying framework files...");
-    NCP(Path.resolve("framework"), out, {filter: filter}, function (err) {
+    NCP(Path.resolve(__dirname, "framework"), out, {filter: filter}, function (err) {
         if (err) return console.error(err);
         compile();
     });
@@ -165,7 +157,7 @@ var options = {
     filters: ["savvy.framework"]
 };
 
-var typescript = /\.ts$/i;
+var typescript = /[^d]\.ts$/i;
 var coffeescript = /\.coffee$/i;
 var dart = /\.dart$/i;
 var sass = /\.scss$/i;
@@ -219,7 +211,7 @@ var compressor_options = {
     if_return: true,
     join_vars: true,
     cascade: true,
-    warnings: false, /* true, */
+    warnings: true,
     negate_iife: true,
     drop_console: true
 };
@@ -230,7 +222,7 @@ function compress() {
         var cmd;
         if (css.test(file.name)) {
             // compress CSS
-            var path = Path.join(root, file.name);
+            var path = Path.resolve(root, file.name);
             console.log("Optomising: " + Path.relative(out, path));
             var source = FS.readFileSync(path);
             var minimized = new CleanCSS().minify(source);
@@ -240,7 +232,7 @@ function compress() {
         
         if (javascript.test(file.name)) {
             // compress js
-            var path = Path.join(root, file.name);
+            var path = Path.resolve(root, file.name);
             console.log("Optomising: " + Path.relative(out, path));
             var rel = Path.relative(out, root);
             var map = Path.join(rel, file.name + ".map");
@@ -248,7 +240,6 @@ function compress() {
             try {
                 result = UglifyJS.minify(path, {
                     outSourceMap: map,
-                    warnings: true,
                     compress: compressor_options
                 });
             } catch (err) {
@@ -267,8 +258,8 @@ function compress() {
         
         if (html.test(file.name)) {
             // compress html
-            var path = Path.join(root, file.name);
-            if (path != Path.join(out_rel, "index.html")) {
+            var path = Path.resolve(root, file.name);
+            if (path != Path.resolve(out, "index.html")) {
                 // don't compress index.html because we want to keep
                 // the Savvy logo and pretty mark up in that
                 console.log("Optomising: " + Path.relative(out, path));
@@ -353,13 +344,12 @@ function xml() {
             }));
 
             var cache = Path.join(out, "manifest.appcache");
-            var cache_rel = Path.relative(__dirname, cache);
+            var cache_rel = Path.relative(out, cache);
             if (argv.nocache) {
                 // don't cache
                 // remove app cache is the author doesn't want this
                 FS.unlinkSync(cache);
-                if (argv.zip) zip();
-                else end();
+                zip();
             } else {
                 var source = FS.readFileSync(cache);
                 var template = Handlebars.compile(source.toString());
@@ -408,8 +398,7 @@ function xml() {
                         files: files
                     }));
 
-                    if (argv.zip) zip();
-                    else end();
+                    zip();
                 });
             }
         });
@@ -432,26 +421,59 @@ function escape2(str){
     return str;
 }
 
-
 function zip() {
-    console.log("Zipping output directory...");
+    if (argv.zip) {
+        console.log("Creating zip package...");
+        var path = Path.resolve(argv.zip);
+        var output = FS.createWriteStream(path);
+        output.on("close", function () {
+            if (argv.clean) clean();
+            else copy();
+        });
 
-    var path = Path.resolve(argv.zip);
-    var output = FS.createWriteStream(path);
-    output.on("close", function () {
+        var archive = Archiver("zip");
+        archive.on("error", function(err){
+            throw err;
+        });
+
+        archive.pipe(output);
+        archive.bulk([
+            { expand: true, cwd: out, src: ['**'] }
+        ]);
+        archive.finalize();
+    } else {
+        if (argv.clean) clean();
+        else copy();
+    }
+}
+
+function clean() {
+    if (argv.clean && argv.out) {
+        console.log("Cleaning output directory...");
+        var path = argv.out;
+        RMDIR(path, function(err){
+            if (err) return console.log(err);
+            copy();
+        });
+    } else {
+        copy();
+    }
+}
+
+function copy(){
+    if (argv.out) {
+        console.log("Copying build to output directory...");
+        var path = Path.resolve(__dirname, argv.out);
+        NCP(out, path, {}, function (err) {
+            if (err) return console.error(err);
+            RMDIR(out, function(err){
+                if (err) return console.log(err);
+                end();
+            });
+        });
+    } else {
         end();
-    });
-
-    var archive = Archiver("zip");
-    archive.on("error", function(err){
-        throw err;
-    });
-
-    archive.pipe(output);
-    archive.bulk([
-        { expand: true, cwd: out, src: ['**'] }
-    ]);
-    archive.finalize();
+    }
 }
 
 function end() {
@@ -460,8 +482,9 @@ function end() {
     console.log("---");
     console.log("Compilation complete in " + sec + " seconds.");
     if (argv.out) {
+        var path = Path.resolve(argv.out);
         console.log("A build was created at:");
-        console.log(out);
+        console.log(path);
     }
     if (argv.zip) {
         var path = Path.resolve(argv.zip);
