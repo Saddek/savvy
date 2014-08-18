@@ -20,13 +20,6 @@ body > main > footer {
     color: $light;
 }
 
-@mixin calc($property, $expression) {
-    #{$property}: -webkit-calc(#{$expression}); 
-    #{$property}: -moz-calc(#{$expression}); 
-    #{$property}: -ms-calc(#{$expression}); 
-    #{$property}: calc(#{$expression}); 
-} 
-
 body > main > section {
     $sum: $header + $footer;
     background-color: white;
