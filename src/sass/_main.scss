@@ -87,6 +87,7 @@ body {
 html, body {
     height:100% !important;
     width: 100% !important;
+    box-sizing: border-box !important;
     overflow: hidden !important;
 }
 
@@ -96,6 +97,7 @@ body > main {
     left: 0px;
     width: 100% !important;
     height: 100% !important;
+    box-sizing: border-box !important;
     overflow: hidden !important;
     
     box-shadow: 0 0 14px rgba(0, 0, 0, 0.66) !important;
@@ -111,6 +113,7 @@ body > main > footer {
     position: absolute !important;
     width: 100% !important;
     height: 0%;
+    box-sizing: border-box !important;
     overflow: hidden !important;
 }
 
@@ -132,6 +135,7 @@ body > main > section {
     left: 0px !important;
     width: 100% !important;
     hieght: 100%;
+    box-sizing: border-box !important;
     display: none !important;
     z-index: 0 !important;
     overflow: auto !important;
