@@ -17,15 +17,15 @@
         <css>savvy.framework/themes/black_pearl/style.min.css</css>
         <css>assets/fonts/font-awesome-4.1.0/css/font-awesome.min.css</css>
         <js>js/vendor/hammer-2.0.2.min.js</js>
+        <js>js/script.js</js>
 
         <header>
             <html>html/header.html</html>
             <css>css/header.css</css>
         </header>
 
-        <card id="Home" title="Welcome to Savvy" default="yes">
-            <html>html/home.html</html>
-            <js>js/home.js</js>
+        <card id="Home" title="Typography" default="yes">
+            <html>html/typography.html</html>
         </card>
         
     </savvy:deck>
