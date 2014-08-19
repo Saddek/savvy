@@ -112,7 +112,6 @@ module Savvy {
 
     function initCards(cards:any, main:HTMLElement):void {
         for(var i = 0, ii = cards.length; i < ii; i++) {
-            
             var node = cards[i];
             var id = node["@id"];
             var title = node["@title"];
@@ -132,7 +131,7 @@ module Savvy {
                 }
             }
             
-            initNode(node, section, id);
+            initNode(node, section);
         
             // NB: this object SHOULD NOT added to the body until ready to be shown
             main.appendChild(section);
@@ -143,9 +142,13 @@ module Savvy {
         }
 	}
     
-    function initNode(node:any, element:HTMLElement, id?:string):void {
+    function initNode(node:any, element:HTMLElement):void {
         guaranteeArray(node.css).forEach((url:string):void => {
-            appendCssToHeadFromUrl(url, id);
+            var selector:string = (element == document.body) ? null
+                : (element.id == "")
+                ? element.nodeName
+                : element.nodeName + "#" + element.id;
+            appendCssToHeadFromUrl(url, selector);
         });
 
         guaranteeArray(node.html).forEach((url:string):void => {
@@ -205,9 +208,9 @@ module Savvy {
      * @param url The URL of the CSS file
      * @param isCardCSS A Boolean indicating that this CSS relates to the current screeen (optional)
      */
-    function appendCssToHeadFromUrl(url:string, forId?:string):void {
+    function appendCssToHeadFromUrl(url:string, selector?:string):void {
         var isAbsolute:boolean = regex.isRemoteUrl.test(url);
-        if (isAbsolute && forId) {
+        if (isAbsolute && selector) {
             throw "Card styles sheets cannot be remote (e.g. http://www.examples.com/style.css). Please include remote style sheets globally.";
         }
         if (isAbsolute) {
@@ -222,8 +225,8 @@ module Savvy {
             node = document.createElement("style");
             node.setAttribute("type", "text/css");
             var content:string = read(url);
-            if (forId) {
-                content = content.replace(regex.css.selector, "body > main > section#"+forId+" $1$2");
+            if (selector) {
+                content = content.replace(regex.css.selector, "body > main > " + selector + " $1$2");
                 content = content.replace(regex.css.card, "$1");
             }
             var i:number = url.toString().lastIndexOf("/");
