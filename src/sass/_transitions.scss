@@ -15,10 +15,10 @@
 */
 
 body > main > section.transition {
-    -webkit-animation-fill-mode: both;
-    -moz-animation-fill-mode: both;
-    -ms-animation-fill-mode: both;
-    animation-fill-mode: both;
+    -webkit-animation-fill-mode: none !important;
+    -moz-animation-fill-mode: none !important;
+    -ms-animation-fill-mode: none !important;
+    animation-fill-mode: none !important;
     display: block !important;
 }
 
