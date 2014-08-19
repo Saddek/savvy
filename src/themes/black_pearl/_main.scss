@@ -2,6 +2,7 @@ body {
     background: black;
 	background-image: url("./images/dark_fish_skin/dark_fish_skin.png");
     color: $light;
+    padding: round($fontsize/2);
 }
 
 body > main > header {
@@ -10,6 +11,7 @@ body > main > header {
 	background-image: url("./images/noisy_net/noisy_net.png");
     box-shadow: 0 0 7px rgba(0, 0, 0, 0.66);
     color: $light;
+    padding: 0px;
 }
 
 body > main > footer {
@@ -18,12 +20,13 @@ body > main > footer {
 	background-image: url("./images/noisy_net/noisy_net.png");
     box-shadow: 0 0 7px rgba(0, 0, 0, 0.66);
     color: $light;
+    padding: 0px;
 }
 
 body > main > section {
-    $sum: $header + $footer;
     background-color: white;
 	background-image: url("./images/debut_light/debut_light.png");
     background-attachment: local;
     color: $dark;
+    padding: round($fontsize/2);
 }

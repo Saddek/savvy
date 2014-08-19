@@ -1,38 +1,42 @@
-* {
+html {
     font-family: "Roboto Regular", sans-serif;
-    color: $light;
     font-size: $fontsize;
+    color: $light;
+}
+
+small {
+    font-family: "Roboto Condensed Regular", sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Roboto Bold", sans-serif;
+    font-size: $fontsize;
+    font-weight: 700;
+}
+
+a,
+a:link,
+a:visited {
+    color: $highlight-dark;
+}
+
+a:hover,
+a:active {
+    color: darken($highlight-dark, 12.5%);
 }
 
 body > main > section {
     color: $dark;
-    * {
-        color: $dark;
-    }
-    
-    a,
-    a:link,
-    a:visited {
-        color: $highlight-dark;
-    }
-
-    a:hover,
-    a:active {
-        color: darken($highlight-dark, 12.5%);
-    }
-
-    small {
-        font-family: "Roboto Condensed", sans-serif;
-    }
 }
 
 body > main > header,
 body > main > footer {
-    * {
-        color: $light;
-    }
-    
-    h1, h2, h3, h4, h5, h6 {
+    h1, h2, h3, h4, h5, h6, p {
+        font-family: "Roboto Light", sans-serif;
+        text-transform: uppercase;
         text-align: center;
+        height: $header;
+        vertical-align: middle;
+        font-weight: 500;
     }
 }

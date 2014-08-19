@@ -26,61 +26,57 @@ button:focus {
     outline: none;
 }
 
-body > main > section {
-    button {
-        text-transform: uppercase;
-        font-size: $fontsize;
-        padding: ($fontsize * 0.6) ($fontsize * 0.8);
-        -moz-border-radius: ($fontsize * 0.3);
-        -webkit-border-radius: ($fontsize * 0.3);
-        border-radius: ($fontsize * 0.3);
-        border: none;
-    }
+button {
+    font-size: $fontsize;
+    padding: round($fontsize / 3) round($fontsize * 2/3);
+    -moz-border-radius: round($fontsize / 3);
+    -webkit-border-radius: round($fontsize / 3);
+    border-radius: round($fontsize / 3);
+    border: none;
+}
 
-    button {
-        background: $highlight;
-        color: $light;
-        font-weight: 500;
-    }
+button {
+    font-family: "Roboto Regular", sans-serif;
+    background: $highlight;
+    color: $light;
+    font-weight: 500;
+}
 
-    button:active,
-    button:active {
-        background: $highlight-dark;
-        color: $light;
-        font-weight: 500;
-    }
+button:active,
+button:active {
+    background: $highlight-dark;
+}
 
-    button[type="submit"] {
-        -webkit-animation: pulsate 2s ease-in-out infinite;
-        -moz-animation: pulsate 2s ease-in-out infinite;
-        -ms-animation: pulsate 2s ease-in-out infinite;
-        animation: pulsate 2s ease-in-out infinite;
-    }
+button[type="submit"] {
+    -webkit-animation: pulsate 2s ease-in-out infinite;
+    -moz-animation: pulsate 2s ease-in-out infinite;
+    -ms-animation: pulsate 2s ease-in-out infinite;
+    animation: pulsate 2s ease-in-out infinite;
+}
 
-    button[type="submit"]:active {
-        -webkit-animation: none;
-        -moz-animation: none;
-        -ms-animation: none;
-        animation: none;
-    }
-
+button[type="submit"]:active {
+    -webkit-animation: none;
+    -moz-animation: none;
+    -ms-animation: none;
+    animation: none;
 }
 
 body > main > header,
 body > main > footer {
     button {
         text-transform: uppercase;
-        font-size: $header * 0.5;
-        padding: $header * 0.25;
+        font-size: round($header / 2);
+        line-height: round($header / 2);
+        padding: round($header / 4);
         border: none;
         background: transparent;
         color: $light;
     }
 
     button:active {
-        background: -webkit-radial-gradient(rgba(255, 255, 255, 0.5) 0%, transparent 100%);
-        background: -moz-radial-gradient(rgba(255, 255, 255, 0.5) 0%, transparent 100%);
-        background: -ms-radial-gradient(rgba(255, 255, 255, 0.5) 0%, transparent 100%);
-        background: radial-gradient(rgba(255, 255, 255, 0.5) 0%, transparent 100%);
+        background: -webkit-radial-gradient(rgba(255, 255, 255, 0.5) 0%, transparent 80%);
+        background: -moz-radial-gradient(rgba(255, 255, 255, 0.5) 0%, transparent 80%);
+        background: -ms-radial-gradient(rgba(255, 255, 255, 0.5) 0%, transparent 80%);
+        background: radial-gradient(rgba(255, 255, 255, 0.5) 0%, transparent 80%);
     }
 }
