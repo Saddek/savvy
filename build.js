@@ -50,6 +50,7 @@ var argv = require("yargs")
            .usage("$0 init [--themes] [--noclean]")
            .version(package.version, "version")
            .help("help")
+           .boolean("nocompress", "Don't compress the code.")
            .boolean("themes", "Only build the theme's directory")
            .boolean("noclean", "Don't clean any the target directory")
            .argv;
@@ -148,52 +149,57 @@ function sass() {
 }
 
 function ugly() {
-	console.log("Optomising JavaScript using UglifyJS...");
-    
     var js = path.join(location.dist, "framework", "savvy.framework", "savvy.js");
     var min = path.join(location.dist, "framework", "savvy.framework", "savvy.min.js");
     var map = path.join(location.dist, "framework", "savvy.framework", "savvy.min.js.map");
     
-    var result;
-    try {
-        result = uglify.minify(js, {
-            outSourceMap: "savvy.min.js.map",
-            compress: {
-                sequences: true,
-                properties: true,
-                dead_code: true,
-                drop_debugger: true,
-                conditionals: true,
-                comparisons: true,
-                evaluate: true,
-                booleans: true,
-                loops: true,
-                unused: true,
-                hoist_funs: false,
-                hoist_vars: false,
-                if_return: true,
-                join_vars: true,
-                cascade: true,
-                warnings: true,
-                negate_iife: true,
-                drop_console: true
-            }
-        });
-    } catch (err) {
-        // FIXME: this always assumes the error is a JS parsing error
-        //        and line and column come out as undefined
-        console.log("JavaScript error: " 
-                    + err.message + " ("
-                    + path + ":"
-                    + err.line + ":"
-                    + err.col + ")");
-        process.exit(-1);
+    if (argv.nocompress) {
+        fs.renameSync(js, min); // simply rename js to min.js
+        fs.writeFile(map, ""); // touch a map file
+        license();
+    } else {
+        console.log("Optomising JavaScript using UglifyJS...");
+        var result;
+        try {
+            result = uglify.minify(js, {
+                outSourceMap: "savvy.min.js.map",
+                compress: {
+                    sequences: true,
+                    properties: true,
+                    dead_code: true,
+                    drop_debugger: true,
+                    conditionals: true,
+                    comparisons: true,
+                    evaluate: true,
+                    booleans: true,
+                    loops: true,
+                    unused: true,
+                    hoist_funs: false,
+                    hoist_vars: false,
+                    if_return: true,
+                    join_vars: true,
+                    cascade: true,
+                    warnings: true,
+                    negate_iife: true,
+                    drop_console: true
+                }
+            });
+        } catch (err) {
+            // FIXME: this always assumes the error is a JS parsing error
+            //        and line and column come out as undefined
+            console.log("JavaScript error: " 
+                        + err.message + " ("
+                        + path + ":"
+                        + err.line + ":"
+                        + err.col + ")");
+            process.exit(-1);
+        }
+
+        fs.writeFileSync(min, result.code);
+        fs.writeFileSync(map, result.map);
+        fs.unlinkSync(js);
+        license();
     }
-    
-    fs.writeFileSync(min, result.code);
-    fs.writeFileSync(map, result.map);
-    fs.unlinkSync(js);
-    license();
 }
 
 function license() {
