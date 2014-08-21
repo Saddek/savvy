@@ -34,8 +34,6 @@ x88:  `)8b. .@88 "8888"   8888  8888   8888  8888   888E  888I
 
 */
 
-var t1 = new Date(); // start time
-
 var Path = require("path");
 var package = require(Path.resolve(__dirname, "package.json"));
 
@@ -45,21 +43,32 @@ var argv = require("yargs")
            .example("$0 init [target]", "Create an empty project")
            .example("$0 [source] --out [target]", "Build an application")
            .example("$0 [source] --zip [target]", "Build an zipped application")
+           .example("$0 [source] --port [port]", "Build an application served over HTTP.")
            .version(package.version, "version")
            .help("help")
            .string("out")
            .string("zip")
+           .string("port")
            .boolean("clean")
            .boolean("nocompress")
            .boolean("nocache")
+           .boolean("watch")
+           .boolean("verbose")
+           .boolean("warn")
+           .alias("v", "verbose")
            .describe("out", "A directory to build the application in.")
            .describe("zip", "A zip file to built the application in.")
+           .describe("port", "A HTTP port to serve the built application from.")
            .describe("clean", "Empties the target directory before the operation.")
            .describe("nocompress", "Disables HTML, CSS and JavaScript compression.")
            .describe("nocache", "Disables offline caching.")
+           .describe("watch", "Rebuild the applicaton everytime a source file is modified.")
+           .describe("warn", "Show JavaScript warnings.")
+           .describe("verbose", "Enable verbose logging.")
            .check(function (argv) {
                if (typeof argv._[0] == "string" && typeof argv.out == "string") return true;
                if (typeof argv._[0] == "string" && typeof argv.zip == "string") return true;
+               if (typeof argv._[0] == "string" && typeof argv.port == "string") return true;
                if (argv._[0] == "init" && typeof argv._[1] == "string") return true;
                throw "";
            })
@@ -80,6 +89,9 @@ var HTMLMinify = require("html-minifier").minify;
 var MKDIRP = require("mkdirp");
 var Archiver = require("archiver");
 var UUID = require('node-uuid');
+var Express = require('express');
+var IP = require("ip");
+var Watch = require("watch");
 
 var banner = FS.readFileSync(Path.resolve(__dirname, "banner.txt"));
 NCP.limit = 16;
@@ -97,34 +109,76 @@ function filter(path) {
     return true;
 }
 
-var src, out, out_rel;
+function log(str) {
+    if (argv.verbose) console.log(str);
+}
+
+var src, out, out_rel, t1;
+var server = Path.join(OS.tmpdir(), UUID.v4());
 
 if (argv._[0] == "init")  {
     // init a directory
     var dir = Path.resolve(argv._[1]);
     if (argv.clean) {
         RMDIR(dir, function(err){
-            if (err) return console.log(err);
+            if (err) throw err;
             init();
         });
-    }
-    else init();
+    } else init();
     
     function init() {
         MKDIRP(dir, function (err) {
-            if (err) return console.error(err);
+            if (err) throw err;
             NCP(Path.resolve(__dirname, "project"), dir, {filter: filter}, function (err) {
-                if (err) return console.error(err);
-                console.log("Created project at: " + dir);
+                if (err) throw err;
+                console.info("Created project at: " + dir);
             });
         });
     }
-} else {
-    console.log(banner.toString());
-    console.log("Version: " + package.version);
-    console.log("---");
+} else setup();
 
+function setup() {
+    if (argv.port) { // start the server
+        log("Initialings HTTP server...");
+        var Express = require('express');
+        var app = Express();
+        app.get('/*', function(req, res, next){
+            res.header("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
+            res.header("Pragma", "no-cache"); // HTTP 1.0.
+            res.header("Expires", "0"); // Proxies.
+            next(); // http://expressjs.com/guide.html#passing-route control
+        });
+        app.use(Express.static(server));
+        app.listen(argv.port);
+    }
+    
+    console.info(banner.toString());
     src = Path.resolve(argv._[0]);
+    
+    var f = false;
+    if (argv.watch) {
+        Watch.watchTree(src, { ignoreDotFiles:true }, function(files, stat_now, state_before) {
+            if (f) {
+                console.info("---");
+                if (typeof files == "string") {
+                    console.log("Modified: " + Path.relative(src, files));
+                    console.log("Rebuilding...")
+                } else if (typeof files == "object") {
+                    var list = Object.getOwnPropertyNames(files);
+                    console.log(list.length + " files modified. Rebulding...");
+                }
+            } else {
+                f = true;
+            }
+            build();
+        })
+    } else {
+        build();
+    }
+}
+
+function build() {
+    t1 = new Date(); // start time
     out = Path.join(OS.tmpdir(), UUID.v4());
     MKDIRP(out, function (err) {
         // for some reason the walk library needs a relative path
@@ -134,20 +188,20 @@ if (argv._[0] == "init")  {
 }
 
 function source() {
-    console.log("Copying source files...");
+    log("Copying source files...");
     MKDIRP(out, function (err) {
-        if (err) return console.error(err);
+        if (err) throw err;
         NCP(src, out, {filter: filter}, function (err) {
-            if (err) return console.error(err);
+            if (err) throw err;
             framework();
         });
     });
 }
 
 function framework() {
-    console.log("Copying framework files...");
+    log("Copying framework files...");
     NCP(Path.resolve(__dirname, "framework"), out, {filter: filter}, function (err) {
-        if (err) return console.error(err);
+        if (err) throw err;
         compile();
     });
 }
@@ -177,7 +231,7 @@ function compile() {
         if (handlebars.test(file.name)) cmd = "handlebars " + path;
 
         if (cmd) {
-            console.log("Compiling: " + path);
+            log("Compiling: " + path);
             Exec(cmd, function (error, stdout, stderr) {
                 if (error) Sys.puts(stderr);
                 else next();
@@ -211,7 +265,7 @@ var compressor_options = {
     if_return: true,
     join_vars: true,
     cascade: true,
-    warnings: true,
+    warnings: argv.warn || argv.verbose,
     negate_iife: true,
     drop_console: true
 };
@@ -223,7 +277,7 @@ function compress() {
         if (css.test(file.name)) {
             // compress CSS
             var path = Path.resolve(root, file.name);
-            console.log("Optomising: " + Path.relative(out, path));
+            log("Optomising: " + Path.relative(out, path));
             var source = FS.readFileSync(path);
             var minimized = new CleanCSS().minify(source);
             // FIXME: this doesn't catch any errors
@@ -233,7 +287,7 @@ function compress() {
         if (javascript.test(file.name)) {
             // compress js
             var path = Path.resolve(root, file.name);
-            console.log("Optomising: " + Path.relative(out, path));
+            log("Optomising: " + Path.relative(out, path));
             var rel = Path.relative(out, root);
             var map = Path.join(rel, file.name + ".map");
             var result;
@@ -245,12 +299,7 @@ function compress() {
             } catch (err) {
                 // FIXME: this always assumes the error is a JS parsing error
                 //        and line and column come out as undefined
-                console.log("JavaScript error: " 
-                            + err.message + " ("
-                            + path + ":"
-                            + err.line + ":"
-                            + err.col + ")");
-                process.exit(-1);
+                throw "JavaScript error: " + err.message + " (" + path + ":" + err.line + ":" + err.col + ")";
             }
             FS.writeFileSync(path, result.code);
             FS.writeFileSync(path + ".map", result.map);
@@ -262,7 +311,7 @@ function compress() {
             if (path != Path.resolve(out, "index.html")) {
                 // don't compress index.html because we want to keep
                 // the Savvy logo and pretty mark up in that
-                console.log("Optomising: " + Path.relative(out, path));
+                log("Optomising: " + Path.relative(out, path));
                 var source = FS.readFileSync(path);
                 var minimized = HTMLMinify(source.toString(), {
                     removeComments: true,
@@ -297,7 +346,7 @@ function remove() {
         
         if (isSourceFile) {
             var path = Path.join(root, file.name);
-            console.log("Removing: " + Path.relative(out, path));
+            log("Removing: " + Path.relative(out, path));
             FS.unlinkSync(path);
         }
         
@@ -310,11 +359,11 @@ function remove() {
 }
 
 function xml() {
-    console.log("Preparing configuration and manifest files...");
+    log("Preparing configuration and manifest files...");
     
     var config = Path.join(out, "config.xml");
     FS.readFile(config, function(err, data) {
-        if (err) return console.error(err);
+        if (err) throw err;
         var parser = new XML2JS.Parser();
         parser.parseString(data, function (err, result) {
             var name = (result.widget.name) ? result.widget.name.toString() : "Loading...";
@@ -423,7 +472,7 @@ function escape2(str){
 
 function zip() {
     if (argv.zip) {
-        console.log("Creating zip package...");
+        log("Creating zip package...");
         var path = Path.resolve(argv.zip);
         var output = FS.createWriteStream(path);
         output.on("close", function () {
@@ -449,10 +498,10 @@ function zip() {
 
 function clean() {
     if (argv.clean && argv.out) {
-        console.log("Cleaning output directory...");
+        log("Cleaning output directory...");
         var path = argv.out;
         RMDIR(path, function(err){
-            if (err) return console.log(err);
+            if (err) throw err;
             copy();
         });
     } else {
@@ -462,33 +511,55 @@ function clean() {
 
 function copy(){
     if (argv.out) {
-        console.log("Copying build to output directory...");
+        log("Copying build to output directory...");
         var path = Path.resolve(process.cwd(), argv.out);
         NCP(out, path, {}, function (err) {
-            if (err) return console.error(err);
-            RMDIR(out, function(err){
-                if (err) return console.log(err);
+            if (err) throw err;
+            serve();
+        });
+    } else {
+        serve();
+    }
+}
+
+function serve(){
+    if (argv.port) {
+        log("Overwriting content of server directory...");
+        RMDIR(server, function(err){
+            if (err) throw err;
+            NCP(out, server, {}, function (err) {
+                if (err) throw err;
                 end();
             });
         });
+
     } else {
         end();
     }
 }
 
 function end() {
-    var t2 = new Date(); // end time
-    var sec = ((t2.getTime() - t1.getTime()) / 1e3).toFixed(2);
-    console.log("---");
-    console.log("Compilation complete in " + sec + " seconds.");
-    if (argv.out) {
-        var path = Path.resolve(argv.out);
-        console.log("A build was created at:");
-        console.log(path);
-    }
-    if (argv.zip) {
-        var path = Path.resolve(argv.zip);
-        console.log("A zipped package was created at:");
-        console.log(path);
-    }
+    log("Removing temporary files...");
+    RMDIR(out, function(err){
+        if (err) throw err;
+        
+        var t2 = new Date(); // end time
+        var sec = ((t2.getTime() - t1.getTime()) / 1e3).toFixed(2);
+        console.info("Compilation complete in " + sec + " seconds.");
+        if (argv.out) {
+            var path = Path.resolve(argv.out);
+            console.info("A build was created at: " + path);
+        }
+        if (argv.zip) {
+            var path = Path.resolve(argv.zip);
+            console.info("A zipped package was created at: " + path);
+        }
+        if (argv.port) { // start the server
+            console.info("The build is being served at: http://" + IP.address() + ":" + argv.port + "/");
+        }
+        if (argv.watch) {
+            console.info("Watching for changes: " + src);
+            console.log(t2.toTimeString());
+        }
+    });
 }
