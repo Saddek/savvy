@@ -363,12 +363,15 @@ function remove() {
 }
 
 function xml() {
-    log("Preparing configuration and manifest files...");
+    log("Reading config.xml and preparing index.html...");
     
     var config = Path.join(out, "config.xml");
     FS.readFile(config, function(err, data) {
         if (err) throw err;
-        var parser = new XML2JS.Parser();
+        var parser = new XML2JS.Parser({
+            trim: true,
+            normalize: true
+        });
         parser.parseString(data, function (err, result) {
             var name = (result.widget.name) ? result.widget.name.toString() : "Loading...";
             var description = (result.widget.description) ? result.widget.description.toString() : "";
@@ -382,80 +385,86 @@ function xml() {
                 href = (result.widget.author[0]) ? result.widget.author[0].$.href.toString() : "";
             }
             
-            var author_long = author.trim();
-            if (email) author_long += " <" + email.trim() + ">";
-            if (href) author_long += " (" + href.trim() + ")";
+            var author_long = author;
+            if (email) author_long += " <" + email + ">";
+            if (href) author_long += " (" + href + ")";
             
             var html = Path.join(out, "index.html");
             var source = FS.readFileSync(html);
             var template = Handlebars.compile(source.toString());
             FS.writeFileSync(html, template({
-                title: escape2(name.trim()),
-                description: escape2(description.trim()),
-                author: escape2(author_long.trim()),
+                title: escape2(name),
+                description: escape2(description),
+                author: escape2(author_long),
                 manifest: (argv.nocache) ? "" : "manifest.appcache"
             }));
-
-            var cache = Path.join(out, "manifest.appcache");
-            var cache_rel = Path.relative(out, cache);
-            if (argv.nocache) {
-                // don't cache
-                // remove app cache is the author doesn't want this
-                FS.unlinkSync(cache);
-                zip();
-            } else {
-                var source = FS.readFileSync(cache);
-                var template = Handlebars.compile(source.toString());
-                var fileList = [];
-                var excludeList = [];
-                var walker = Walk.walk(out_rel);
-                
-                walker.on("file", function (root, file, next) {
-                    var path = Path.join(root, file.name);
-                    var path_rel = Path.relative(out, path);
-                    if (path_rel != "manifest.appcache") {
-                        // NB: don't cache the cache
-                        fileList.push(path_rel);
-                    }
-                    if (pgbomit.test(file.name)) {
-                        // NB: don't cache files that will be removed
-                        var dir = Path.relative(out, root);
-                        excludeList.push(dir);
-                    }
-                    next();
-                });
-                walker.on("end", function () {
-                    var bytes = 0;
-                    var fileList2 = [];
-                    fileList.forEach(function (file) {
-                        var exclude = false;
-                        for (var i=0; i<excludeList.length; i++) {
-                            if (file.indexOf(excludeList[i]) == 0) {
-                                exclude = true;
-                            }
-                        }
-                        if (!exclude) {
-                            var path = Path.join(out, file);
-                            bytes += FS.statSync(path)["size"];
-                            fileList2.push(file);
-                        }
-                    });
-                    
-                    var files = fileList2.join("\n");
-                    files += "\n# Count: " + fileList2.length + "\n";
-                    files += "# Size: " + bytesToSize(bytes);
-                    var version = (result.widget.$.version) ? result.widget.$.version : "";
-                    FS.writeFileSync(cache, template({
-                        timestamp: (new Date()).toISOString(),
-                        version: version,
-                        files: files
-                    }));
-
-                    zip();
-                });
-            }
+    
+            var version = (result.widget.$.version) ? result.widget.$.version : "";
+            cache(version);
         });
     });
+}
+
+function cache(version) {
+    var cache = Path.join(out, "manifest.appcache");
+    var cache_rel = Path.relative(out, cache);
+    if (argv.nocache) {
+        // don't cache
+        // remove app cache is the author doesn't want this
+        FS.unlinkSync(cache);
+        zip();
+    } else {
+        log("Generating app cache...");
+        
+        var source = FS.readFileSync(cache);
+        var template = Handlebars.compile(source.toString());
+        var fileList = [];
+        var excludeList = [];
+        var walker = Walk.walk(out_rel);
+
+        walker.on("file", function (root, file, next) {
+            var path = Path.join(root, file.name);
+            var path_rel = Path.relative(out, path);
+            if (path_rel != "manifest.appcache") {
+                // NB: don't cache the cache
+                fileList.push(path_rel);
+            }
+            if (pgbomit.test(file.name)) {
+                // NB: don't cache files that will be removed
+                var dir = Path.relative(out, root);
+                excludeList.push(dir);
+            }
+            next();
+        });
+        walker.on("end", function () {
+            var bytes = 0;
+            var fileList2 = [];
+            fileList.forEach(function (file) {
+                var exclude = false;
+                for (var i=0; i<excludeList.length; i++) {
+                    if (file.indexOf(excludeList[i]) == 0) {
+                        exclude = true;
+                    }
+                }
+                if (!exclude) {
+                    var path = Path.join(out, file);
+                    bytes += FS.statSync(path)["size"];
+                    fileList2.push(file);
+                }
+            });
+
+            var files = fileList2.join("\n");
+            files += "\n# Count: " + fileList2.length + "\n";
+            files += "# Size: " + bytesToSize(bytes);
+            FS.writeFileSync(cache, template({
+                timestamp: (new Date()).toISOString(),
+                version: version,
+                files: files
+            }));
+
+            zip();
+        });
+    }
 }
 
 // http://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript
