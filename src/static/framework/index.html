@@ -55,8 +55,15 @@
         <!-- es5-sham.js patches other ES5 methods as closely as possible. -->
         <!-- <script src="savvy.framework/libs/js/es5-shim/es5-sham.min.js" type="application/javascript"></script> -->
 
-        <!-- energize.min.js remove the artificial 300ms delay from touch events -->
-        <script src="savvy.framework/libs/js/energize.js/energize.min.js" type="application/javascript"></script>
+        <!-- fastclick.js - remove the artificial 300ms delay from touch events -->
+        <script type='application/javascript' src='savvy.framework/libs/js/fastclick/fastclick.js'></script>
+        <script>
+            // add fast click to the window
+            window.addEventListener("load", function addFastClick() {
+                window.removeEventListener("load", addFastClick); // remove self
+                FastClick.attach(document.body);
+            });
+        </script>
 
         <!-- Some monkey patches for older browsers that are needed for Savvy -->
         <script src="savvy.framework/libs/js/plugins.js" type="application/javascript"></script>
