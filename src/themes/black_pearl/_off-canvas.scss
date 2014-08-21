@@ -1,0 +1,51 @@
+body > nav {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 0;
+    width: 260px;
+    height: 100%;
+    overflow: scroll;
+    padding: $fontsize 0px;
+
+    hr {
+        border: 0;
+        height: 1px;
+        background-image: linear-gradient(to left, rgba($light, 0), rgba($light, 0.75), rgba($light ,0));
+    }
+
+    ul {
+        list-style-type: none;
+        padding: 0px;
+        margin: 0px;
+
+        li {
+            font-family: "Roboto Regular", sans-serif;
+            font-size: $fontsize;
+            font-weight: 500;
+            text-transform: uppercase;
+            color: $light;
+            
+            a,
+            a:link,
+            a:visited,
+            a:hover,
+            a:active {
+                color: $light;
+                text-decoration: none;
+                padding: round($fontsize/6) round($fontsize* 2/3);
+                display: inline-block;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            a:hover {
+                background-color: rgba($dark, 0.25)
+            }
+            
+            a:active {
+                background-color: rgba($dark, 0.50)
+            }
+        }
+    }
+}

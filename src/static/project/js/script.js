@@ -7,4 +7,11 @@ this.addEventListener(Application.READY, function(e) {
     hammertime.on("swiperight", function(ev) {
         application.offCanvas(Transition.OFF_CANVASS_LEFT);
     });
+    
+    var links = application.querySelectorAll("nav a");
+    for (var i = 0; i < links.length; i++) {
+        links[i].addEventListener("click", function () {
+            application.offCanvas("0px"); 
+        });
+    }
 });

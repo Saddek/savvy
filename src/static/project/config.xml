@@ -18,14 +18,33 @@
         <css>assets/fonts/font-awesome-4.1.0/css/font-awesome.min.css</css>
         <js>js/vendor/hammer-2.0.2.min.js</js>
         <js>js/script.js</js>
+        <html>html/off-canvas.html</html>
 
         <header>
             <html>html/header.html</html>
             <css>css/header.css</css>
         </header>
 
-        <card id="Home" title="Typography" default="yes">
+        <card id="Home" title="Home" default="yes">
+            <html>html/home.html</html>
+        </card>
+        
+        <card id="Typography" title="Typography" default="yes">
             <html>html/typography.html</html>
+        </card>
+        
+        <card id="Forms" title="Form Elements">
+            <html>html/forms.html</html>
+        </card>
+        
+        <card id="AV" title="Audio &amp; Video">
+            <html>html/av.html</html>
+        </card>
+        
+        <card id="2D" title="2D Graphics">
+        </card>
+        
+        <card id="3D" title="3D Graphics">
         </card>
         
     </savvy:deck>
