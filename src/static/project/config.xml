@@ -19,6 +19,8 @@
         <js>js/vendor/hammer-2.0.2.min.js</js>
         <js>js/script.js</js>
         <html>html/off-canvas.html</html>
+        
+        <js>js/samples/coffee-script.js</js>
 
         <header>
             <html>html/header.html</html>
@@ -27,6 +29,7 @@
 
         <card id="Home" title="Home" default="yes">
             <html>html/home.html</html>
+            <css>css/home.css</css>
         </card>
         
         <card id="Typography" title="Typography" default="yes">

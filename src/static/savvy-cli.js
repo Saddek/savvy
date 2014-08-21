@@ -222,19 +222,23 @@ function compile() {
     var walker = Walk.walk(out_rel, options);
     walker.on("file", function (root, file, next) {
         var cmd;
-        var path = Path.join(root, file.name);
-        if (typescript.test(file.name)) cmd = "tsc --declaration --target ES5 " + path;
+        var path = Path.resolve(root, file.name);
+        var path2 = path.substr(0, path.lastIndexOf("."));
+        if (typescript.test(file.name)) cmd = "tsc --declaration --target ES5 " + path + " --out " + path2 + ".js";
         if (coffeescript.test(file.name)) cmd = "coffee --compile " + path;
-        if (dart.test(file.name)) cmd = "dart2js " + path + " --out=" + path.substr(0, path.length - 5) + ".js";
-        if (sass.test(file.name)) cmd = "sass " + path;
-        if (less.test(file.name)) cmd = "lessc " + path;
-        if (handlebars.test(file.name)) cmd = "handlebars " + path;
+        if (dart.test(file.name)) cmd = "dart2js " + path + " --out=" + path2 + ".js";
+        if (sass.test(file.name)) cmd = "sass " + path + " " + path2 + ".css";
+        if (less.test(file.name)) cmd = "lessc " + path + " " + path2 + ".css";
+        if (handlebars.test(file.name)) cmd = "handlebars " + path + " --output " + path2 + ".js";
 
         if (cmd) {
-            log("Compiling: " + path);
+            log("Compiling: " + Path.relative(out, path));
             Exec(cmd, function (error, stdout, stderr) {
-                if (error) Sys.puts(stderr);
-                else next();
+                if (error) {
+                    console.log(cmd);
+                    throw stderr.toString();
+                }
+                next();
             });
         } else next();
     });
