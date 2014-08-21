@@ -48,6 +48,11 @@ module Savvy {
         var id:string = getIdForPath(path);
         var to:HTMLElement = document.getElementById(id);
         var from:HTMLElement = application.currentCard;
+        
+        if (to == from) {
+            console.warn("Attempt to go to current card ignored");
+            return; // get out of here
+        }
 
         if (application.cards.indexOf(to) > -1) {
             var detail:any = {
