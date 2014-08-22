@@ -72,8 +72,18 @@ module Savvy {
         var event:SavvyEvent = createSavvyEvent(detail, path, preventHistory);
         
         if (detail.from == null) {
-            event.initCustomEvent(Application.READY, true, true, detail);
+            event.initCustomEvent(Application.READY, false, true, detail);
+            // manually dispatch the event to everyone who sould be listening
+            // this is because we want to "capture" from ancestor to descendants
+            window.dispatchEvent(event);
+            document.dispatchEvent(event);
             document.body.dispatchEvent(event);
+            if (application.main) application.main.dispatchEvent(event);
+            if (application.header) application.header.dispatchEvent(event);
+            if (application.footer) application.footer.dispatchEvent(event);
+            application.cards.forEach(function(card:HTMLElement){
+                card.dispatchEvent(event);
+            });
         } else {
             event.initCustomEvent(Card.EXIT, true, true, detail);
             detail.from.dispatchEvent(event);

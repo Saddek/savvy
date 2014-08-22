@@ -42,7 +42,8 @@ module application {
         main.style.left = left;
     }
     
-    /* psuedo methods to mimic the interaction of the standard HTML Document */
+    /* Psuedo methods to mimic the interaction of the standard HTML Document */
+    
     export function getElementById(id):Element {
         return document.body.querySelector("#" + id);
     }
@@ -57,6 +58,14 @@ module application {
     
     export function getElementsByName(name):NodeList {
         return document.body.getElementsByTagName(name);
+    }
+    
+    export function addEventListener(type:string, listener:any, useCapture:boolean):void {
+        return window.addEventListener(type, listener, useCapture);
+    }
+
+    export function removeEventListener(type:string, listener:any, useCapture?:boolean):void {
+        return window.removeEventListener(type, listener, useCapture);
     }
 
 }
