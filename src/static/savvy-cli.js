@@ -215,7 +215,7 @@ var options = {
 
 var typescript = /[^d]\.ts$/i;
 var coffeescript = /\.coffee$/i;
-var dart = /\.dart$/i;
+var cpp = /\.cpp$/i;
 var sass = /\.scss$/i;
 var less = /\.less$/i;
 var handlebars = /\.handlebars$/i;
@@ -226,9 +226,10 @@ function compile() {
         var cmd;
         var path = Path.resolve(root, file.name);
         var path2 = path.substr(0, path.lastIndexOf("."));
+        
         if (typescript.test(file.name)) cmd = "tsc --declaration --target ES5 " + path + " --out " + path2 + ".js";
         if (coffeescript.test(file.name)) cmd = "coffee --compile " + path;
-        if (dart.test(file.name)) cmd = "dart2js " + path + " --out=" + path2 + ".js";
+        if (cpp.test(file.name)) cmd = "emcc " + path + " -O2 --memory-init-file 0 -o " + path2 + ".js" ;
         if (sass.test(file.name)) cmd = "sass " + path + " " + path2 + ".css";
         if (less.test(file.name)) cmd = "lessc " + path + " " + path2 + ".css";
         if (handlebars.test(file.name)) cmd = "handlebars " + path + " --output " + path2 + ".js";
@@ -345,7 +346,7 @@ function remove() {
     walker.on("file", function (root, file, next) {
         var isSourceFile = (typescript.test(file.name)) 
             || (coffeescript.test(file.name))
-            || (dart.test(file.name))
+            || (cpp.test(file.name))
             || (sass.test(file.name))
             || (less.test(file.name))
             || (handlebars.test(file.name));

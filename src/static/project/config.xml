@@ -20,7 +20,9 @@
         <js>js/script.js</js>
         <html>html/off-canvas.html</html>
         
-        <js>js/samples/coffee-script.js</js>
+        <js>js/samples/coffeescript-example.js</js>
+        <js>js/samples/typescript-example.js</js>
+        <js>js/samples/cpp-example.js</js>
 
         <header>
             <html>html/header.html</html>
