@@ -16,7 +16,6 @@ module Savvy {
             var path:string = application.getRoute();
             var id:string = getIdForPath(path);
             var card = document.getElementById(id);
-            console.log(application.cards.indexOf(card));
             if (application.cards.indexOf(card) > -1) {
                 // don't load a route that doesn't exist
                 application.goto(path, Transition.CUT, true);
@@ -50,7 +49,7 @@ module Savvy {
         var from:HTMLElement = application.currentCard;
         
         if (to == from) {
-            console.warn("Attempt to go to current card ignored");
+            console.warn("Application was asked to go to current card. Ignoring.");
             return; // get out of here
         }
 

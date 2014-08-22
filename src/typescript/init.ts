@@ -137,8 +137,11 @@ module Savvy {
             main.appendChild(section);
     	}
 
-        if (application.defaultCard === null) {
-            throw "No default card set.";
+        if (application.cards.length == 0) {
+            throw "No cards specificed in config.xml.";
+        } else if (application.defaultCard === null) {
+            application.defaultCard = application.cards[0];
+            console.warn("No default card specificed. The first card will be set as the default card.");
         }
 	}
     
