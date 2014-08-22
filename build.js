@@ -90,7 +90,7 @@ function clean() {
 function static() {
     console.log("Copying static files...");
     var static = path.join(location.src, "static");
-    ncp(static, location.dist, {filter: filter}, function (err) {
+    ncp(static, location.dist, {}, function (err) {
         if (err) return console.error(err);
         pack();
     });
@@ -181,7 +181,7 @@ function ugly() {
                     cascade: true,
                     warnings: true,
                     negate_iife: true,
-                    drop_console: true
+                    drop_console: false
                 }
             });
         } catch (err) {
