@@ -55,6 +55,7 @@ var argv = require("yargs")
            .boolean("watch")
            .boolean("verbose")
            .boolean("warn")
+           .boolean("dev")
            .alias("v", "verbose")
            .describe("out", "A directory to build the application in.")
            .describe("zip", "A zip file to built the application in.")
@@ -63,8 +64,9 @@ var argv = require("yargs")
            .describe("nocompress", "Disables HTML, CSS and JavaScript compression.")
            .describe("nocache", "Disables offline caching.")
            .describe("watch", "Rebuild the applicaton everytime a source file is modified.")
-           .describe("warn", "Show JavaScript warnings.")
+           .describe("warn", "Show JavaScript compilation warnings.")
            .describe("verbose", "Enable verbose logging.")
+           .describe("dev", "Don't strip console commands from JavaScript.")
            .check(function (argv) {
                if (typeof argv._[0] == "string" && typeof argv.out == "string") return true;
                if (typeof argv._[0] == "string" && typeof argv.zip == "string") return true;
@@ -269,9 +271,9 @@ var compressor_options = {
     if_return: true,
     join_vars: true,
     cascade: true,
-    warnings: argv.warn || argv.verbose,
+    warnings: (argv.warn || argv.verbose),
     negate_iife: true,
-    drop_console: true
+    drop_console: (!argv.dev)
 };
 
 function compress() {
