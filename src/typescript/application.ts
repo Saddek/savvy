@@ -4,6 +4,7 @@ module Application {
 
 module application {
     
+    export var name:string = null;
     export var id:string = null;
     export var isCordova:boolean = false;
     export var version:string = null;
@@ -40,6 +41,18 @@ module application {
         
         // apply the style
         main.style.left = left;
+    }
+    
+    // offer update on application cache update
+    if (window.applicationCache) {
+        // error, checking, noupdate, downloading, progress, updateready, cached
+        window.applicationCache.addEventListener("updateready", function () {
+            var message:string = "A new version of "
+                + (("string" == typeof application.name) ? application.name : "this application")
+                + " is available. Do you want to update now?";
+            var url:string = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            if (window.confirm(message)) window.location.replace(url);
+        }, false);
     }
     
     /* Psuedo methods to mimic the interaction of the standard HTML Document */
