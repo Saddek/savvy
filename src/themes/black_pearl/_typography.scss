@@ -29,6 +29,14 @@ body > main > section {
     color: $dark;
 }
 
+abbr[title] {
+    border-bottom: inherit; // override normalize.css
+}
+
+abbr[title]:after {
+   content: " (" attr(title) ")";
+}
+
 body > main > header,
 body > main > footer {
     h1, h2, h3, h4, h5, h6, p {
