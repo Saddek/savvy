@@ -1,5 +1,6 @@
 html {
     font-family: "Roboto Regular", sans-serif;
+    font-weight: 400;
     font-size: $fontsize;
     color: $light;
 }
@@ -10,8 +11,8 @@ small {
 
 h1, h2, h3, h4, h5, h6 {
     font-family: "Roboto Bold", sans-serif;
-    font-size: $fontsize;
     font-weight: 700;
+    font-size: $fontsize;
 }
 
 a,
@@ -46,14 +47,23 @@ body > main > section {
     color: $dark;
 }
 
-body > main > header,
-body > main > footer {
+body > main > header {
     h1, h2, h3, h4, h5, h6, p {
-        font-family: "Roboto Light", sans-serif;
+        font-family: "Roboto Slab Light", sans-serif;
+        font-weight: 300;
         text-transform: uppercase;
         text-align: center;
         height: $header;
         vertical-align: middle;
-        font-weight: 500;
+    }
+}
+
+body > main > footer {
+    h1, h2, h3, h4, h5, h6, p {
+        font-family: "Roboto Light", sans-serif;
+        font-weight: 300;
+        text-align: center;
+        height: $fontsize;
+        vertical-align: middle;
     }
 }

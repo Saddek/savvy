@@ -1,0 +1,29 @@
+figure {
+    display: inline-block;
+    border: 1px solid darken($white, 7%);
+    background: darken($white, 2%);
+    padding: 0.75em;
+    margin: 0px;
+}
+
+figure > img {
+    width: 100%;
+    height: auto;
+}
+
+figure > * {
+    background: $white;
+    border: 1px solid darken($white, 5%);
+}
+
+figure > figcaption {
+    background: transparent;
+    border: none;
+    margin-top: 0.25em;
+    font-size: round($fontsize * 0.9);
+    color: lighten($dark, 12.5%);
+}
+
+area {
+    outline: 0;
+}

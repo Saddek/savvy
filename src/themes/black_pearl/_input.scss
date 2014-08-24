@@ -1,0 +1,143 @@
+input,
+textarea,
+select {
+    font-family: "Roboto Regular", sans-serif;
+    background: $light;
+    color: $dark;
+    font-weight: 500;
+    
+    font-size: $fontsize;
+    padding: round($fontsize / 3) round($fontsize * 2/3);
+    -webkit-border-radius: round($fontsize / 3);
+    -moz-border-radius: round($fontsize / 3);
+    border-radius: round($fontsize / 3);
+    border: 1px solid $highlight;
+    outline: none;
+}
+
+input,
+textarea,
+select,
+progress {
+    vertical-align: middle;
+}
+
+input:active {
+    border: 1px solid $highlight-dark;
+}
+
+input:focus {
+    box-shadow: 0px 0px 4px 1px rgba($highlight, .75);
+}
+
+input[type="search"] {
+    -moz-border-radius: round($fontsize / 2 + $fontsize * 2/3);
+    -webkit-border-radius: round($fontsize / 2 + $fontsize * 2/3);
+    border-radius: round($fontsize / 2 + $fontsize * 2/3);
+}
+
+input[type="color"] {
+    height: round($fontsize * 2);
+    padding: round($fontsize / 6) round($fontsize / 4);
+    box-sizing: border-box;
+}
+
+input[type="image"],
+input[type="button"],
+input[type="reset"],
+input[type="submit"] {
+    /* Disable selection of all element (input fields enabled below). */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+
+/* remove special styling from there */
+input[type="file"],
+input[type="image"],
+input[type="range"] {
+    background: transparent;
+    padding: 0px;
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+    border-radius: 0px;
+    border: none;
+}
+
+input[type="file"]:active,
+input[type="image"]:active,
+input[type="range"]:active {
+    border: none;
+}
+
+input[type="file"]:focus,
+input[type="image"]:focus,
+input[type="range"]:focus,
+input[type="button"]:focus,
+input[type="reset"]:focus,
+input[type="submit"]:focus {
+    box-shadow: none;
+}
+
+input[type="file"] {
+    font-family: "Roboto Light", sans-serif;
+    font-size: round($fontsize * 0.9);
+    font-weight: 300;
+    -webkit-appearance: none;
+    color: $highlight;
+    background: $light;
+    border: 1px solid $highlight;
+    border-radius: round($fontsize / 3);
+    height: $fontsize * 2;
+}
+
+/* input[type="file"]::-ms-browse {} */
+
+input[type="file"]::-webkit-file-upload-button {
+    font-family: "Roboto Regular", sans-serif;
+    font-size: $fontsize;
+    font-weight: 500;
+    color: $light;
+    padding: round($fontsize / 3) round($fontsize * 2/3);
+    -webkit-appearance: none;
+    background: $highlight;
+    background-image: none;
+    border: none;
+    border-radius: 0px;
+    outline: none;
+}
+
+input[type="file"]:active {
+    color: $highlight-dark;
+    border: 1px solid $highlight-dark;
+    border-radius: round($fontsize / 3);
+}
+
+input[type="file"]::-webkit-file-upload-button:active {
+    background: $highlight-dark;
+    background-image: none;
+    border-radius: 0px;
+}
+
+output {
+    color: $highlight;
+}
+
+
+
+input:required {}
+input:optional {}
+input:valid {}
+
+input:invalid {
+    background: mix(red, $light, 5%);
+    border-color: red;
+}
+
+input:focus:invalid {
+    box-shadow: 0px 0px 4px 1px rgba(red, .75);
+}
+
+

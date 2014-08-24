@@ -20,10 +20,12 @@
         <js>js/script.js</js>
         <html>html/off-canvas.html</html>
         
+        <!--
         <js>js/samples/coffeescript-example.js</js>
         <js>js/samples/typescript-example.js</js>
         <js>js/samples/cpp-example.js</js>
-
+        -->
+        
         <header>
             <html>html/header.html</html>
             <css>css/header.css</css>
@@ -44,6 +46,7 @@
         
         <card id="AV" title="Audio &amp; Video">
             <html>html/av.html</html>
+            <js>js/av.js</js>
         </card>
         
         <card id="2D" title="2D Graphics">

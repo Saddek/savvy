@@ -26,35 +26,53 @@ button:focus {
     outline: none;
 }
 
-button {
-    font-size: $fontsize;
-    padding: round($fontsize / 3) round($fontsize * 2/3);
-    -moz-border-radius: round($fontsize / 3);
-    -webkit-border-radius: round($fontsize / 3);
-    border-radius: round($fontsize / 3);
-    border: none;
-}
-
-button {
+button,
+input[type="button"],
+input[type="reset"],
+input[type="submit"] {
     font-family: "Roboto Regular", sans-serif;
     background: $highlight;
     color: $light;
     font-weight: 500;
+    
+    font-size: $fontsize;
+    padding: (round($fontsize / 3) + 1) round($fontsize * 2/3);
+    -moz-border-radius: round($fontsize / 3);
+    -webkit-border-radius: round($fontsize / 3);
+    border-radius: round($fontsize / 3);
+    border: none;
+    outline: none;
 }
 
 button:active,
-button:active {
+input[type="button"]:active {
     background: $highlight-dark;
 }
 
-button[type="submit"] {
+button[type="reset"],
+input[type="reset"] {
+    background: $light;
+    color: $highlight;
+    border: 1px solid $highlight;
+    padding: round($fontsize / 3) round($fontsize * 2/3);
+}
+
+button[type="reset"]:active,
+input[type="reset"]:active {
+    color: $highlight-dark;
+    border: 1px solid $highlight-dark;
+}
+
+button[type="submit"],
+input[type="submit"] {
     -webkit-animation: pulsate 2s ease-in-out infinite;
     -moz-animation: pulsate 2s ease-in-out infinite;
     -ms-animation: pulsate 2s ease-in-out infinite;
     animation: pulsate 2s ease-in-out infinite;
 }
 
-button[type="submit"]:active {
+button[type="submit"]:active,
+input[type="submit"]:active {
     -webkit-animation: none;
     -moz-animation: none;
     -ms-animation: none;
@@ -63,7 +81,10 @@ button[type="submit"]:active {
 
 body > main > header,
 body > main > footer {
-    button {
+    button,
+    input[type="button"],
+    input[type="reset"],
+    input[type="submit"] {
         text-transform: uppercase;
         font-size: round($header / 2);
         line-height: round($header / 2);
@@ -71,9 +92,14 @@ body > main > footer {
         border: none;
         background: transparent;
         color: $light;
+        outline: none;
     }
 
-    button:active {
+    button:active,
+    input[type="button"]:active,
+    input[type="reset"]:active,
+    input[type="submit"]:active {
+        color: darken($light, 50%);
         background: -webkit-radial-gradient(rgba(255, 255, 255, 0.5) 0%, transparent 80%);
         background: -moz-radial-gradient(rgba(255, 255, 255, 0.5) 0%, transparent 80%);
         background: -ms-radial-gradient(rgba(255, 255, 255, 0.5) 0%, transparent 80%);

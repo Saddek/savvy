@@ -2,6 +2,12 @@ module Application {
     export var READY:string = "savvy-load";
 }
 
+// extend the Navigator interface so that TypeScript
+// knows about the standalone property
+interface Navigator {
+    standalone:boolean;
+}
+
 module application {
     
     export var name:string = null;
@@ -43,8 +49,8 @@ module application {
         main.style.left = left;
     }
     
-    // offer update on application cache update
-    if (window.applicationCache) {
+    // offer update on application cache update on standalone applications
+    if (window.applicationCache && window.navigator.standalone) {
         // error, checking, noupdate, downloading, progress, updateready, cached
         window.applicationCache.addEventListener("updateready", function () {
             var message:string = "A new version of "
