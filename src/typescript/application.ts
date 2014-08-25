@@ -49,18 +49,6 @@ module application {
         main.style.left = left;
     }
     
-    // offer update on application cache update on standalone applications
-    if (window.applicationCache && window.navigator.standalone) {
-        // error, checking, noupdate, downloading, progress, updateready, cached
-        window.applicationCache.addEventListener("updateready", function () {
-            var message:string = "A new version of "
-                + (("string" == typeof application.name) ? application.name : "this application")
-                + " is available. Do you want to update now?";
-            var url:string = window.location.protocol + "//" + window.location.host + window.location.pathname;
-            if (window.confirm(message)) window.location.replace(url);
-        }, false);
-    }
-    
     /* Psuedo methods to mimic the interaction of the standard HTML Document */
     
     export function getElementById(id):Element {

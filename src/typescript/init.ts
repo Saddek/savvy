@@ -32,21 +32,101 @@ module Savvy {
         // ordinarily, Savvy will be initialised when the DOM is ready
         element.addEventListener(event, function deviceReadyEvent():void {
             element.removeEventListener(event, deviceReadyEvent);
-            
-            parseWidgetXML(config.widget["savvy:deck"]);
-    
-            setTimeout(function(){
-                // FIXME: why doesn't the header and footer CSS apply immediately?
-                setCardsCSS(); // force the card css to fill the screen
-                // remove all the fouc prevention styles
-                var styles:NodeList = document.querySelectorAll("style[data-fouc='true']");
-                for (var i=0; i < styles.length; i++) {
-                    styles[i].parentNode.removeChild(styles[i]);
-                }
-                application.goto(application.getRoute(), Transition.CUT, true);
-            }, 250); // 250ms delay
-
+            checkAppCache();
         }, false);
+    }
+    
+    function checkAppCache():void {
+        // offer update on application cache update on standalone applications
+        // checking
+        // 
+        if (window.applicationCache) {// && window.navigator.standalone) {
+            var msg = (window.applicationCache.UNCACHED) ? "Installing: " : "Updating: ";
+            
+            // error, checking, noupdate, downloading, progress, updateready, cached
+            var progress:HTMLProgressElement = document.createElement("progress");
+            progress.setAttribute("max", "100");
+            progress.style.cssText = "display: block !important;"
+                + "position: absolute;"
+                + "top: 50%;"
+                + "left: 25%;"
+                + "width: 50%;"
+                + "color: white;"
+                + "vertical-align: middle;"
+                + "font-family: sans-serif;"
+                + "text-align: center;"
+
+            function onDownloading():void {
+                document.body.appendChild(progress);
+            }
+
+            function doStart():void {
+                if (progress.parentNode == document.body) {
+                    document.body.removeChild(progress);
+                }
+
+                // clean up
+                window.applicationCache.removeEventListener("downloading", onDownloading)
+                window.applicationCache.removeEventListener("progress", onProgress);
+                window.applicationCache.removeEventListener("cached",  doStart);
+                window.applicationCache.removeEventListener("noupdate", doStart);
+                window.applicationCache.removeEventListener("error", doStart);
+                window.applicationCache.removeEventListener("obsolete", doStart);
+                window.applicationCache.addEventListener("updateready", doUpdate);
+
+                start();
+            }
+            
+            function doUpdate():void {
+                var url:string = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                window.location.replace(url);
+            }
+            
+            function onProgress(event:any):void {
+                if (event.lengthComputable) {
+                    var p:number = Math.round(event.loaded / event.total * 100);
+                    progress.value = p;
+                    progress.innerHTML = msg + p + "%";
+                }
+            }
+            
+            switch (window.applicationCache.status) {
+                case window.applicationCache.UPDATEREADY:
+                case window.applicationCache.IDLE:
+                case window.applicationCache.OBSOLETE:
+                    doStart();
+                    break;
+                case window.applicationCache.DOWNLOADING:
+                    onDownloading();
+                case window.applicationCache.CHECKING:
+                default:
+                    window.applicationCache.addEventListener("downloading", onDownloading)
+                    window.applicationCache.addEventListener("progress", onProgress);
+                    window.applicationCache.addEventListener("cached",  doStart);
+                    window.applicationCache.addEventListener("noupdate", doStart);
+                    // TODO: Should we just ignore and move on? Or do something more?
+                    window.applicationCache.addEventListener("error", doStart);
+                    window.applicationCache.addEventListener("obsolete", doStart);
+                    
+                    window.applicationCache.addEventListener("updateready", doUpdate);
+            }
+        } else {
+            start();
+        }
+    }
+    
+    function start():void {
+        parseWidgetXML(config.widget["savvy:deck"]);
+        setTimeout(function(){
+            // FIXME: why doesn't the header and footer CSS apply immediately?
+            setCardsCSS(); // force the card css to fill the screen
+            // remove all the fouc prevention styles
+            var styles:NodeList = document.querySelectorAll("style[data-fouc='true']");
+            for (var i:number = 0; i < styles.length; i++) {
+                styles[i].parentNode.removeChild(styles[i]);
+            }
+            application.goto(application.getRoute(), Transition.CUT, true);
+        }, 250); // 250ms delay
     }
     
     /**
