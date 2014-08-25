@@ -99,10 +99,13 @@ body > main > footer {
     input[type="button"]:active,
     input[type="reset"]:active,
     input[type="submit"]:active {
-        color: darken($light, 50%);
+        color: darken($light, 20%);
+        background: transparent;
+        /*
         background: -webkit-radial-gradient(rgba(255, 255, 255, 0.5) 0%, transparent 80%);
         background: -moz-radial-gradient(rgba(255, 255, 255, 0.5) 0%, transparent 80%);
         background: -ms-radial-gradient(rgba(255, 255, 255, 0.5) 0%, transparent 80%);
         background: radial-gradient(rgba(255, 255, 255, 0.5) 0%, transparent 80%);
+        */
     }
 }

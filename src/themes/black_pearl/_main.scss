@@ -2,7 +2,7 @@ body {
     background: $black;
 	background-image: url("./images/dark_fish_skin/dark_fish_skin.png");
     color: $light;
-    padding: round($fontsize/2);
+    padding: round($fontsize/2); 
 }
 
 body > main {
@@ -31,5 +31,5 @@ body > main > section {
     background-color: $white;
     background-attachment: local;
     color: $dark;
-    padding: round($fontsize/2);
+    padding: round($fontsize/2); 
 }

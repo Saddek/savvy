@@ -7,6 +7,7 @@ body > nav {
     height: 100%;
     overflow: scroll;
     padding: $fontsize 0px;
+    box-sizing: border-box;
 
     hr {
         border: 0;

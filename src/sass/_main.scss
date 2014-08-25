@@ -85,57 +85,60 @@ body {
 }
 
 html, body {
-    height:100% !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    overflow: hidden !important;
+    height:100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+body {
+    box-sizing: border-box;
 }
 
 body > main {
-    position: fixed !important;
-    top: 0px !important;
+    position: fixed;
+    top: 0px;
     left: 0px;
-    z-index: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    box-sizing: border-box !important;
-    overflow: hidden !important;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
     
-    -webkit-transition: left 250ms !important;
-    -moz-transition: left 250ms !important;
-    -ms-transition: left 250ms !important;
-    transition: left 250ms !important;
+    -webkit-transition: left 250ms;
+    -moz-transition: left 250ms;
+    -ms-transition: left 250ms;
+    transition: left 250ms;
 }
 
 body > main > header,
 body > main > footer {
-    position: absolute !important;
-    width: 100% !important;
+    position: absolute;
+    width: 100%;
     height: 0%;
-    box-sizing: border-box !important;
-    overflow: hidden !important;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 body > main > header {
-    top: 0% !important;
-    left: 0px !important;
+    top: 0%;
+    left: 0px;
     z-index: 10;
 }
 
 body > main > footer {
-    bottom: 0% !important;
-    left: 0px !important;
+    bottom: 0%;
+    left: 0px;
     z-index: 5;
 }
 
 body > main > section {
-    position: absolute !important;
+    position: absolute;
     top: 0px;
-    left: 0px !important;
-    width: 100% !important;
+    left: 0px;
+    width: 100%;
     hieght: 100%;
-    box-sizing: border-box !important;
-    display: none !important;
-    z-index: 0 !important;
-    overflow: auto !important;
+    box-sizing: border-box;
+    display: none;
+    z-index: 0;
+    overflow: auto;
 }
