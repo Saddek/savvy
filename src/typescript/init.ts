@@ -32,15 +32,18 @@ module Savvy {
         // ordinarily, Savvy will be initialised when the DOM is ready
         element.addEventListener(event, function deviceReadyEvent():void {
             element.removeEventListener(event, deviceReadyEvent);
-            checkAppCache();
+            start();
         }, false);
     }
     
+    /*
+    // FIXME: This is a nice feature, but too easy to get into an unresponsive
+    // state (e.g. if the server is slow, etc.)
     function checkAppCache():void {
         // offer update on application cache update on standalone applications
         // checking
         // 
-        if (window.applicationCache) {// && window.navigator.standalone) {
+        if (window.applicationCache && window.navigator.standalone) {
             var msg = (window.applicationCache.UNCACHED) ? "Installing: " : "Updating: ";
             
             // error, checking, noupdate, downloading, progress, updateready, cached
@@ -55,12 +58,18 @@ module Savvy {
                 + "vertical-align: middle;"
                 + "font-family: sans-serif;"
                 + "text-align: center;"
+            
+            // we will only wait one second for the cache, otherwise plough on
+            var t:number = setTimeout(doStart, 1e3);
 
             function onDownloading():void {
+                clearTimeout(t);
                 document.body.appendChild(progress);
             }
 
             function doStart():void {
+                clearTimeout(t);
+                
                 if (progress.parentNode == document.body) {
                     document.body.removeChild(progress);
                 }
@@ -72,12 +81,19 @@ module Savvy {
                 window.applicationCache.removeEventListener("noupdate", doStart);
                 window.applicationCache.removeEventListener("error", doStart);
                 window.applicationCache.removeEventListener("obsolete", doStart);
-                window.applicationCache.addEventListener("updateready", doUpdate);
+                window.applicationCache.addEventListener("updateready", function() {
+                    var message:string = "A new version of "
+                        + (("string" == typeof application.name) ? application.name : "this application")
+                        + " is available. Do you want to update now?";
+                    var url:string = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                    if (confirm(message)) window.location.replace(url);
+                });
 
                 start();
             }
             
             function doUpdate():void {
+                clearTimeout(t);
                 var url:string = window.location.protocol + "//" + window.location.host + window.location.pathname;
                 window.location.replace(url);
             }
@@ -114,6 +130,7 @@ module Savvy {
             start();
         }
     }
+    */
     
     function start():void {
         parseWidgetXML(config.widget["savvy:deck"]);

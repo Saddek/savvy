@@ -49,6 +49,19 @@ module application {
         main.style.left = left;
     }
     
+    // listen for updates over the application cache
+    if (window.applicationCache && window.navigator.standalone) {
+        window.applicationCache.addEventListener("updateready", function() {
+            var message:string = "A new version of "
+                + (("string" == typeof application.name) ? application.name : "this application")
+                + " is available. Do you want to update now?";
+            var url:string = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            if (confirm(message)) {
+                document.body.style.display = "none"; // hide the body for prettiness sake while the app reloads
+                window.location.replace(url);
+            }
+        });
+    }
     /* Psuedo methods to mimic the interaction of the standard HTML Document */
     
     export function getElementById(id):Element {
