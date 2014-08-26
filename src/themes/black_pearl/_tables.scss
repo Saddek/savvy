@@ -1,0 +1,58 @@
+table {
+    font-size: 90%;
+}
+
+caption {
+    font-family: "Roboto Condensed Regular", sans-serif;
+    font-size: 90%;
+    caption-side: bottom;
+    margin-top: em;
+}
+
+th {
+    font-family: "Roboto Regular", sans-serif;
+    font-weight: 500;
+    color: $highlight;
+    text-align: left;
+}
+
+thead th,
+thead td {
+    text-align: center;
+}
+
+td, th {
+    padding: 0.2em 0.6em;
+    border: 1px solid lighten($dark, 65%);
+}
+
+th {
+    border-style: dotted;
+}
+
+th:first-child {
+    border-left: none;
+    padding-left: 0px;
+}
+
+th:last-child {
+    border-right: none;
+    padding-right: 0px;
+}
+
+thead td,
+thead th {
+    border: none;
+    border-bottom: 2px solid lighten($dark, 40%);
+}
+
+tfoot td,
+tfoot th {
+    border: none;
+    border-top: 2px solid lighten($dark, 40%);
+}
+
+tfoot td {
+    font-family: "Roboto Medium", sans-serif;
+    font-weight: 500;
+}
