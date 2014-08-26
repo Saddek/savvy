@@ -60,6 +60,11 @@ $header: 42px;
 $footer: 42px;
 $fontsize: 16px;
 
+@mixin calc($property, $expression) { 
+  #{$property}: -webkit-calc(#{$expression}); 
+  #{$property}: calc(#{$expression}); 
+}
+
 @import "main";
 @import "fonts";
 @import "typography";
