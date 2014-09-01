@@ -155,7 +155,21 @@ module Savvy {
     }
     
     function createSavvyEvent(detail, path, preventHistory):SavvyEvent {
-        var event:SavvyEvent = <SavvyEvent> document.createEvent("CustomEvent");
+        var event:SavvyEvent;
+        try {
+            event = <SavvyEvent> document.createEvent("CustomEvent");
+        } catch (err) {
+            // on older Android devices (e.g. Gingerbread) CustomEvent cause a DOM exception
+            event = <SavvyEvent> document.createEvent("Event");
+            event.initCustomEvent = (
+                type:string,
+                canBubble:boolean = false,
+                cancelable:boolean = false,
+                detail?:any) => {
+                    event.initEvent(type, canBubble, cancelable);
+                    event.detail = detail;
+            }
+        }
         continueTransition = noop;
         event["continue"] = ():void => {
             continueTransition.call(Savvy, detail, path, preventHistory); // NB: make sure 'this' is Savvy
