@@ -353,7 +353,7 @@ module Savvy {
     function executeJavaScript(url:string, context?:any):void {
     	var code:string = parseScriptFile(url);
         try  {
-            Savvy._eval(code, context);
+            Savvy._eval(code, context, url);
         } catch (err) {
 	    	throw err.toString() + " (" + url + ")";
     	}
