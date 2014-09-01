@@ -94,6 +94,7 @@ var UUID = require('node-uuid');
 var Express = require('express');
 var IP = require("ip");
 var Watch = require("watch");
+var gzip = require("compression");
 
 var banner = FS.readFileSync(Path.resolve(__dirname, "banner.txt"));
 NCP.limit = 16;
@@ -144,6 +145,7 @@ function setup() {
         log("Initialings HTTP server...");
         var Express = require('express');
         var app = Express();
+        app.use(gzip());
         app.get('/*', function(req, res, next){
             res.header("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
             res.header("Pragma", "no-cache"); // HTTP 1.0.
