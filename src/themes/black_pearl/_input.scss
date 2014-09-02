@@ -160,6 +160,12 @@ input[type="radio"] {
 }
 
 input[type="radio"]:checked {
+    background-image: url("images/radio@2x.png");
+    background-size: 16px 16px;
+    background-repeat: no-repeat;
+}
+
+html.svg input[type="radio"]:checked {
     background-image: url("images/radio.svg");
 }
 
@@ -175,6 +181,12 @@ input[type="checkbox"] {
 }
 
 input[type="checkbox"]:checked {
+    background-image: url("images/check@2x.png");
+    background-size: 16px 16px;
+    background-repeat: no-repeat;
+}
+
+html.svg input[type="checkbox"]:checked {
     background-image: url("images/check.svg");
 }
 
