@@ -61,6 +61,27 @@ location.src = path.resolve("src");
 location.banner = path.join(location.dist, "banner.txt");
 location.copyright = path.join(location.src, "copyright.txt");
 
+var compress = {
+    sequences: true,
+    properties: true,
+    dead_code: true,
+    drop_debugger: true,
+    conditionals: true,
+    comparisons: true,
+    evaluate: true,
+    booleans: true,
+    loops: true,
+    unused: true,
+    hoist_funs: false,
+    hoist_vars: false,
+    if_return: true,
+    join_vars: true,
+    cascade: true,
+    warnings: true,
+    negate_iife: true,
+    drop_console: false
+};
+
 ncp.limit = 16;
 
 function filter(filename) {
@@ -163,26 +184,7 @@ function ugly() {
         try {
             result = uglify.minify(js, {
                 outSourceMap: "savvy.min.js.map",
-                compress: {
-                    sequences: true,
-                    properties: true,
-                    dead_code: true,
-                    drop_debugger: true,
-                    conditionals: true,
-                    comparisons: true,
-                    evaluate: true,
-                    booleans: true,
-                    loops: true,
-                    unused: true,
-                    hoist_funs: false,
-                    hoist_vars: false,
-                    if_return: true,
-                    join_vars: true,
-                    cascade: true,
-                    warnings: true,
-                    negate_iife: true,
-                    drop_console: false
-                }
+                compress: compress
             });
         } catch (err) {
             // FIXME: this always assumes the error is a JS parsing error
