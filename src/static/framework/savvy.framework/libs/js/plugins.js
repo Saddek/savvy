@@ -60,3 +60,8 @@ if(window.navigator.standalone){var canScrollRight=function(a){return a.scrollLe
 
 // Enable scrolling on Android < 3.0
 if(0<=navigator.userAgent.indexOf("Android")){var from=navigator.userAgent.indexOf("Android")+8,version=navigator.userAgent.substr(from,5);if(3>parseFloat(version)){var isScrollable=function(a){var c=window.getComputedStyle(a).overflowX;a=window.getComputedStyle(a).overflowY;return"auto"==c||"scroll"==c||"auto"==a||"scroll"==a},start={x:0,y:0};document.addEventListener("touchstart",function(a){start.x=a.touches[0].screenX;start.y=a.touches[0].screenY});document.addEventListener("touchmove",function(a){var c= a.touches[0].screenX-start.x,d=a.touches[0].screenY-start.y;start.x=a.touches[0].screenX;start.y=a.touches[0].screenY;for(var b=a.target;b!=document.documentElement;){if(isScrollable(b)){b.scrollLeft-=c;b.scrollTop-=d;a.preventDefault();break}b=b.parentNode}})}};
+
+// cut down version of modernizer
+if ("undefined" != typeof SVGSVGElement) {
+    document.documentElement.className += " svg"
+}
