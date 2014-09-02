@@ -14,7 +14,6 @@
     
     <savvy:deck>
 
-        <css>savvy.framework/themes/black_pearl/style.min.css</css>
         <css>assets/fonts/font-awesome-4.1.0/css/font-awesome.min.css</css>
         <js>js/vendor/hammer-2.0.2.min.js</js>
         <js>js/script.js</js>
