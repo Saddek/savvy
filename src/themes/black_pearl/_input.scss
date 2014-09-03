@@ -196,3 +196,14 @@ html.svg input[type="checkbox"]:checked {
     input[type="checkbox"]:checked { background-image: none; }
 }
 
+fieldset {
+	border: 1px solid lighten($dark, 66%);
+	border-radius: 2px;
+}
+
+legend {
+	font-family: "Roboto Light", sans-serif;
+    color: $dark;
+	padding-right: 0.5em;
+	padding-left: 0.5em;
+}

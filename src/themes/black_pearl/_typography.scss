@@ -43,6 +43,11 @@ abbr[title]:after {
    content: " (" attr(title) ")";
 }
 
+summary {
+    font-family: "Roboto Medium", sans-serif;
+    font-weight: 500;
+}
+
 body > main > section {
     color: $dark;
 }
