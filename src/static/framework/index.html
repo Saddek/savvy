@@ -9,6 +9,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
         <title>{{title}}</title>
+        
         <meta name="description" content="{{description}}" />
         <meta name="author" content="{{author}}">
         <link rel="author" type="text/plain" href="humans.txt" />
@@ -64,28 +65,31 @@
             body * { display: none !important; }
         </style>
         
-        <!-- es5-shim.js patches a JavaScript context to contain all EcmaScript 5 methods 
-             that can be faithfully emulated with a legacy JavaScript engine.s -->
-        <script src="savvy.framework/libs/js/es5-shim/es5-shim.min.js" type="application/javascript"></script>
-        <!-- es5-sham.js patches other ES5 methods as closely as possible. -->
-        <script src="savvy.framework/libs/js/es5-shim/es5-sham.min.js" type="application/javascript"></script>
+        <!--[if gt IE 8]><!-->
+        
+            <!-- es5-shim.js patches a JavaScript context to contain all EcmaScript 5 methods 
+                 that can be faithfully emulated with a legacy JavaScript engine.s -->
+            <script src="savvy.framework/libs/js/es5-shim/es5-shim.min.js" type="application/javascript"></script>
+            <!-- es5-sham.js patches other ES5 methods as closely as possible. -->
+            <script src="savvy.framework/libs/js/es5-shim/es5-sham.min.js" type="application/javascript"></script>
 
-        <!-- fastclick.js - remove the artificial 300ms delay from touch events -->
-        <script type='application/javascript' src='savvy.framework/libs/js/fastclick/fastclick.js'></script>
-        <script>
-            // add fast click to the window
-            window.addEventListener("load", function addFastClick() {
-                window.removeEventListener("load", addFastClick); // remove self
-                FastClick.attach(document.body);
-            });
-        </script>
+            <!-- fastclick.js - remove the artificial 300ms delay from touch events -->
+            <script type='application/javascript' src='savvy.framework/libs/js/fastclick/fastclick.js'></script>
+            <script>
+                // add fast click to the window
+                window.addEventListener("load", function addFastClick() {
+                    window.removeEventListener("load", addFastClick); // remove self
+                    FastClick.attach(document.body);
+                });
+            </script>
 
-        <!-- Some monkey patches for older browsers that are needed for Savvy -->
-        <script src="savvy.framework/libs/js/plugins.js" type="application/javascript"></script>
-
-        <!--[if gt IE 7]><!-->
-        <!-- The Savvy library -->
-        <script src="savvy.framework/savvy.min.js" type="application/javascript"></script>
+            <!-- Attempt to to include Cordova - either a dummy file or the real file will be loaded. -->
+            <script src="cordova.js" type="application/javascript"></script>
+            <!-- Some monkey patches for older browsers that are needed for Savvy -->
+            <script src="savvy.framework/libs/js/plugins.js" type="application/javascript"></script>
+            <!-- The Savvy library -->
+            <script src="savvy.framework/savvy.min.js" type="application/javascript"></script>
+        
         <!--<![endif]-->
 
         <!-- reset CSS styles: http://html5doctor.com/html-5-reset-stylesheet/ -->

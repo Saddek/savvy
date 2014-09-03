@@ -1,3 +1,7 @@
+interface Window {
+    cordova:any;
+}
+
 module Savvy {
 
     var config:any = JXON.parse(read("config.xml", true));
@@ -6,7 +10,15 @@ module Savvy {
     } else {
         application.id = (config.widget["@id"]) ? config.widget["@id"] : null;
         application.version = (config.widget["@version"]) ? config.widget["@version"] : null;
-        application.isCordova = (config.widget["@cordova"] == "yes");
+        application.isCordova = ("undefined" != typeof window.cordova);
+        
+        application.name = (config.widget.name.toString()) ? config.widget.name.toString() : null;
+        application.description = (config.widget.description.toString()) ? config.widget.description.toString() : null;
+        application.author = {
+            name: (config.widget.author.toString()) ? config.widget.author.toString() : null,
+            email: (config.widget.author["@email"]) ? config.widget.author["@email"] : null,
+            href: (config.widget.author["@href"]) ? config.widget.author["@href"] : null
+        }
         
         // first assume window.load
         var event:string = "load";
@@ -16,16 +28,11 @@ module Savvy {
             event = "deviceready";
             element = document;
 
-            // add the Cordova scritps (assume these are in the root directory)
-            var cordova_lib:HTMLElement = document.createElement("script");
-            cordova_lib.setAttribute("src", "cordova.js");
-            cordova_lib.setAttribute("type", "text/javascript");
-
+            // add the Cordova plugin script (assumes this file is in the root directory)
             var cordova_plugins:HTMLElement = document.createElement("script");
             cordova_plugins.setAttribute("src", "cordova_plugins.js");
-            cordova_plugins.setAttribute("type", "text/javascript");
+            cordova_plugins.setAttribute("type", "application/javascript");
 
-            document.head.appendChild(cordova_lib);
             document.head.appendChild(cordova_plugins);
         }
 
