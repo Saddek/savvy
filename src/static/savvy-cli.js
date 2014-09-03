@@ -34,49 +34,54 @@ x88:  `)8b. .@88 "8888"   8888  8888   8888  8888   888E  888I
 
 */
 
+var FS = require("fs");
 var Path = require("path");
 var package = require(Path.resolve(__dirname, "package.json"));
 
 // console arguments
 var argv = require("yargs")
            .usage("Builds a Savvy project or creates an empty Savvy project.")
-           .example("$0 init [target]", "Create an empty project")
-           .example("$0 [source] --out [target]", "Build an application")
-           .example("$0 [source] --zip [target]", "Build an zipped application")
-           .example("$0 [source] --port [port]", "Build an application served over HTTP.")
+           .example("$0 -create [target]", "Create an empty project")
+           .example("$0 --src [source] --out [target]", "Build an application")
+           .example("$0 --src [source] --zip [target]", "Build an zipped application")
+           .example("$0 --src [source] --port [port]", "Build an application served over HTTP.")
            .version(package.version, "version")
            .help("help")
+           .string("create")
+           .string("src")
            .string("out")
            .string("zip")
            .string("port")
            .boolean("clean")
            .boolean("nocompress")
            .boolean("nocache")
-           .boolean("watch")
            .boolean("verbose")
            .boolean("warn")
-           .boolean("dev")
+           .boolean("console")
            .alias("v", "verbose")
+           .describe("create", "A directory to initialise with a basic application.")
+           .describe("src", "A directory containing the application source.")
            .describe("out", "A directory to build the application in.")
            .describe("zip", "A zip file to built the application in.")
            .describe("port", "A HTTP port to serve the built application from.")
            .describe("clean", "Empties the target directory before the operation.")
            .describe("nocompress", "Disables HTML, CSS and JavaScript compression.")
            .describe("nocache", "Disables offline caching.")
-           .describe("watch", "Rebuild the applicaton everytime a source file is modified.")
            .describe("warn", "Show JavaScript compilation warnings.")
            .describe("verbose", "Enable verbose logging.")
-           .describe("dev", "Don't strip console commands from JavaScript.")
+           .describe("console", "Don't strip console commands from JavaScript.")
            .check(function (argv) {
-               if (typeof argv._[0] == "string" && typeof argv.out == "string") return true;
-               if (typeof argv._[0] == "string" && typeof argv.zip == "string") return true;
-               if (typeof argv._[0] == "string" && typeof argv.port == "string") return true;
-               if (argv._[0] == "init" && typeof argv._[1] == "string") return true;
+               if ("string" == typeof argv.create) return true;
+               if ("string" == typeof argv.src && "string" == typeof argv.out) return true;
+               if ("string" == typeof argv.src && "string" == typeof argv.zip) return true;
+               if ("string" == typeof argv.src && "string" == typeof argv.port) return true;
                throw "";
            })
            .argv;
 
-var FS = require("fs");
+var banner = FS.readFileSync(Path.resolve(__dirname, "banner.txt"));
+console.info(banner.toString());
+
 var OS = require('os')
 var NCP = require("ncp").ncp;
 var UglifyJS = require("uglify-js");
@@ -93,10 +98,8 @@ var Archiver = require("archiver");
 var UUID = require('node-uuid');
 var Express = require('express');
 var IP = require("ip");
-var Watch = require("watch");
 var gzip = require("compression");
 
-var banner = FS.readFileSync(Path.resolve(__dirname, "banner.txt"));
 NCP.limit = 16;
 
 var git = /\.git$/i;
@@ -117,11 +120,10 @@ function log(str) {
 }
 
 var src, out, out_rel, t1;
-var server = Path.join(OS.tmpdir(), UUID.v4());
 
-if (argv._[0] == "init")  {
+if (argv.create)  {
     // init a directory
-    var dir = Path.resolve(argv._[1]);
+    var dir = Path.resolve(argv.create);
     if (argv.clean) {
         RMDIR(dir, function(err){
             if (err) throw err;
@@ -135,50 +137,16 @@ if (argv._[0] == "init")  {
             NCP(Path.resolve(__dirname, "project"), dir, {filter: filter}, function (err) {
                 if (err) throw err;
                 console.info("Created project at: " + dir);
+                if (argv.src) setup();
             });
         });
     }
-} else setup();
+} else if (argv.src) setup();
 
 function setup() {
-    if (argv.port) { // start the server
-        log("Initialings HTTP server...");
-        var Express = require('express');
-        var app = Express();
-        app.use(gzip());
-        app.get('/*', function(req, res, next){
-            res.header("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
-            res.header("Pragma", "no-cache"); // HTTP 1.0.
-            res.header("Expires", "0"); // Proxies.
-            next(); // http://expressjs.com/guide.html#passing-route control
-        });
-        app.use(Express.static(server));
-        app.listen(argv.port);
-    }
-    
-    console.info(banner.toString());
-    src = Path.resolve(argv._[0]);
-    
-    var f = false;
-    if (argv.watch) {
-        Watch.watchTree(src, { ignoreDotFiles:true }, function(files, stat_now, state_before) {
-            if (f) {
-                console.info("---");
-                if (typeof files == "string") {
-                    console.log("Modified: " + Path.relative(src, files));
-                    console.log("Rebuilding...")
-                } else if (typeof files == "object") {
-                    var list = Object.getOwnPropertyNames(files);
-                    console.log(list.length + " files modified. Rebulding...");
-                }
-            } else {
-                f = true;
-            }
-            build();
-        })
-    } else {
-        build();
-    }
+    src = Path.resolve(argv.src);
+    console.info("Building project from: " + src);
+    build();
 }
 
 function build() {
@@ -276,7 +244,7 @@ var compressor_options = {
     cascade: true,
     warnings: (argv.warn || argv.verbose),
     negate_iife: true,
-    drop_console: (!argv.dev)
+    drop_console: (!argv.console)
 };
 
 function compress() {
@@ -296,22 +264,25 @@ function compress() {
         if (javascript.test(file.name)) {
             // compress js
             var path = Path.resolve(root, file.name);
-            log("Optomising: " + Path.relative(out, path));
-            var rel = Path.relative(out, root);
-            var map = Path.join(rel, file.name + ".map");
-            var result;
-            try {
-                result = UglifyJS.minify(path, {
-                    outSourceMap: map,
-                    compress: compressor_options
-                });
-            } catch (err) {
-                // FIXME: this always assumes the error is a JS parsing error
-                //        and line and column come out as undefined
-                throw "JavaScript error: " + err.message + " (" + path + ":" + err.line + ":" + err.col + ")";
+            var path_rel = Path.relative(out, path);
+            if (path_rel != "cordova.js") {
+                log("Optomising: " + Path.relative(out, path_rel));
+                var rel = Path.relative(out, root);
+                var map = Path.join(rel, file.name + ".map");
+                var result;
+                try {
+                    result = UglifyJS.minify(path, {
+                        outSourceMap: map,
+                        compress: compressor_options
+                    });
+                } catch (err) {
+                    // FIXME: this always assumes the error is a JS parsing error
+                    //        and line and column come out as undefined
+                    throw "JavaScript error: " + err.message + " (" + path + ":" + err.line + ":" + err.col + ")";
+                }
+                FS.writeFileSync(path, result.code);
+                FS.writeFileSync(path + ".map", result.map);
             }
-            FS.writeFileSync(path, result.code);
-            FS.writeFileSync(path + ".map", result.map);
         }
         
         if (html.test(file.name)) {
@@ -454,7 +425,8 @@ function cache(version) {
                 if (!exclude) {
                     var path = Path.join(out, file);
                     bytes += FS.statSync(path)["size"];
-                    fileList2.push(file);
+                    // NB: make sure to encodeURI this (spaces have meaning in app cache)
+                    fileList2.push(encodeURI(file));
                 }
             });
 
@@ -542,15 +514,25 @@ function copy(){
 
 function serve(){
     if (argv.port) {
-        log("Overwriting content of server directory...");
-        RMDIR(server, function(err){
+        log("Initialings HTTP server...");
+        var server = Path.join(OS.tmpdir(), UUID.v4());
+        NCP(out, server, {}, function (err) {
             if (err) throw err;
-            NCP(out, server, {}, function (err) {
-                if (err) throw err;
-                end();
-            });
-        });
 
+            var Express = require('express');
+            var app = Express();
+            app.use(gzip());
+            app.get('/*', function(req, res, next){
+                res.header("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
+                res.header("Pragma", "no-cache"); // HTTP 1.0.
+                res.header("Expires", "0"); // Proxies.
+                next(); // http://expressjs.com/guide.html#passing-route control
+            });
+            app.use(Express.static(server));
+            app.listen(argv.port);
+
+            end();
+        });
     } else {
         end();
     }
@@ -574,10 +556,6 @@ function end() {
         }
         if (argv.port) { // start the server
             console.info("The build is being served at: http://" + IP.address() + ":" + argv.port + "/");
-        }
-        if (argv.watch) {
-            console.info("Watching for changes: " + src);
-            console.log(t2.toTimeString());
         }
     });
 }
