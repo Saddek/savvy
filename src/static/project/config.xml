@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <widget xmlns       = "http://www.w3.org/ns/widgets"
         xmlns:gap   = "http://phonegap.com/ns/1.0"
-        xmlns:savvy = "https://github.com/nth-iteration/savvy"
-        id="com.example.savvy" version="1.0.0" cordova="no">
+        xmlns:savvy = "https://savvy.example.com/ns/1.0"
+        id="com.example.savvy" version="1.0.0">
     
     <name>Savvy Example</name>
     <description>
@@ -18,10 +18,6 @@
         <js>js/vendor/hammer-2.0.2.min.js</js>
         <js>js/script.js</js>
         <html>html/off-canvas.html</html>
-        
-        <js>js/samples/coffeescript-example.js</js>
-        <js>js/samples/typescript-example.js</js>
-        <js>js/samples/cpp-example.js</js>
         
         <header>
             <html>html/header.html</html>
