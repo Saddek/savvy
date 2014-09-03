@@ -10,10 +10,17 @@ interface Navigator {
 
 module application {
     
-    export var name:string = null;
     export var id:string = null;
     export var isCordova:boolean = false;
     export var version:string = null;
+    
+    export var name:string = null;
+    export var description:string = null;
+    export var author:any = {
+        name: null,
+        email: null,
+        href: null
+    }
     
     export var cards:HTMLElement[] = [];
     export var header:HTMLElement = null;
