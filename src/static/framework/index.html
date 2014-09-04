@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" role="application" manifest="{{manifest}}">
+<html role="application"{{#if manifest}} manifest="{{manifest}}"{{/if}}>
     
     <head>
         <meta charset="utf-8">
@@ -40,7 +40,7 @@
         <link href="start@1496x2048.png" media="(device-width: 768px) and (device-height: 1024px) and (orientation: landscape) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
         
         <!-- Mobile viewport optimized and user sclaing and zooming disabled: h5bp.com/viewport -->
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
 
         <!-- iPhone-specific settings suitable for HTML-based apps:
              https://developer.apple.com/library/safari/#codinghowtos/Mobile/UserExperience/_index.html -->
@@ -97,8 +97,10 @@
         <!-- savvy.css  -->
         <link rel="stylesheet" type="text/css" href="savvy.framework/savvy.min.css" />
         
-        <!-- theme -->
-        <link rel="stylesheet" type="text/css" href="savvy.framework/themes/black_pearl/style.min.css">
+        {{#if theme}}
+        <!-- Savvy theme: {{theme}} -->
+        <link rel="stylesheet" type="text/css" href="savvy.framework/themes/{{theme}}_pearl/style.min.css">
+        {{/if}}
         
     </head>
 

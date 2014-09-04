@@ -2,7 +2,7 @@
 <widget xmlns       = "http://www.w3.org/ns/widgets"
         xmlns:gap   = "http://phonegap.com/ns/1.0"
         xmlns:savvy = "https://savvy.example.com/ns/1.0"
-        id="com.example.savvy" version="1.0.0">
+        id="com.example.savvy" version="1.0.0" theme="black">
     
     <name>Savvy Example</name>
     <description>

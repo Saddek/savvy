@@ -20,8 +20,8 @@ module Savvy {
             href: (config.widget.author["@href"]) ? config.widget.author["@href"] : null
         }
         
-        // first assume window.load
-        var event:string = "load";
+        // first assume window.onload (or window.onpageshow if it is available)
+        var event:string = ("onpageshow" in window) ? "pageshow" : "load";
         var element:any = window;
         if (application.isCordova) {
             // then modify to document.deviceready

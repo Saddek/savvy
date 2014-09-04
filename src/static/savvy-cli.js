@@ -361,6 +361,9 @@ function xml() {
                 href = (result.widget.author[0]) ? result.widget.author[0].$.href.toString() : "";
             }
             
+            var theme = (result.widget.$.theme) ? result.widget.$.theme : "";
+            if (theme == "none") theme = "";
+            
             var author_long = author;
             if (email) author_long += " <" + email + ">";
             if (href) author_long += " (" + href + ")";
@@ -372,11 +375,21 @@ function xml() {
                 title: escape2(name),
                 description: escape2(description),
                 author: escape2(author_long),
-                manifest: (argv.nocache) ? "" : "manifest.appcache"
+                manifest: (argv.nocache) ? "" : "manifest.appcache",
+                theme: theme
             }));
     
             var version = (result.widget.$.version) ? result.widget.$.version : "";
-            cache(version);
+            
+            // remove themes if unneeded
+            if (theme == "") {
+                var theme_path = Path.join(out, "savvy.framework/themes");
+                RMDIR(theme_path, function(err){
+                    if (err) throw err;
+                    cache(version);
+                });
+            } else cache(version);
+
         });
     });
 }
