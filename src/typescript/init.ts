@@ -249,11 +249,7 @@ module Savvy {
     
     function initNode(node:any, element:HTMLElement):void {
         guaranteeArray(node.css).forEach((url:string):void => {
-            var selector:string = (element == document.body) ? null
-                : (element.id == "")
-                ? element.nodeName
-                : element.nodeName + "#" + element.id;
-            appendCssToHeadFromUrl(url, selector);
+            appendCssToHeadFromUrl(url, element);
         });
 
         guaranteeArray(node.html).forEach((url:string):void => {
@@ -300,7 +296,9 @@ module Savvy {
                 doubleQuotes: /url\("(?!https?:\/\/)(?!\/)/gi,
                 noQuotes: /url\((?!https?:\/\/)(?!['"]\/?)/gi
             },
+            header: /\bheader\b(,(?=[^}]*{)|\s*{)/gi,
             card: /\bcard\b(,(?=[^}]*{)|\s*{)/gi,
+            footer: /\bfooter\b(,(?=[^}]*{)|\s*{)/gi,
             selector: /([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/gi
 		}
 	}
@@ -313,8 +311,14 @@ module Savvy {
      * @param url The URL of the CSS file
      * @param isCardCSS A Boolean indicating that this CSS relates to the current screeen (optional)
      */
-    function appendCssToHeadFromUrl(url:string, selector?:string):void {
+    function appendCssToHeadFromUrl(url:string, element:HTMLElement):void {
         var isAbsolute:boolean = regex.isRemoteUrl.test(url);
+        
+        var selector:string = (element == document.body) ? null
+            : (element.id == "")
+            ? element.nodeName
+            : element.nodeName + "#" + element.id;
+
         if (isAbsolute && selector) {
             throw "Card styles sheets cannot be remote (e.g. http://www.examples.com/style.css). Please include remote style sheets globally.";
         }
@@ -331,8 +335,24 @@ module Savvy {
             node.setAttribute("type", "text/css");
             var content:string = read(url);
             if (selector) {
+                // first replace selectors with a the scoped selector
                 content = content.replace(regex.css.selector, "body > main > " + selector + " $1$2");
-                content = content.replace(regex.css.card, "$1");
+                // next, back out where the above mistook media queries, etc. for selectors
+                content = content.replace("body > main > " + selector + " @", "@");
+                
+                // now remove references to headers, footers and cards
+                // FIXME: what is the user is selecting a legitimate header, footer, etc.?
+                switch (element.nodeName) {
+                    case "header":
+                        content = content.replace(regex.css.header, "$1");
+                        break;
+                    case "footer":
+                        content = content.replace(regex.css.footer, "$1");
+                        break;
+                    default:
+                        content = content.replace(regex.css.card, "$1");
+                        break;
+                }
             }
             var i:number = url.toString().lastIndexOf("/");
             if(i != -1) {
