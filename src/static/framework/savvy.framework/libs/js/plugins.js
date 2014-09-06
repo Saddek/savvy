@@ -16,8 +16,6 @@ x88:  `)8b. .@88 "8888"   8888  8888   8888  8888   888E  888I
                                                        ./"     
                                                       ~`       
 
-   Version: 0.3.0
-
    Copyright 2014 Oliver Moran
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -57,6 +55,9 @@ r=/[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u20
 
 // Prevent iOS body overscoll
 if(window.navigator.standalone){var canScrollRight=function(a){return a.scrollLeft!=a.scrollWidth-a.getBoundingClientRect().width},canScrollLeft=function(a){return 0!=a.scrollLeft},canScrollDown=function(a){return a.scrollTop!=a.scrollHeight-a.getBoundingClientRect().height},canScrollUp=function(a){return 0!=a.scrollTop},canScrollHorizontal=function(a){return a.scrollWidth>a.getBoundingClientRect().width},canScrollVertical=function(a){return a.scrollHeight>a.getBoundingClientRect().height},isScrollable= function(a){var c=window.getComputedStyle(a).overflowX;a=window.getComputedStyle(a).overflowY;return"auto"==c||"scroll"==c||"auto"==a||"scroll"==a},isOnWhiteList=function(a){switch(a.constructor){case HTMLInputElement:return"range"==a.type;case HTMLAudioElement:return!0;default:return!1}},start={x:0,y:0};document.addEventListener("touchstart",function(a){start.x=a.touches[0].screenX;start.y=a.touches[0].screenY});document.addEventListener("touchmove",function(a){for(var c=a.touches[0].screenX-start.x, d=a.touches[0].screenY-start.y,b=a.target;b!=document.documentElement;){if(!isScrollable(b)){if(isOnWhiteList(b))return}else if(canScrollVertical(b)&&Math.abs(d)>Math.abs(c)){if(0<d&&canScrollUp(b)||0>d&&canScrollDown(b))return}else if(canScrollHorizontal(b)&&Math.abs(c)>Math.abs(d)&&(0<c&&canScrollLeft(b)||0>c&&canScrollRight(b)))return;b=b.parentNode}a.preventDefault()})};
+
+// iOS7 cannot open browser windows, so over-ride window.open to inform user of this
+navigator.userAgent.match(/(iPad|iPhone);.*CPU.*OS 7_\d/i)&&window.navigator.standalone&&(window.open=function(b,a){"_self"!=a&&alert("Unfortunately, iOS 7 cannot open Safari from standalone web apps. Please report this bug at: http://bugreport.apple.com")});
 
 // Enable scrolling on Android < 3.0
 if(0<=navigator.userAgent.indexOf("Android")){var from=navigator.userAgent.indexOf("Android")+8,version=navigator.userAgent.substr(from,5);if(3>parseFloat(version)){var isScrollable=function(a){var b=window.getComputedStyle(a).overflowX;a=window.getComputedStyle(a).overflowY;return"auto"==b||"scroll"==b||"auto"==a||"scroll"==a},sample={x:0,y:0},velocity={x:0,y:0},point={x:0,y:0},sampleTime=new Date,i,obj;document.addEventListener("touchstart",function(a){clearInterval(i);point.x=a.touches[0].screenX; point.y=a.touches[0].screenY;sample.x=point.x;sample.y=point.y;velocity.x=0;velocity.y=0;for(obj=a.target;obj!=document.documentElement&&!isScrollable(obj);)obj=obj.parentNode});document.addEventListener("touchmove",function(a){var b=a.touches[0].screenX-point.x,c=a.touches[0].screenY-point.y;point.x=a.touches[0].screenX;point.y=a.touches[0].screenY;(new Date).getTime()>sampleTime.getTime()+100&&(velocity.x=point.x-sample.x,velocity.y=point.y-sample.y,sample.x=point.x,sample.y=point.y);isScrollable(obj)&& (obj.scrollLeft-=b,obj.scrollTop-=c,a.preventDefault())});document.addEventListener("touchend",function(a){i=setInterval(function(){velocity.x*=.9;velocity.y*=.9;obj.scrollLeft-=velocity.x;obj.scrollTop-=velocity.y;10>Math.abs(velocity.x)&&10>Math.abs(velocity.y)&&clearInterval(i)},1E3/24)})}};
