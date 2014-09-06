@@ -28,3 +28,13 @@
    The Roboto typeface is by Christian Robertson and copyright Google Inc.
    It is also released under the Apache License, Version 2.0.
 
+   Part of this software are copyright of Digisoft.tv and are licenced under
+   the MIT license. Normalize.css is copyright of Nicolas Gallagher and
+   Jonathan Neal and is licensed under the MIT license. es5-shim is copyright
+   of Kristopher Michael Kowal and contributors and is licenced under the MIT
+   license. FastClick is copyright of The Financial Times Ltd. and is licensed
+   under the MIT license.
+   
+   The JSON-js json2 library is by Douglas Crockford and has been released into
+   the public domain.
+   

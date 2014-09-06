@@ -14,12 +14,12 @@
     
     <savvy:deck>
 
-        <css>assets/fonts/font-awesome-4.1.0/css/font-awesome.min.css</css>
-        <js>js/script.js</js>
-        
         <html>html/off-canvas.html</html>
         <css>css/off-canvas.css</css>
+        <js>js/script.js</js>
         
+        <css>assets/fonts/font-awesome-4.1.0/css/font-awesome.min.css</css>
+                
         <header>
             <html>html/header.html</html>
             <css>css/header.css</css>
@@ -30,28 +30,13 @@
             <css>css/footer.css</css>
         </footer>
 
-        <card id="Home" title="Home" default="yes">
+        <card id="Home" title="Welcome to Savvy" default="yes">
             <html>html/home.html</html>
             <css>css/home.css</css>
         </card>
         
-        <card id="Typography" title="Typography">
-            <html>html/typography.html</html>
-        </card>
-        
-        <card id="Forms" title="Form Elements">
-            <html>html/forms.html</html>
-        </card>
-        
-        <card id="AV" title="Audio &amp; Video">
-            <html>html/av.html</html>
-            <js>js/av.js</js>
-        </card>
-        
-        <card id="2D" title="2D Graphics">
-        </card>
-        
-        <card id="3D" title="3D Graphics">
+        <card id="Code" title="Developing and Licensing">
+            <html>html/code.html</html>
         </card>
         
     </savvy:deck>

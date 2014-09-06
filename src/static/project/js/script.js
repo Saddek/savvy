@@ -1,18 +1,18 @@
-application.addEventListener(Application.READY, function (e) {
-    var links = application.querySelectorAll("nav a");
-    links[0].setAttribute("data-selected", "selected");
-    for (var i = 0; i < links.length; i++) {
-        links[i].addEventListener("click", function () {
-            for (var i = 0; i < links.length; i++) {
-                links[i].removeAttribute("data-selected");
-            }
-            this.setAttribute("data-selected", "selected");
-            application.offCanvas(Transition.OFF_CANVASS_NONE); 
-        });
-    }
-});
+application.addEventListener(Application.READY, highlightFooterButton);
+application.addEventListener(Card.EXIT, highlightFooterButton);
 
-application.addEventListener(Card.ENTER, function (e) {
-    var h1 = application.header.querySelector("h1");
-    h1.innerHTML = application.currentCard.title;
+function highlightFooterButton(event) {
+    var buttons = application.footer.querySelectorAll("button");
+    
+    for (var i = 0; i < buttons.length; i++) {
+        buttons[i].style.color = null;
+    }
+    
+    var button = [Home, Code].indexOf(event.detail.to);
+    buttons[button].style.color = "#6CCAEC";
+}
+                             
+application.addEventListener(Card.ENTER, function (event) {
+    var title = application.header.querySelector("h1");
+    title.innerHTML = application.currentCard.title;
 });

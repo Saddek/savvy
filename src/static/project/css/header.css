@@ -1,10 +1,8 @@
-.fa {
-    /* reset for FontAwesome */
-    color:inherit;
-}
-
 button {
     position: absolute;
     top: 0px;
-    left: 8px;
+    left: 0px;
+    /* Add padding to increase contact area: https://en.wikipedia.org/wiki/Fitts%27s_law */
+    padding-left: 8px;
+    padding-right: 8px;
 }

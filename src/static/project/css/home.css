@@ -1,11 +1,8 @@
-.welcome {
-    text-align: center;
-    text-transform: uppercase;
-    font-family: "Roboto Slab Regular", sans-serif;
-    font-size: 120%;
+p {
+    text-align:center;
 }
 
-.welcome img {
-    height: 50%;
-    width: auto;
+img {
+    height: 220px;
+    width: 220px;
 }

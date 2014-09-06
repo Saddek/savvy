@@ -130,7 +130,8 @@ body > main > footer {
     input[type="button"]:active,
     input[type="reset"]:active,
     input[type="submit"]:active {
-        background-color: mix($highlight, black, 10%);
+        color: $highlight-dark;
+        background-color: mix($highlight, black, 15%);
     }
 }
 
