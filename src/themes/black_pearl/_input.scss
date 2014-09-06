@@ -192,7 +192,9 @@ html.svg input[type="checkbox"]:checked {
 
 @-moz-document url-prefix() {
     /* Due to: https://bugzilla.mozilla.org/show_bug.cgi?id=605985 */
+    html.svg input[type="radio"]:checked,
     input[type="radio"]:checked { background-image: none; }
+    html.svg input[type="checkbox"]:checked,
     input[type="checkbox"]:checked { background-image: none; }
 }
 
@@ -203,6 +205,7 @@ fieldset {
 
 legend {
 	font-family: "Roboto Light", sans-serif;
+    font-weight: 300;
     color: $dark;
 	padding-right: 0.5em;
 	padding-left: 0.5em;

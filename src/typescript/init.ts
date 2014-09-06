@@ -145,10 +145,8 @@ module Savvy {
             // FIXME: why doesn't the header and footer CSS apply immediately?
             setCardsCSS(); // force the card css to fill the screen
             // remove all the fouc prevention styles
-            var styles:NodeList = document.querySelectorAll("style[data-fouc='true']");
-            for (var i:number = 0; i < styles.length; i++) {
-                styles[i].parentNode.removeChild(styles[i]);
-            }
+            var fouc = document.querySelector("style[data-fouc]");
+            fouc.parentNode.removeChild(fouc);
             application.goto(application.getRoute(), Transition.CUT, true);
         }, 250); // 250ms delay
     }

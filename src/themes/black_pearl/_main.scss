@@ -16,7 +16,7 @@ body > main > header {
    
     box-shadow: 0 0 7px rgba(0, 0, 0, 0.66);
     color: $light;
-    padding: 0px;
+    padding: 0px round($fontsize / 2);
 }
 
 body > main > footer {

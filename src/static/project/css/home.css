@@ -3,10 +3,9 @@
     text-transform: uppercase;
     font-family: "Roboto Slab Regular", sans-serif;
     font-size: 120%;
+}
 
-    img {
-        height: 50%;
-        width: auto;
-    }
-
+.welcome img {
+    height: 50%;
+    width: auto;
 }

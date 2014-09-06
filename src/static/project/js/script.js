@@ -1,18 +1,18 @@
-// when the application is ready, set up touch events
-application.addEventListener(Application.READY, function(e) {
-
-    var hammertime = new Hammer(application.main, {});
-    hammertime.on("swipeleft", function(ev) {
-        application.offCanvas("0px");
-    });
-    hammertime.on("swiperight", function(ev) {
-        application.offCanvas(Transition.OFF_CANVASS_LEFT);
-    });
-    
+application.addEventListener(Application.READY, function (e) {
     var links = application.querySelectorAll("nav a");
+    links[0].setAttribute("data-selected", "selected");
     for (var i = 0; i < links.length; i++) {
         links[i].addEventListener("click", function () {
-            application.offCanvas("0px"); 
+            for (var i = 0; i < links.length; i++) {
+                links[i].removeAttribute("data-selected");
+            }
+            this.setAttribute("data-selected", "selected");
+            application.offCanvas(Transition.OFF_CANVASS_NONE); 
         });
     }
+});
+
+application.addEventListener(Card.ENTER, function (e) {
+    var h1 = application.header.querySelector("h1");
+    h1.innerHTML = application.currentCard.title;
 });

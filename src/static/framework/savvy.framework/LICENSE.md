@@ -1,6 +1,6 @@
 The MIT License (MIT)
 
-Copyright (C) 2009-2014 Kristopher Michael Kowal and contributors
+Copyright (c) 2013 TVTextbook Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

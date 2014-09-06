@@ -57,7 +57,7 @@ $highlight-dark: darken($highlight, 12.5%);
 $highlight-light: lighten($highlight, 12.5%);
 
 $header: 42px;
-$footer: 42px;
+$footer: 52px;
 $fontsize: 16px;
 
 @mixin calc($property, $expression) { 
@@ -72,5 +72,3 @@ $fontsize: 16px;
 @import "input";
 @import "buttons";
 @import "tables";
-@import "off-canvas";
-

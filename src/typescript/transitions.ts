@@ -27,9 +27,9 @@ module Transition {
 
 
     export var SLIDE_RIGHT:Transition = {
-        from: "transition -d500ms -ease-in-out -out -right",
-        to: "transition -d500ms -ease-in-out -in -right",
-        duration: 500,
+        from: "transition -d333ms -ease-in-out -out -right",
+        to: "transition -d333ms -ease-in-out -in -right",
+        duration: 333,
         inverse: null
     }
     
