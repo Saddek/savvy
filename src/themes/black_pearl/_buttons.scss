@@ -113,6 +113,9 @@ body > main > header {
         line-height: round($header / 2);
         font-size: round($header / 2);
         margin: 0px;
+        /* Add padding to increase contact area: https://en.wikipedia.org/wiki/Fitts%27s_law */
+        padding-left: ($fontsize / 2);
+        padding-right: ($fontsize / 2);
     }
 }
 
