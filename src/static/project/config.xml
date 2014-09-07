@@ -30,12 +30,12 @@
             <css>css/footer.css</css>
         </footer>
 
-        <card id="Home" title="Welcome to Savvy" default="yes">
+        <card id="Home" title="Savvy is Running" default="yes">
             <html>html/home.html</html>
             <css>css/home.css</css>
         </card>
         
-        <card id="Code" title="Developing and Licensing">
+        <card id="Code" title="Code Savvy">
             <html>html/code.html</html>
         </card>
         
