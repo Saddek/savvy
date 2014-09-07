@@ -342,7 +342,7 @@ module Savvy {
                 
                 // now remove references to headers, footers and cards
                 // FIXME: what is the user is selecting a legitimate header, footer, etc.?
-                switch (element.nodeName) {
+                switch (element.nodeName.toLowerCase()) {
                     case "header":
                         content = content.replace(regex.css.header, "$1");
                         break;
