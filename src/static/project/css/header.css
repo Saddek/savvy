@@ -1,23 +1,30 @@
-header {
-    height: 42px;
-    background-color: white;
-    color: black;
-    box-shadow: none;
-    border-bottom: 1px solid lightGrey;
-}
+/*
 
-h1 {
-    font-family: "Roboto Light", sans-serif;
-    font-weight: 300;
-}
+    # Instead of creating a whole new theme,
+    # an existing theme header can be tweaked as below:
 
-button {
-    color: black;
-}
+    header {
+        height: 42px;
+        background-color: white;
+        color: black;
+        box-shadow: none;
+        border-bottom: 1px solid lightGrey;
+    }
 
-button:active {
-    color: grey;
-}
+    h1 {
+        font-family: "Roboto Light", sans-serif;
+        font-weight: 300;
+    }
+
+    button {
+        color: black;
+    }
+
+    button:active {
+        color: grey;
+    }
+
+*/
 
 button {
     position: absolute;
