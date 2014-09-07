@@ -5,11 +5,11 @@ function highlightFooterButton(event) {
     var buttons = application.footer.querySelectorAll("button");
     
     for (var i = 0; i < buttons.length; i++) {
-        buttons[i].style.color = null;
+        buttons[i].removeAttribute("data-selected");
     }
     
     var button = [Home, Code].indexOf(event.detail.to);
-    buttons[button].style.color = "#6CCAEC";
+    buttons[button].setAttribute("data-selected", "true");
 }
                              
 application.addEventListener(Card.ENTER, function (event) {
