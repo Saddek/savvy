@@ -258,7 +258,10 @@ function compress() {
             log("Optomising: " + Path.relative(out, path));
             var source = FS.readFileSync(path);
             /* FIXME: @this does not work is noAdvanced is false */
-            var minimized = new CleanCSS({noAdvanced: true}).minify(source);
+            var minimized = new CleanCSS({
+                noAdvanced: true,
+                keepSpecialComments: 0 /* because any comments can cause problems for the run-time RegEx */
+            }).minify(source);
             // FIXME: this doesn't catch any errors
             FS.writeFileSync(path, minimized);
         }
