@@ -1,6 +1,7 @@
 @this {
     height: 46px;
     padding: 0px;
+    border-top: 1px solid #EFEFEF;
 }
 
 button,
@@ -10,11 +11,11 @@ button:active {
     border: none;
     border-radius: 0px;
     background: transparent;
-    color: rgba(34, 34, 34, 0.66);
+    color: rgba(34, 34, 34, 0.50);
     font-size: 24px;
 }
 
 /* data-selected is added by script.js */
 button[data-selected] {
-    color: hsl(196, 68%, 34%); //33B5E5
+    color: #249ecb;
 }

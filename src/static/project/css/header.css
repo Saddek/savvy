@@ -1,5 +1,7 @@
 @this {
     height: 42px;
+    padding: 0px;
+    border-bottom: 1px solid #EFEFEF;
 }
 
 h1 {
