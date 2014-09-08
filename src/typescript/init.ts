@@ -142,13 +142,13 @@ module Savvy {
     function start():void {
         parseWidgetXML(config.widget["savvy:deck"]);
         setTimeout(function(){
-            // FIXME: why doesn't the header and footer CSS apply immediately?
-            setCardsCSS(); // force the card css to fill the screen
             // remove all the fouc prevention styles
             var fouc = document.querySelector("style[data-fouc]");
             fouc.parentNode.removeChild(fouc);
+            // FIXME: why doesn't the header and footer CSS apply immediately?
+            setCardsCSS(); // force the card css to fill the screen
             application.goto(application.getRoute(), Transition.CUT, true);
-        }, 250); // 250ms delay
+        }, 0); // 250ms delay
     }
     
     /**
@@ -296,10 +296,8 @@ module Savvy {
                 doubleQuotes: /url\("(?!https?:\/\/)(?!\/)/gi,
                 noQuotes: /url\((?!https?:\/\/)(?!['"]\/?)/gi
             },
-            header: /\bheader\b(,(?=[^}]*{)|\s*{)/gi,
-            card: /\bcard\b(,(?=[^}]*{)|\s*{)/gi,
-            footer: /\bfooter\b(,(?=[^}]*{)|\s*{)/gi,
-            selector: /([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/gi
+            at_this: /(^|[,{}])(\s*)(@this)([^,{}]*)(,(?=[^}]*{)|\s*{)/gi,
+            selector: /([^,{}]+)(,(?=[^}]*{)|\s*{)/gi
 		}
 	}
 
@@ -314,13 +312,13 @@ module Savvy {
     function appendCssToHeadFromUrl(url:string, element:HTMLElement):void {
         var isAbsolute:boolean = regex.isRemoteUrl.test(url);
         
-        var selector:string = (element == document.body) ? null
+        var selector:string = (element == document.body) ? "html > body"
             : (element.id == "")
-            ? element.nodeName
-            : element.nodeName + "#" + element.id;
+                ? "html > body > main > " + element.nodeName
+                : "html > body > main > " + element.nodeName + "#" + element.id;
 
-        if (isAbsolute && selector) {
-            throw "Card styles sheets cannot be remote (e.g. http://www.examples.com/style.css). Please include remote style sheets globally.";
+        if (isAbsolute && element != document.body) {
+            throw "Only global style sheets cannot be remote (e.g. http://www.examples.com/style.css). Please include remote style sheets globally.";
         }
         if (isAbsolute) {
             var node:HTMLElement;
@@ -333,27 +331,17 @@ module Savvy {
             var node:HTMLElement;
             node = document.createElement("style");
             node.setAttribute("type", "text/css");
+            
             var content:string = read(url);
-            if (selector) {
-                // first replace selectors with a the scoped selector
-                content = content.replace(regex.css.selector, "body > main > " + selector + " $1$2");
+            if (element != document.body) {
+                content = content.replace(regex.css.selector, selector + " $1$2");
                 // next, back out where the above mistook media queries, etc. for selectors
-                content = content.replace("body > main > " + selector + " @", "@");
-                
-                // now remove references to headers, footers and cards
-                // FIXME: what is the user is selecting a legitimate header, footer, etc.?
-                switch (element.nodeName.toLowerCase()) {
-                    case "header":
-                        content = content.replace(regex.css.header, "$1");
-                        break;
-                    case "footer":
-                        content = content.replace(regex.css.footer, "$1");
-                        break;
-                    default:
-                        content = content.replace(regex.css.card, "$1");
-                        break;
-                }
+                content = content.replace(new RegExp(selector + "\\s*@", "gi"), "@");
             }
+            
+            // remove references to @this and replace with selector
+            content = content.replace(regex.css.at_this, "$1$2" + selector + " $4$5");
+            
             var i:number = url.toString().lastIndexOf("/");
             if(i != -1) {
                 var dir:string = url.toString().substr(0, i + 1);

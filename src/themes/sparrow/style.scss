@@ -50,8 +50,6 @@ $highlight: #33B5E5;
 $highlight-dark: darken($highlight, 12.5%);
 $highlight-light: lighten($highlight, 12.5%);
 
-$header: 42px;
-$footer: 52px;
 $fontsize: 16px;
 
 @mixin calc($property, $expression) { 

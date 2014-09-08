@@ -60,6 +60,9 @@ html {
     -moz-font-smoothing: antialiased;
     -ms-font-smoothing: antialiased;
     font-smoothing: antialiased;
+    
+    background: black;
+    color: white;
 }
 
 body {
@@ -73,16 +76,13 @@ body {
     -moz-transform: -moz-rotateZ(360deg);
     -ms-transform: -ms-rotateZ(360deg);
     transform: rotateZ(360deg);
+    box-sizing: border-box;
 }
 
 html, body {
     height:100%;
     width: 100%;
     overflow: hidden;
-}
-
-body {
-    box-sizing: border-box;
 }
 
 body > main {
@@ -107,7 +107,7 @@ body > main > footer {
     width: 100%;
     height: 0%;
     box-sizing: border-box;
-    overflow: visible;
+    overflow: hidden;
 }
 
 body > main > header {
@@ -120,6 +120,7 @@ body > main > footer {
     bottom: 0%;
     left: 0px;
     z-index: 5;
+    box-sizing: border-box;
 }
 
 body > main > section {
@@ -128,8 +129,8 @@ body > main > section {
     left: 0px;
     width: 100%;
     hieght: 100%;
-    box-sizing: border-box;
     display: none;
     z-index: 0;
     overflow: auto;
+    box-sizing: border-box;
 }

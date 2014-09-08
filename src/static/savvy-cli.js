@@ -247,6 +247,7 @@ var compressor_options = {
     drop_console: (!argv.console)
 };
 
+var at_rule = /(^|[,{}])(\s*)(@this)([^,{}]*)(,(?=[^}]*{)|\s*{)/gi;
 function compress() {
     var walker = Walk.walk(out_rel, options);
     walker.on("file", function (root, file, next) {
@@ -256,7 +257,8 @@ function compress() {
             var path = Path.resolve(root, file.name);
             log("Optomising: " + Path.relative(out, path));
             var source = FS.readFileSync(path);
-            var minimized = new CleanCSS().minify(source);
+            /* FIXME: @this does not work is noAdvanced is false */
+            var minimized = new CleanCSS({noAdvanced: true}).minify(source);
             // FIXME: this doesn't catch any errors
             FS.writeFileSync(path, minimized);
         }
@@ -361,7 +363,7 @@ function xml() {
                 href = (result.widget.author[0]) ? result.widget.author[0].$.href.toString() : "";
             }
             
-            var theme = (result.widget.$.theme) ? result.widget.$.theme : "";
+            var theme = (result.widget.$.theme) ? result.widget.$.theme.toLowerCase() : "";
             if (theme == "none") theme = "";
             
             var author_long = author;

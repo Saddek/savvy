@@ -1,33 +1,24 @@
-/*
+@this {
+    height: 42px;
+}
 
-    # Instead of creating a whole new theme,
-    # an existing theme header can be tweaked as below:
+h1 {
+    font-family: "Roboto Light", sans-serif;
+    font-weight: 300;
+    text-align: center;
+    text-transform: uppercase;
+}
 
-    header {
-        height: 42px;
-        background-color: white;
-        color: black;
-        box-shadow: none;
-        border-bottom: 1px solid lightGrey;
-    }
-
-    h1 {
-        font-family: "Roboto Light", sans-serif;
-        font-weight: 300;
-    }
-
-    button {
-        color: black;
-    }
-
-    button:active {
-        color: grey;
-    }
-
-*/
-
-button {
+button,
+button:active {
     position: absolute;
     top: 0px;
     left: 0px;
+    height: 100%;
+    padding: 0px 8px;
+    border: none;
+    border-radius: 0px;
+    background: transparent;
+    
+    color: inherit;
 }

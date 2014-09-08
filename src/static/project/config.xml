@@ -2,7 +2,7 @@
 <widget xmlns       = "http://www.w3.org/ns/widgets"
         xmlns:gap   = "http://phonegap.com/ns/1.0"
         xmlns:savvy = "https://savvy.example.com/ns/1.0"
-        id="com.example.savvy" version="1.0.0" theme="black">
+        id="com.example.savvy" version="1.0.0" theme="sparrow">
     
     <name>Savvy Example</name>
     <description>
@@ -14,11 +14,12 @@
     
     <savvy:deck>
 
+        <css>assets/fonts/font-awesome-4.1.0/css/font-awesome.min.css</css>
+        <css>css/vendor/animate.css</css>
+        
         <html>html/off-canvas.html</html>
         <css>css/off-canvas.css</css>
         <js>js/script.js</js>
-        
-        <css>assets/fonts/font-awesome-4.1.0/css/font-awesome.min.css</css>
                 
         <header>
             <html>html/header.html</html>

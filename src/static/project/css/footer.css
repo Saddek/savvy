@@ -1,37 +1,20 @@
-/*
+@this {
+    height: 46px;
+    padding: 0px;
+}
 
-    # Instead of creating a whole new theme,
-    # an existing theme footer can be tweaked as below:
-
-    footer {
-        height: 42px;
-        background-color: white;
-        color: black;
-        box-shadow: none;
-        border-top: 1px solid lightGrey;
-    }
-
-    h1 {
-        font-family: "Roboto Light", sans-serif;
-        font-weight: 300;
-    }
-
-    button {
-        color: black;
-    }
-
-    button:active {
-        background-color: transparent;
-    }
-
-*/
-
-button {
-    /* 100% of the space divided between 2 buttons */
+button,
+button:active {
     width: 50%;
+    height: 100%;
+    border: none;
+    border-radius: 0px;
+    background: transparent;
+    color: rgba(34, 34, 34, 0.66);
+    font-size: 24px;
 }
 
 /* data-selected is added by script.js */
 button[data-selected] {
-    color: #6CCAEC;
+    color: hsl(196, 68%, 34%); //33B5E5
 }
