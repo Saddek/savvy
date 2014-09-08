@@ -13,16 +13,8 @@ body > main  {
     box-shadow: 0 0 14px rgba(0, 0, 0, 0.66);
 }
 
-body > main > section {
+body > main > * {
     background-color: $white;
     color: $dark;
     padding: round($fontsize/2); 
-}
-
-body > main > header,
-body > main > footer {
-    background-color: $white;
-    color: $dark;
-    padding: 0px round($fontsize/2); 
-    box-shadow: 0 0 7px rgba(0, 0, 0, 0.66);
 }
