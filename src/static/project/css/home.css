@@ -5,6 +5,7 @@ p {
 img {
     height: 220px;
     width: 220px;
+    cursor: pointer;
 }
 
 @media (min-height: 420px) {
