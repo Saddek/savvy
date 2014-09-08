@@ -15,7 +15,6 @@
     <savvy:deck>
 
         <css>assets/fonts/font-awesome-4.1.0/css/font-awesome.min.css</css>
-        <css>css/vendor/animate.css</css>
         
         <html>html/off-canvas.html</html>
         <css>css/off-canvas.css</css>
@@ -34,6 +33,7 @@
         <card id="Home" title="Savvy is Running" default="yes">
             <html>html/home.html</html>
             <css>css/home.css</css>
+            <css>css/bounce-in.css</css>
         </card>
         
         <card id="Code" title="Code Savvy">
