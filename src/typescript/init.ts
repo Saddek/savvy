@@ -296,8 +296,8 @@ module Savvy {
                 doubleQuotes: /url\("(?!https?:\/\/)(?!\/)/gi,
                 noQuotes: /url\((?!https?:\/\/)(?!['"]\/?)/gi
             },
-            at_this: /(^|[,{}])(\s*)(@this)([^,{}]*)(,(?=[^}]*{)|\s*{)/gi,
-            selector: /([^,{}]+)(,(?=[^}]*{)|\s*{)/gi
+            at_this: /(^|[,{}])(\s*)(@-savvy-this)([^,{}]*)(,(?=[^}]*{)|\s*{)/gi,
+            selector: /([-_a-zA-Z\.#*:][^,{}]*)(,(?=[^}]*{)|\s*{)/gi
 		}
 	}
 
@@ -335,8 +335,8 @@ module Savvy {
             var content:string = read(url);
             if (element != document.body) {
                 content = content.replace(regex.css.selector, selector + " $1$2");
-                // next, back out where the above mistook media queries, etc. for selectors
-                content = content.replace(new RegExp(selector + "\\s*@", "gi"), "@");
+                // now, back out where the above mistook media queries, etc. for selectors
+                content = content.replace(new RegExp("@" + selector + " ", "gi"), "@");
             }
             
             // remove references to @this and replace with selector
