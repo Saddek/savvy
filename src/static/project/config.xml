@@ -12,6 +12,8 @@
         John Smith
     </author>
     
+    <icon src="icon.png" />
+    
     <savvy:deck>
 
         <css>assets/fonts/font-awesome-4.1.0/css/font-awesome.min.css</css>
