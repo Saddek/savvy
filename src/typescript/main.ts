@@ -141,7 +141,8 @@ module Savvy {
     }
 
     function onEnter(detail:any, path:string, preventHistory:boolean) {
-        document.title = (detail.to.title || "");
+        // Removed so that the app title is always the window title (helps with setting home screen icon title)
+        // document.title = (detail.to.title || "");
         if(!preventHistory) {
             ignoreHashChange = true;
             window.location.hash = "!/" + path;
