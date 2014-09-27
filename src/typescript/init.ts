@@ -342,7 +342,7 @@ module Savvy {
                 content = content.replace(new RegExp("@" + selector + " ", "gi"), "@");
             }
             
-            // remove references to @this and replace with selector
+            // remove references to @-savvy-this and replace with selector
             content = content.replace(regex.css.at_this, "$1$2" + selector + " $4$5");
             
             var i:number = url.toString().lastIndexOf("/");
