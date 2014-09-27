@@ -26,17 +26,21 @@ function highlightFooterButton(event) {
 application.addEventListener(Application.READY, function (event) {
     var x, t;
     application.main.addEventListener("touchstart", function(e){
-        x = e.changedTouches[0].screenX;
-        t = new Date().getTime();
+        if (e.changedTouches) {
+            x = e.changedTouches[0].screenX;
+            t = new Date().getTime();
+        }
     });
 
     application.main.addEventListener("touchend", function(e){
-        var d = e.changedTouches[0].screenX - x;
-        var e = (new Date().getTime()) - t;
-        
-        if (Math.abs(d) < 50) return;
-        if (e > 300) return;
-        if (d < 0) application.offCanvas(Transition.OFF_CANVASS_NONE);
-        else application.offCanvas(Transition.OFF_CANVASS_LEFT);
+        if (e.changedTouches) {
+            var d = e.changedTouches[0].screenX - x;
+            var e = (new Date().getTime()) - t;
+
+            if (Math.abs(d) < 50) return;
+            if (e > 300) return;
+            if (d < 0) application.offCanvas(Transition.OFF_CANVASS_NONE);
+            else application.offCanvas(Transition.OFF_CANVASS_LEFT);
+        }
     });
 });
