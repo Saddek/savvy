@@ -16,6 +16,12 @@
         
         <meta name="robots" content="nofollow" />
         
+        <!-- iPhone-specific settings suitable for HTML-based apps:
+             https://developer.apple.com/library/safari/#codinghowtos/Mobile/UserExperience/_index.html -->
+        <!-- Hide the URL bar when running the app from the iPhone Home screen -->
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
         <!-- Enable icon on iOS and Android webapps -->
         <link rel="apple-touch-icon-precomposed" type="image/png" href="icon.png">
 
@@ -38,19 +44,13 @@
         <!-- Mobile viewport optimized and user sclaing and zooming disabled: h5bp.com/viewport -->
         <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
 
-        <!-- iPhone-specific settings suitable for HTML-based apps:
-             https://developer.apple.com/library/safari/#codinghowtos/Mobile/UserExperience/_index.html -->
-        <!-- Hide the URL bar when running the app from the iPhone Home screen -->
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-
         <!-- Do not attempt to automatically detect phone numbers -->
         <meta name="format-detection" content="telephone=no" />
 
         <!-- enable ClearType on IE -->
         <meta http-equiv="cleartype" content="on">
 
-        <style data-fouc>
+        <style data-fouc="true">
             /*
                 These styles are to improve the appearance of the app while
                 it is loading. This style block will be removed programatically
@@ -68,11 +68,11 @@
             <script src="savvy.framework/libs/js/es5-shim/es5-sham.min.js" type="application/javascript"></script>
 
             <!-- FastClick - Remove the 300ms delay from touch events. -->
-            <script type='application/javascript' src='savvy.framework/libs/js/fastclick/fastclick.js'></script>
-            <script>
+            <script type="application/javascript" src="savvy.framework/libs/js/fastclick/fastclick.min.js"></script>
+            <script type="application/javascript">
                 // add fast click to the window
-                window.addEventListener("load", function addFastClick() {
-                    window.removeEventListener("load", addFastClick); // remove self
+                window.addEventListener("load", function initFastClick() {
+                    window.removeEventListener("load", initFastClick); // remove self
                     FastClick.attach(document.body);
                 });
             </script>
@@ -119,7 +119,7 @@
                                                            ./"     
                                                           ~`       
 
-
+    v{{version}}
                                                            --//-->
 
     </body>
