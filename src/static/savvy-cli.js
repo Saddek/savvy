@@ -190,6 +190,8 @@ var sass = /\.scss$/i;
 var less = /\.less$/i;
 var handlebars = /\.handlebars$/i;
 
+var asmFiles = [];
+
 function compile() {
     var walker = Walk.walk(out_rel, options);
     walker.on("file", function (root, file, next) {
@@ -204,6 +206,9 @@ function compile() {
         if (less.test(file.name)) cmd = "lessc " + path + " " + path2 + ".css";
         if (handlebars.test(file.name)) cmd = "handlebars " + path + " --output " + path2 + ".js";
 
+        // note asm files for later, since we will NEVER compess them
+        if (cpp.test(file.name)) asmFiles.push(path2 + ".js");
+        
         if (cmd) {
             log("Compiling: " + Path.relative(out, path));
             Exec(cmd, function (error, stdout, stderr) {
@@ -217,8 +222,7 @@ function compile() {
     });
 
     walker.on("end", function () {
-        if (argv.nocompress) remove();
-        else compress();
+        compress();
     });
 }
 
@@ -266,11 +270,13 @@ function compress() {
             FS.writeFileSync(path, minimized);
         }
         
-        if (javascript.test(file.name)) {
+        if (javascript.test(file.name) && !argv.nocompress) {
             // compress js
             var path = Path.resolve(root, file.name);
+            var isAsm = (asmFiles.indexOf(path) > -1);
             var path_rel = Path.relative(out, path);
-            if (path_rel != "cordova.js") {
+            // never compress cordova.js, cordova_plugins.js or an ASM file
+            if (path_rel != "cordova.js" && path_rel != "cordova_plugins.js" && !isAsm) {
                 log("Optomising: " + Path.relative(out, path_rel));
                 var rel = Path.relative(out, root);
                 var map = Path.join(rel, file.name + ".map");
