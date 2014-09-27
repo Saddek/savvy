@@ -381,7 +381,8 @@ function xml() {
                 description: escape2(description),
                 author: escape2(author_long),
                 manifest: (argv.nocache) ? "" : "manifest.appcache",
-                theme: theme
+                theme: theme,
+                version: package.version
             }));
     
             var version = (result.widget.$.version) ? result.widget.$.version : "";
