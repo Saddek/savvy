@@ -145,10 +145,13 @@ module Savvy {
             // remove all the fouc prevention styles
             var fouc = document.querySelector("style[data-fouc]");
             fouc.parentNode.removeChild(fouc);
-            // FIXME: why doesn't the header and footer CSS apply immediately?
             setCardsCSS(); // force the card css to fill the screen
+            // set scroll top to 0,0 as hack to fix minimal-ui grey area issue
+            // a more substantial fix is in plugins.js
+            // http://stackoverflow.com/questions/22391157/gray-area-visible-when-switching-from-portrait-to-landscape-using-ios-7-1-minima
+            window.scrollTo(0, 0);
             application.goto(application.getRoute(), Transition.CUT, true);
-        }, 0); // 250ms delay
+        }, 0); // wait for JS event loop
     }
     
     /**
