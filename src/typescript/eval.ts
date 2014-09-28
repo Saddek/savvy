@@ -23,7 +23,7 @@ module Savvy {
     }
     
     function logError(err:Error, url?:string):void {
-        var message = err.name + ": " + err.name;
+        var message = err.name + ": " + err.message;
         if (url) message += " (" + url + ")";
         console.error(message);
     }
