@@ -41,7 +41,7 @@ var package = require(Path.resolve(__dirname, "package.json"));
 // console arguments
 var argv = require("yargs")
            .usage("Builds a Savvy project or creates an empty Savvy project.")
-           .example("$0 -create [target]", "Create an empty project")
+           .example("$0 --create [target]", "Create an empty project")
            .example("$0 --src [source] --out [target]", "Build an application")
            .example("$0 --src [source] --zip [target]", "Build an zipped application")
            .example("$0 --src [source] --port [port]", "Build an application served over HTTP.")
