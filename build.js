@@ -122,6 +122,7 @@ function pack() {
     var _package = require(file);
     package.dependencies = _package.dependencies;
     package.main = _package.main;
+    package.bin = _package.bin;
     package.preferGlobal = _package.preferGlobal;
     
     var json = JSON.stringify(package, null, 4);

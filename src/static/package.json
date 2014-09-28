@@ -17,5 +17,6 @@
         "compression": "~1.0.11"
     },
     "main": "savvy-cli.js",
-    "preferGlobal": true
+    "preferGlobal": true,
+    "bin": "savvy-cli.js"
 }
