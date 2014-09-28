@@ -188,7 +188,6 @@ var coffeescript = /\.coffee$/i;
 var cpp = /\.cpp$/i;
 var sass = /\.scss$/i;
 var less = /\.less$/i;
-var handlebars = /\.handlebars$/i;
 
 var asmFiles = [];
 
@@ -204,7 +203,6 @@ function compile() {
         if (cpp.test(file.name)) cmd = "emcc " + path + " -O2 --memory-init-file 0 -o " + path2 + ".js" ;
         if (sass.test(file.name)) cmd = "sass " + path + " " + path2 + ".css";
         if (less.test(file.name)) cmd = "lessc " + path + " " + path2 + ".css";
-        if (handlebars.test(file.name)) cmd = "handlebars " + path + " --output " + path2 + ".js";
 
         // note asm files for later, since we will NEVER compess them
         if (cpp.test(file.name)) asmFiles.push(path2 + ".js");
@@ -332,8 +330,7 @@ function remove() {
             || (coffeescript.test(file.name))
             || (cpp.test(file.name))
             || (sass.test(file.name))
-            || (less.test(file.name))
-            || (handlebars.test(file.name));
+            || (less.test(file.name));
         
         if (isSourceFile) {
             var path = Path.join(root, file.name);
