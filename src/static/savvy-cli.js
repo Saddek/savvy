@@ -57,7 +57,7 @@ var argv = require("yargs")
            .boolean("nocache")
            .boolean("verbose")
            .boolean("warn")
-           .boolean("console")
+           .boolean("debug")
            .alias("v", "verbose")
            .describe("create", "A directory to initialise with a basic application.")
            .describe("src", "A directory containing the application source.")
@@ -65,11 +65,11 @@ var argv = require("yargs")
            .describe("zip", "A zip file to built the application in.")
            .describe("port", "A HTTP port to serve the built application from.")
            .describe("clean", "Empties the target directory before the operation.")
-           .describe("nocompress", "Disables HTML, CSS and JavaScript compression.")
+           .describe("nocompress", "Disables JavaScript compression.")
            .describe("nocache", "Disables offline caching.")
            .describe("warn", "Show JavaScript compilation warnings.")
            .describe("verbose", "Enable verbose logging.")
-           .describe("console", "Don't strip console commands from JavaScript.")
+           .describe("debug", "Compiles a debug release (e.g. console messags retained).")
            .check(function (argv) {
                if ("string" == typeof argv.create) return true;
                if ("string" == typeof argv.src && "string" == typeof argv.out) return true;
@@ -246,7 +246,7 @@ var compressor_options = {
     cascade: true,
     warnings: (argv.warn || argv.verbose),
     negate_iife: true,
-    drop_console: (!argv.console)
+    drop_console: (!argv.debug)
 };
 
 var at_rule = /(^|[,{}])(\s*)(@this)([^,{}]*)(,(?=[^}]*{)|\s*{)/gi;
