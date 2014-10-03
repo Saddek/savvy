@@ -68,11 +68,13 @@ module Savvy {
 
         initNode(deck, document.body);
         
-        application.main = document.createElement("main");
+        application.main = <HTMLCardElement> document.createElement("main");
+        extendHTMLElement(application.main);
         document.body.appendChild(application.main);
         
         if (deck.header) {
-            application.header = document.createElement("header");
+            application.header = <HTMLCardElement> document.createElement("header");
+            extendHTMLElement(application.header);
             initNode(deck.header, application.header);
             application.main.appendChild(application.header);
         }
@@ -80,7 +82,8 @@ module Savvy {
         initCards(guaranteeArray(deck.card), application.main);
         
         if (deck.footer) {
-            application.footer = document.createElement("footer");
+            application.footer = <HTMLCardElement> document.createElement("footer");
+            extendHTMLElement(application.footer);
             initNode(deck.footer, application.footer);
             application.main.appendChild(application.footer);
         }
@@ -89,6 +92,17 @@ module Savvy {
         window.addEventListener("resize", setCardsCSS);
         
         delete Savvy._eval; // no longer needed
+    }
+    
+    function extendHTMLElement(el) {
+        el.getElementById = (id:string):Element => {
+            return el.querySelector("#" + id);
+        }
+
+
+        el.getElementsByName = (name:string):NodeList => {
+            return el.getElementsByTagName(name);
+        }
     }
     
     function setCardsCSS():void {
@@ -126,7 +140,8 @@ module Savvy {
             var id = node["@id"];
             var title = node["@title"];
             
-            var section = document.createElement("section");
+            var section = <HTMLCardElement> document.createElement("section");
+            extendHTMLElement(section);
             section.setAttribute("id", id);
             section.setAttribute("title", title);
 
@@ -135,7 +150,7 @@ module Savvy {
             application.cards.push(section); // add to the array of cards
             if (node['@default'] !== undefined) {
                 if (application.defaultCard === null) {
-                    application.defaultCard = section;
+                    application.defaultCard = <HTMLCardElement> section;
                 } else {
                     console.warn("More than one card is set as the default in config.xml. Ignoring.");
                 }

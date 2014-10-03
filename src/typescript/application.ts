@@ -2,6 +2,11 @@ module Application {
     export var READY:string = "savvy-load";
 }
 
+interface HTMLCardElement extends HTMLElement {
+    getElementById(id:string):Element;
+    getElementsByName(name:string):NodeList;
+}
+
 // extend the Navigator interface so that TypeScript
 // knows about the standalone property
 interface Navigator {
@@ -22,12 +27,12 @@ module application {
         href: null
     }
     
-    export var cards:HTMLElement[] = [];
-    export var header:HTMLElement = null;
-    export var footer:HTMLElement = null;
-    export var main:HTMLElement = null;
-    export var defaultCard:HTMLElement = null;
-    export var currentCard:HTMLElement = null;
+    export var cards:HTMLCardElement[] = [];
+    export var header:HTMLCardElement = null;
+    export var footer:HTMLCardElement = null;
+    export var main:HTMLCardElement = null;
+    export var defaultCard:HTMLCardElement = null;
+    export var currentCard:HTMLCardElement = null;
     
     export function goto(path:string, transition:Transition = Transition.CUT, preventHistory:boolean = false):void {
         throw "application.goto has not been over-written. Is there a problem with the order that Savvy is built?";

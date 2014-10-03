@@ -15,7 +15,7 @@ module Savvy {
         } else {
             var path:string = application.getRoute();
             var id:string = getIdForPath(path);
-            var card = document.getElementById(id);
+            var card = <HTMLCardElement> document.getElementById(id);
             if (application.cards.indexOf(card) > -1) {
                 // don't load a route that doesn't exist
                 application.goto(path, Transition.CUT, true);
@@ -45,8 +45,8 @@ module Savvy {
     function goto(path:string, transition:Transition = Transition.CUT, preventHistory:boolean = false):void {
         // FIXME: need to add a queuing sytem so that transitions don't get muddled up if done in quick succession
         var id:string = getIdForPath(path);
-        var to:HTMLElement = document.getElementById(id);
-        var from:HTMLElement = application.currentCard;
+        var to:HTMLCardElement = <HTMLCardElement> document.getElementById(id);
+        var from:HTMLCardElement = application.currentCard;
         
         if (to == from) {
             console.warn("Application was asked to go to current card. Ignoring.");
