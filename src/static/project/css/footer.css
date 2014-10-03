@@ -13,9 +13,10 @@ button:active {
     background: transparent;
     color: rgba(34, 34, 34, 0.50);
     font-size: 24px;
+    float: left;
 }
 
 /* data-selected is added by script.js */
-button[data-selected] {
+button[data-selected="true"] {
     color: #249ecb;
 }

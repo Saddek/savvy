@@ -20,6 +20,8 @@
         
         <html>html/off-canvas.html</html>
         <css>css/off-canvas.css</css>
+        <js>js/header.js</js>
+        <js>js/footer.js</js>
         <js>js/script.js</js>
                 
         <header>
@@ -32,14 +34,16 @@
             <css>css/footer.css</css>
         </footer>
 
-        <card id="Home" title="Welcome" default="yes">
-            <html>html/home.html</html>
-            <css>css/home.css</css>
+        <card id="Card1" title="Card 1" default="yes">
+            <html>html/card1.html</html>
+            <css>css/card1.css</css>
+            <js>js/card1.js</js>
         </card>
         
-        <card id="Cordova" title="Apache Cordova">
-            <html>html/cordova.html</html>
-            <css>css/cordova.css</css>
+        <card id="Card2" title="Card 2">
+            <html>html/card2.html</html>
+            <css>css/card2.css</css>
+            <js>js/card2.js</js>
         </card>
         
     </savvy:deck>

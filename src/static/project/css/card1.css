@@ -1,0 +1,9 @@
+@-savvy-this {
+    text-align: center;
+}
+
+@media (min-width: 768px) {
+    @-savvy-this {
+        /* example media quiery */
+    }
+}
