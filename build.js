@@ -59,7 +59,7 @@ var location = {};
 location.dist = path.resolve("dist");
 location.src = path.resolve("src");
 location.banner = path.join(location.dist, "banner.txt");
-location.copyright = path.join(location.src, "copyright.txt");
+location.copyright = path.join(location.dist, "copyright.txt");
 
 var compress = {
     sequences: true,

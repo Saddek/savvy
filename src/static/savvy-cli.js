@@ -58,19 +58,22 @@ var argv = require("yargs")
            .boolean("verbose")
            .boolean("warn")
            .boolean("debug")
+           .boolean("copyright")
            .alias("v", "verbose")
-           .describe("create", "A directory to initialise with a basic application.")
-           .describe("src", "A directory containing the application source.")
-           .describe("out", "A directory to build the application in.")
-           .describe("zip", "A zip file to built the application in.")
-           .describe("port", "A HTTP port to serve the built application from.")
            .describe("clean", "Empties the target directory before the operation.")
-           .describe("nocompress", "Disables JavaScript compression.")
-           .describe("nocache", "Disables offline caching.")
-           .describe("warn", "Show JavaScript compilation warnings.")
-           .describe("verbose", "Enable verbose logging.")
+           .describe("copyright", "Display copyright information.")
+           .describe("create", "A directory to initialise with a basic application.")
            .describe("debug", "Compiles a debug release (e.g. console messags retained).")
+           .describe("nocache", "Disables offline caching.")
+           .describe("nocompress", "Disables JavaScript compression.")
+           .describe("out", "A directory to build the application in.")
+           .describe("port", "A HTTP port to serve the built application from.")
+           .describe("src", "A directory containing the application source.")
+           .describe("verbose", "Enable verbose logging.")
+           .describe("warn", "Show JavaScript compilation warnings.")
+           .describe("zip", "A zip file to built the application in.")
            .check(function (argv) {
+               if (argv.copyright) return true;
                if ("string" == typeof argv.create) return true;
                if ("string" == typeof argv.src && "string" == typeof argv.out) return true;
                if ("string" == typeof argv.src && "string" == typeof argv.zip) return true;
@@ -81,6 +84,11 @@ var argv = require("yargs")
 
 var banner = FS.readFileSync(Path.resolve(__dirname, "banner.txt"));
 console.info(banner.toString());
+
+if (argv.copyright) {
+    var copyright = FS.readFileSync(Path.resolve(__dirname, "copyright.txt"));
+    console.info(copyright.toString());
+}
 
 var OS = require('os')
 var NCP = require("ncp").ncp;
@@ -369,7 +377,7 @@ function xml() {
                 href = (result.widget.author[0]) ? result.widget.author[0].$.href.toString() : "";
             }
             
-            var theme = (result.widget.$.theme) ? result.widget.$.theme.toLowerCase() : "";
+            var theme = (result.widget.$["savvy:theme"]) ? result.widget.$["savvy:theme"].toLowerCase() : "";
             if (theme == "none") theme = "";
             
             var author_long = author;
